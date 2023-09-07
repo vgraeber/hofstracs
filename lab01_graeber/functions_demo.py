@@ -10,4 +10,6 @@ def compuuteSum(nums):
 
 def main():
   quiz = []98, 78, 79, 83, 87]
-  return computeSum(quiz)
+  print("Sum: ",computeSum(quiz))
+
+main()
