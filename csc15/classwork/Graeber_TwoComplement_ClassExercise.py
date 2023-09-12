@@ -5,7 +5,7 @@ def toBin(n):
   binN = []
   while (n != 0):
     binN.append(n % 2)
-    n = n // 2
+    n //= 2
   binN.reverse()
   binN.insert(0, 0)
   return binN
