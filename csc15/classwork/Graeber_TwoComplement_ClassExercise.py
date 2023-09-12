@@ -10,16 +10,16 @@ def toBin(n):
   binN.insert(0, 0)
   return binN
 
-def toDec(n, type):
+def toDec(n):
   decN = 0
   exp = 0
   n.reverse()
-  if (type == "bin"):
+  if (n[-1] == 0):
     for i in n:
       if (i == 1): decN += (2 ** exp)
       exp += 1
     return decN
-  elif (type == "twosComp"):
+  elif (n[-1] == 1):
     for i in range(len(n) - 1):
       if (i == 1): decN += (2 ** exp)
       exp += 1
@@ -46,6 +46,6 @@ def toTwosComp(n):
 
 print(toBin(31))
 print(toBin(32))
-print(toDec(toBin(32), "bin"))
+print(toDec(toBin(32)))
 print(toTwosComp(-6))
-print(toDec(toTwosComp(-6), "twosComp"))
+print(toDec(toTwosComp(-6)))
