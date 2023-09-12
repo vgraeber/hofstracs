@@ -14,19 +14,12 @@ def toDec(n):
   decN = 0
   exp = 0
   n.reverse()
-  if (n[-1] == 0):
-    for i in n:
-      if (i == 1): decN += (2 ** exp)
-      exp += 1
-    return decN
-  elif (n[-1] == 1):
-    for i in range(len(n) - 1):
-      if (i == 1): decN += (2 ** exp)
-      exp += 1
+  for i in range(len(n) - 1):
+    if (n[i] == 1): decN += (2 ** exp)
+    exp += 1
+  if (n[-1] == 1):
     decN -= (2 ** exp)
-    return decN
-  else:
-    return null
+  return decN
 
 def toTwosComp(n):
   twosCompN = toBin(abs(n))
