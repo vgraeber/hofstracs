@@ -12,7 +12,7 @@ def readInput(i, t):
     return int(i)
   elif (t == "year"):
     while (not i.isnumeric()):
-      print("Invalid input. Please enter a year (ex. 2011).")
+      print("Invalid input. Please enter a full year (ex. 2011).")
       i = input("Year: ")
     return i
   else: return "Internal code error"
@@ -55,6 +55,7 @@ def printMonthBody(mon, y):
   month = ((start - 1) * (s * 2))
   rows = (start + days) % 7
   endRow = 7 - (start - 1)
+  if (endRow == 7): endRow = 0
   for i in range(days):
     d = str(i + 1)
     if (len(d) == 1): d = '0' + d
@@ -67,7 +68,7 @@ def printMonth(mon, y):
   printMonthBody(mon, y)
 
 def printCalendar():
-  year = input("Please enter a year (ex. 2011): ")
+  year = input("Please enter a full year (ex. 2011): ")
   year = readInput(year, "year")
   mon = input("Please enter a month as a number between 1 and 12: ")
   mon = readInput(mon, "mon")
