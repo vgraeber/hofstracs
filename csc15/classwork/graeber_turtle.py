@@ -29,14 +29,28 @@ def tempDisplay():
   tr.clearscreen()
   tr.speed(0)
 
+def drawRings(r):
+  xOffset = (r + (r / 10))
+  yOffset = (r / 2)
+  startX = (-2 * xOffset)
+  for i in range(5):
+    xCoor = startX + (i * xOffset)
+    yCoor = yOffset + ((-2 * (i % 2)) * yOffset)
+    tr.up()
+    tr.goto(xCoor, yCoor)
+    tr.down()
+    tr.circle(r)
+
 def drawFlower():
-  for i in range(750):
+  for i in range(500):
     tr.left(112.5)
     tr.forward(i)
 
 def main():
   initTrSettings()
   drawBoxes(3, 3, 100)
+  tempDisplay()
+  drawRings(100)
   tempDisplay()
   drawFlower()
 
