@@ -72,19 +72,12 @@ def getInputs(num, nums):
     nums = getList()
   return num, nums
 
-def calcSum(x):
-  s = 0
-  for i in x: s += i
-  return s
-
 def knapsack(x, y):
-  subSets = []
   for i in range(len(x)):
-    subSets.append(list(itertools.combinations(x, i)))
-  for i in range(len(subSets)):
-    for j in range(len(subSets[i])):
-      if (calcSum(subSets[i][j]) == y):
-        print(subSets[i][j], y)
+    combos = list(itertools.combinations(x, i))
+    for j in combos:
+      if (sum(j) == y):
+        print(j)
         return True
   return False
 
