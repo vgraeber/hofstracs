@@ -6,19 +6,20 @@ import math
 
 def readInput(i, t):
   if (t == "mon"):
-    while ((not i.isnumeric()) and (int(i) not in range(1, 13))):
+    while ((not i.isnumeric()) or (int(i) not in range(1, 13))):
       print("Invalid input. Please enter a month as a number between 1 and 12.")
       i = input("Month: ")
     return int(i)
   elif (t == "year"):
-    while (not i.isnumeric()):
+    while ((not i.isnumeric()) or (int(i) == 0)):
       print("Invalid input. Please enter a full year (ex. 2011).")
       i = input("Year: ")
     return i
   else: return "Internal code error"
 
 def isLeapYear(y):
-  if ((i % 4) == 0): return True
+  if (((y % 100) == 0) and ((y % 400) != 0)): return False
+  elif ((y % 4) == 0): return True
   else: return False
 
 def getNumberOfDaysInMonth(mon, y):
@@ -31,8 +32,10 @@ def getNumberOfDaysInMonth(mon, y):
 def getStartDay(mon, y):
   monAdj = mon - 2
   if (monAdj < 1): monAdj += 12
+  if (len(y) < 4): y = ('0' * (4 - len(y))) + y
   cen = int(y[:-2])
   year = int(y[-2:])
+  if (mon < 3): year -= 1
   d = (1 + math.floor((2.6 * monAdj) - .2) - (2 * cen) + year + math.floor(year / 4) + math.floor(cen / 4)) % 7
   return (d + 1)
 
@@ -42,11 +45,11 @@ def getMonthName(mon):
 
 def printMonthTitle(mon, y):
   name = getMonthName(mon)
-  title = name + " " + y
+  title = name + "  " + y
   title = title.center(28)
-  print(title)
+  print("\n" + title)
   print("----------------------------")
-  print(" Sun Mon Tue Wed Thu Fri Sat")
+  print(" Sun Mon Tue Wed Thu Fri Sat" + "\n")
 
 def printMonthBody(mon, y):
   start = getStartDay(mon, y)
@@ -61,7 +64,7 @@ def printMonthBody(mon, y):
     if (len(d) == 1): d = '0' + d
     month += s + d
     if ((int(d) % 7) == endRow): month += "\n"
-  print(month)
+  print(month + "\n")
 
 def printMonth(mon, y):
   printMonthTitle(mon, y)
