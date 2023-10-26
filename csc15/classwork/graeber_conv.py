@@ -1,4 +1,4 @@
-# Author: VIvian Graeber
+# Author(s): VIvian Graeber, Christian Ridley
 # Date: 10/25/23
 # Description: Top-down design exercise
 
@@ -9,7 +9,7 @@ def isFLoat(ui):
   except ValueError:
     return False
 
-def checkinput(ui, t):
+def checkinput(ui, t): #Second variable was no0t in original design plan, design plan has been edited
   if (t == "dorw"):
     while ui not in ['d', 'w', "distance", "weight"]:
       print("Error. Not a valid input.")
