@@ -1,81 +1,91 @@
 # Author(s): VIvian Graeber, Christian Ridley
 # Date: 10/25/23
 # Description: Top-down design exercise
+#--------------------------------------
+# Date          Description
+# 10/30/23      Edited code for better clarity and to remove errore
 
-def isFLoat(ui):
-  try:
-    float(ui)
-    return True
-  except ValueError:
-    return False
+from decimal import *
 
-def checkinput(ui, t): #Second variable was no0t in original design plan, design plan has been edited
-  if (t == "dorw"):
-    while ui not in ['d', 'w', "distance", "weight"]:
-      print("Error. Not a valid input.")
-      ui = input("Distance or Weight? ").lower()
-    ui = ui[0]
-  elif (t == "mori"):
-    while ui not in ['m', 'i', "metric", "imperial"]:
-      print("Error. Not a valid measurement system.")
-      ui = input("Metric or Imperial? ").lower()
-    ui = ui[0]
-  elif isinstance(t, list):
-    if (t[1] == 'd'):
-      if (t[2] == 'm'):
-        while ui not in ["cm", 'm', "centimeters", "meters"]:
-          print("Error. Invalid type.")
-          ui = input("Please enter the type of your input: ").lower()
-        ui = ui[0]
-        if (ui == 'c'):
-          ui = "cm"
-      else:
-        while ui not in ["in", "ft", "yds", "inches", "feet", "yards"]:
-          print("Error. Invalid type.")
-          ui = input("Please enter the type of your input: ").lower()
-        ui = ui[0:2]
-        if (ui == 'fe'):
-          ui = "ft"
-        elif (ui == 'ya'):
-          ui = "yds"
-    elif (t == "uin"):
-      if (t[2] == 'm'):
-        while ui not in ['g', "kg", "grams", "kilograms"]:
-          print("Error. Invalid type.")
-          ui = input("Please enter the type of your input: ").lower()
-        ui = ui[0]
-        if (ui == 'k'):
-          ui = "kg"
-      else:
-        while ui not in ["lbs", "pounds"]:
-          print("Error. Invalid type.")
-          ui = input("Please enter the type of your input: ").lower()
-        ui = "lbs"
-  else:
-    while not isFloat(ui):
-      print("Error. Not a number.")
-      ui = input("Please enter the number you wish to convert: ")
-    ui = float(ui)
-  return ui
+def checkdw(ui):
+  while ui not in ['d', 'w', "distance", "weight"]:
+    print("Error. Not a valid input.")
+    ui = input("Distance or Weight? ").lower()
+  return ui[0]
 
 def dorw():
   ui = input("Distance or Weight? ").lower()
-  ui = checkinput(ui, "dorw")
+  ui = checkdw(ui)
   return ui
 
+def checkmi(ui):
+  while ui not in ['m', 'i', "metric", "imperial"]:
+    print("Error. Not a valid measurement system.")
+    ui = input("Metric or Imperial? ").lower()
+  return ui[0]
+
 def mori():
-  ui = input("metric or Imperial? ").lower()
-  ui = checkinput(morw, "morw")
+  ui = input("Metric or Imperial? ").lower()
+  ui = checkmi(ui)
+  return ui
+
+def checkit(ui, dorw, mori):
+  if (dorw == 'd'):
+    if (mori == 'm'):
+      while ui not in ["cm", 'm', "centimeters", "meters"]:
+        print("Error. Invalid type. Valid types are: 'centimeters', 'meters'")
+        ui = input("Please enter the type of your input: ").lower()
+      ui = ui[0]
+      if (ui == 'c'):
+        ui = "cm"
+    elif (mori == 'i'):
+      while ui not in ["in", "ft", "yds", "inches", "feet", "yards"]:
+        print("Error. Invalid type. Valid types are: 'inches', 'feet', 'yards'")
+        ui = input("Please enter the type of your input: ").lower()
+      ui = ui[0]
+      if (ui == 'i'):
+        ui = "in"
+      elif (ui == 'f'):
+        ui = "ft"
+      elif (ui == 'y'):
+        ui = "yds"
+  elif (dorw == 'w'):
+    if (mori == 'm'):
+      while ui not in ['g', "kg", "grams", "kilograms"]:
+        print("Error. Invalid type. Valid types are: 'grams', 'kilograms'")
+        ui = input("Please enter the type of your input: ").lower()
+      ui = ui[0]
+      if (ui == 'k'):
+        ui = "kg"
+    elif (mori == 'i'):
+      while ui not in ["lbs", "pounds"]:
+        print("Error. Invalid type. Valid types are: 'pounds'")
+        ui = input("Please enter the type of your input: ").lower()
+      ui = "lbs"
   return ui
 
 def it(dorw, mori):
   ui = input("Please enter the type of your input: ").lower()
-  ui = checkinput(ui, [dorw, mori])
+  ui = checkit(ui, dorw, mori)
   return ui
+
+def isdec(ui):
+  try:
+    Decimal(ui)
+    return True
+  except (TypeError, ValueError):
+    return False
+
+def checkuin(ui):
+  while not isdec(ui):
+    print("Error. Not a number.")
+    ui = input("Please enter the number you wish to convert: ")
+  return Decimal(ui)
 
 def uin():
   ui = input("Please enter the number you wish to convert: ")
-  ui = checkinput(ui, "uin")
+  ui = checkuin(ui)
+  return ui
 
 def conv(dorw, mori, it, uin):
   convs = []
@@ -85,13 +95,13 @@ def conv(dorw, mori, it, uin):
       ft = ""
       yds = ""
       if (it == 'm'):
-        i += str(uid * 39.3701)
-        ft += str(uid * 3.28084)
-        yds += str(uid * 1.09361)
+        i += str(uin * Decimal("39.3700787402"))
+        ft += str(uin * Decimal("3.28083989501"))
+        yds += str(uin * Decimal("1.0936132983"))
       elif (it == "cm"):
-        i += str(uid * .393701)
-        ft += str(uid * .0328084)
-        yds += str(uid * .0109361)
+        i += str(uin * Decimal(".393700787402"))
+        ft += str(uin * Decimal(".0328083989501"))
+        yds += str(uin * Decimal(".010936132983"))
       i += "in"
       ft += "ft"
       yds += "yds"
@@ -102,14 +112,14 @@ def conv(dorw, mori, it, uin):
       cm = ""
       m = ""
       if (it == "in"):
-        cm += str(uin * 2.54)
-        m += str(uin * .0254)
+        cm += str(uin * Decimal("2.54"))
+        m += str(uin * Decimal(".0254"))
       elif (it == "ft"):
-        cm += str(uin * 30.48)
-        m += str(uin * .3048)
-      elif (it = "yds"):
-        cm += str(uin * 91.44)
-        m += str(uin * .9144)
+        cm += str(uin * Decimal("30.48"))
+        m += str(uin * Decimal(".3048"))
+      elif (it == "yds"):
+        cm += str(uin * Decimal("91.44"))
+        m += str(uin * Decimal(".9144"))
       cm += 'cm'
       m += "m"
       convs.append(cm)
@@ -117,26 +127,31 @@ def conv(dorw, mori, it, uin):
   elif (dorw == 'w'):
     if (mori == 'm'):
       lbs = ""
-      if (it = 'g'):
-        lbs += str(uin / 453.592)
+      if (it == 'g'):
+        lbs += str(uin * Decimal(".00220462262185"))
       elif (it == "kg"):
-        lbs += str(uin / .453592)
+        lbs += str(uin * Decimal("2.20462262185"))
       lbs += "lbs"
       convs.append(lbs)
     elif (mori == 'i'):
       g = ""
       kg = ""
       if (it == "lbs"):
-        g += str(uin * 453.592)
-        kg += str(uin * .453592)
+        g += str(uin * Decimal("453.5923699997"))
+        kg += str(uin * Decimal(".4535923699997"))
       g += 'g'
       kg += "kg"
       convs.append(g)
       convs.append(kg)
+  return convs
 
 def main():
-  dorw = dorw()
-  mori = mori()
-  it = it(dorw, mori)
-  uin = uin()
-  conv = conv(dorw, mori, it, uin)
+  dw = dorw()
+  mi = mori()
+  label = it(dw, mi)
+  num = uin()
+  convs = conv(dw, mi, label, num)
+  for i in convs:
+    print(str(num) + label + " = " + i)
+
+main()
