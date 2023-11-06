@@ -1,12 +1,15 @@
-import itertools, re
+import itertools
+import re
 
 def anstr(s):
   return re.sub('[\W_]+', '', s)
 
 def checkCont(cont):
   while ((cont != 'y') and (cont != 'n')):
-    if (cont == "yes"): cont = 'y'
-    elif (cont == "no"): cont = 'n'
+    if (cont == "yes"):
+      cont = 'y'
+    elif (cont == "no"):
+      cont = 'n'
     else:
       print("Invalid input. Please enter 'Y' or 'N'.")
       cont = input("Do you wish to continue running the program? (Y/N) ")
@@ -15,15 +18,19 @@ def checkCont(cont):
   return cont
 
 def checkInput(x):
-  if (x == ''): return False
+  if (x == ''):
+    return False
   for i in x:
-    if (not i.isnumeric()): return False
+    if (not i.isnumeric()):
+      return False
   return True
 
 def checkMode(mode):
   while ((mode != "list") and (mode != "num")):
-    if ((mode == "number") or (mode == 'n')): mode = "num"
-    elif (mode == "l"): mode = "list"
+    if ((mode == "number") or (mode == 'n')):
+      mode = "num"
+    elif (mode == "l"):
+      mode = "list"
     else:
       print("Invalid input. PLease enter 'list' or 'num'.")
       mode = input("Mode: ")
@@ -43,8 +50,10 @@ def getList():
       x = input("Number: ")
       x = anstr(x)
       x = x.lower()
-    if ((x == "end") and (len(nums) == 0)): print("Error. Cannot sum an empty list.")
-    elif (x == "end"): end = True
+    if ((x == "end") and (len(nums) == 0)):
+      print("Error. Cannot sum an empty list.")
+    elif (x == "end"):
+      end = True
     else: nums.append(int(x))
   return nums
 
@@ -88,7 +97,8 @@ def main():
   cont = anstr(cont)
   cont = cont.lower()
   cont = checkCont(cont)
-  if (cont == 'n'): exit()
+  if (cont == 'n'):
+    exit()
   num = 0
   nums = []
   num, nums = getInputs(num, nums)
