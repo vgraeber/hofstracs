@@ -12,17 +12,17 @@ def addPrimes(primes, n):
   return primes
 
 def isPrime(n):
-  l = math.sqrt(n)
-  if ((l % 1) == 0):
+  maxDiv = math.sqrt(n)
+  if ((maxDiv % 1) == 0):
     return False
-  l = math.floor(l)
+  maxDiv = math.floor(maxDiv)
   nums = open("prime_numbers.txt", 'r+')
   pNums = nums.read()
   primeNums = pNums.split(',')
   primeNums.pop()
   primeNums = list(map(int, primeNums))
-  if (l > primeNums[-1]):
-    primeNums = addPrimes(primeNums, l)
+  if (maxDiv > primeNums[-1]):
+    primeNums = addPrimes(primeNums, maxDiv)
     nums.seek(0)
     for i in primeNums:
       nums.write(str(i) + ',')
