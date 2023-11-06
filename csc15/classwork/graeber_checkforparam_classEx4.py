@@ -2,17 +2,21 @@
 # Date: 10/09/23
 # Descripton: Classwork for the day
 
-import math, random
+import math
+import random
 
 # checks if a number is prime
 def isAPrimeNumber(n):
   l = math.sqrt(n)
-  if ((l % 1) == 0): return False
+  if ((l % 1) == 0):
+    return False
   l = math.floor(l)
-  if ((n % 2) == 0): return False
+  if ((n % 2) == 0):
+    return False
   for i in range(3, l, 2):
     if (isAPrimeNumber(i)):
-      if ((n % i) == 0): return False
+      if ((n % i) == 0):
+         return False
   return True
 
 # generates a list of integers between the min and max

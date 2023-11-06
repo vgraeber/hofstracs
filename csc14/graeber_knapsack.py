@@ -54,7 +54,8 @@ def getList():
       print("Error. Cannot sum an empty list.")
     elif (x == "end"):
       end = True
-    else: nums.append(int(x))
+    else:
+      nums.append(int(x))
   return nums
 
 def getNum():
