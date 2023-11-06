@@ -25,18 +25,18 @@ def numWordVocabs(sentence):
 def numSentences(ui):
   endSent = ['.', '!', '?']
   titles = ["dr.", "esq.", "hon.", "jr.", "mr.", "mrs.", "ms.", "mx.", "messrs.", "mmes.", "msgr.", "rt.", "sr.", "st.", "ald.", "sen.", "gen.", "rep.", "gov.", "pres.", "col.", "lt.", "insp.", "asst.", "assoc."]
+  degrees = ["B.A.", "B.S."]
   sentCount = 0
   w = ui.split()
   for i in w:
-    if ((i[-1] in endSent) and (i[-2] not in endSent) and (i not in titles)):
+    if ((i[-1] in endSent) and (i[-2] not in endSent) and (i not in titles) and (i not in degrees)):
       sentCount += 1
   return sentCount
 
 def numWordTokens(ui):
+  punctuation = ['—', "..."]
   w = ui.split()
   for i in w:
-    if (i == '—'):
-      w.remove('—')
-    elif (i == "..."):
-      w.remove("...")
+    if i in punctuation:
+      w.remove(i)
   return len(w)
