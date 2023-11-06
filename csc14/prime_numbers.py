@@ -33,7 +33,15 @@ def isPrime(n):
       return False
   return True
 
-print("167:",isPrime(167))
-print("127:",isPrime(127))
-print("27:",isPrime(27))
-print("9:",isPrime(9))
+def check(ui):
+  while not ui.isnumeric():
+    print("Invalid input.")
+    ui = input("Please enter a number: ")
+  return int(ui)
+
+def main():
+  ui = input("Please enter a number: ")
+  ui = check(ui)
+  print(str(ui) + " is prime: " + str(isPrime(ui)))
+
+main()
