@@ -7,13 +7,13 @@ import random
 
 # checks if a number is prime
 def isAPrimeNumber(n):
-  l = math.sqrt(n)
-  if ((l % 1) == 0):
+  rtn = math.sqrt(n)
+  if ((rtn % 1) == 0):
     return False
-  l = math.floor(l)
+  rtn = math.floor(rtn)
   if ((n % 2) == 0):
     return False
-  for i in range(3, l, 2):
+  for i in range(3, rtn, 2):
     if (isAPrimeNumber(i)):
       if ((n % i) == 0):
          return False
