@@ -21,7 +21,8 @@ def main():
   sent = checkInput(sent)
   wordCount = countWords(sent)
   ending = "words."
-  if (wordCount == 1): ending = "word."
+  if (wordCount == 1):
+    ending = "word."
   print("The sentence you entered has", wordCount, ending)
 
 main()

@@ -23,7 +23,8 @@ def main():
   word = input("Please enter a word: ")
   constCount = countConsts(word)
   ending = "consonants."
-  if (constCount == 1): ending = "consonant."
+  if (constCount == 1):
+    ending = "consonant."
   print("The word you entered has", constCount, ending)
 
 main()

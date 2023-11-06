@@ -22,7 +22,8 @@ def main():
   para = checkInput(para)
   sentCount = countSents(para)
   ending = "sentences."
-  if (sentCount == 1): ending = "sentence."
+  if (sentCount == 1):
+    ending = "sentence."
   print("The paragrapoh you entered has", sentCount, ending)
 
 main()

@@ -14,7 +14,8 @@ def main():
   word = input("Please enter a word: ")
   vowCount = countVowels(word)
   ending = "vowels."
-  if (vowCount == 1): ending = "vowel."
+  if (vowCount == 1):
+    ending = "vowel."
   print("The word you entered has", vowCount, ending)
 
 main()
