@@ -25,7 +25,9 @@ def numWordVocabs(sentence):
 def numSentences(ui):
   endSent = ['.', '!', '?']
   titles = ["dr.", "esq.", "hon.", "jr.", "mr.", "mrs.", "ms.", "mx.", "messrs.", "mmes.", "msgr.", "rt.", "sr.", "st.", "ald.", "sen.", "gen.", "rep.", "gov.", "pres.", "col.", "lt.", "insp.", "asst.", "assoc."]
-  degrees = ["B.A.", "B.S."]
+  degrees = ["b.a.", "b.s.", "ph.d.", "m.d.", "b.f.a.", "b.s.b.a.", "b.s.ed.", "b.s.n.", "b.s.w.", "m.a.", "m.a.t.", "m.c.s.", "m.ed.", "m.f.a.", "m.h.s.a.", "m.l.s.", "m.mus.", "m.s.m.", "m.s.s.", "m.s.", "ed.d.", "d.p.c.", "ed.s.", "b.s.e.", "b.m.", "b.s.e.e."]
+  degrees.sort()
+  print(degrees)
   sentCount = 0
   w = ui.split()
   for i in w:
@@ -40,3 +42,5 @@ def numWordTokens(ui):
     if i in punctuation:
       w.remove(i)
   return len(w)
+
+numSentences("")
