@@ -5,7 +5,7 @@
 # Date          Description
 # 10/30/23      Edited code for better clarity and to remove errore
 
-from decimal import *
+import decimal as dec
 
 def checkdw(ui):
   while ui not in ['d', 'w', "distance", "weight"]:
@@ -71,7 +71,7 @@ def it(dorw, mori):
 
 def isdec(ui):
   try:
-    Decimal(ui)
+    dec.Decimal(ui)
     return True
   except (TypeError, ValueError):
     return False
@@ -80,7 +80,7 @@ def checkuin(ui):
   while not isdec(ui):
     print("Error. Not a number.")
     ui = input("Please enter the number you wish to convert: ")
-  return Decimal(ui)
+  return dec.Decimal(ui)
 
 def uin():
   ui = input("Please enter the number you wish to convert: ")
@@ -95,13 +95,13 @@ def conv(dorw, mori, it, uin):
       ft = ""
       yds = ""
       if (it == 'm'):
-        i += str(uin * Decimal("39.3700787402"))
-        ft += str(uin * Decimal("3.28083989501"))
-        yds += str(uin * Decimal("1.0936132983"))
+        i += str(uin * dec.Decimal("39.3700787402"))
+        ft += str(uin * dec.Decimal("3.28083989501"))
+        yds += str(uin * dec.Decimal("1.0936132983"))
       elif (it == "cm"):
-        i += str(uin * Decimal(".393700787402"))
-        ft += str(uin * Decimal(".0328083989501"))
-        yds += str(uin * Decimal(".010936132983"))
+        i += str(uin * dec.Decimal(".393700787402"))
+        ft += str(uin * dec.Decimal(".0328083989501"))
+        yds += str(uin * dec.Decimal(".010936132983"))
       i += "in"
       ft += "ft"
       yds += "yds"
@@ -112,14 +112,14 @@ def conv(dorw, mori, it, uin):
       cm = ""
       m = ""
       if (it == "in"):
-        cm += str(uin * Decimal("2.54"))
-        m += str(uin * Decimal(".0254"))
+        cm += str(uin * dec.Decimal("2.54"))
+        m += str(uin * dec.Decimal(".0254"))
       elif (it == "ft"):
-        cm += str(uin * Decimal("30.48"))
-        m += str(uin * Decimal(".3048"))
+        cm += str(uin * dec.Decimal("30.48"))
+        m += str(uin * dec.Decimal(".3048"))
       elif (it == "yds"):
-        cm += str(uin * Decimal("91.44"))
-        m += str(uin * Decimal(".9144"))
+        cm += str(uin * dec.Decimal("91.44"))
+        m += str(uin * dec.Decimal(".9144"))
       cm += 'cm'
       m += "m"
       convs.append(cm)
@@ -128,17 +128,17 @@ def conv(dorw, mori, it, uin):
     if (mori == 'm'):
       lbs = ""
       if (it == 'g'):
-        lbs += str(uin * Decimal(".00220462262185"))
+        lbs += str(uin * dec.Decimal(".00220462262185"))
       elif (it == "kg"):
-        lbs += str(uin * Decimal("2.20462262185"))
+        lbs += str(uin * dec.Decimal("2.20462262185"))
       lbs += "lbs"
       convs.append(lbs)
     elif (mori == 'i'):
       g = ""
       kg = ""
       if (it == "lbs"):
-        g += str(uin * Decimal("453.5923699997"))
-        kg += str(uin * Decimal(".4535923699997"))
+        g += str(uin * dec.Decimal("453.5923699997"))
+        kg += str(uin * dec.Decimal(".4535923699997"))
       g += 'g'
       kg += "kg"
       convs.append(g)

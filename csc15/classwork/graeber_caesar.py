@@ -6,7 +6,7 @@ def check(ui):
     ui = input("Please enter a message: ")
   return ui
 
-def enc(mesaage):
+def enc(messaage):
   encMessage = ""
   lower = [ord('a'), ord('z')]
   upper = [ord('A'), ord('Z')]
