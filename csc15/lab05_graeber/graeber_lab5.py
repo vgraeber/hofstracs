@@ -6,7 +6,6 @@
 # Vivian     10/19/23    Initial code
 
 import numpy as np
-import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import yfinance as yf

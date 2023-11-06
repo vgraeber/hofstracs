@@ -67,9 +67,9 @@ def printMonthBody(mon, y):
   days = getNumberOfDaysInMonth(mon, int(y))
   s = "  "
   month = ((start - 1) * (s * 2))
-  rows = (start + days) % 7
   endRow = 7 - (start - 1)
-  if (endRow == 7): endRow = 0
+  if (endRow == 7):
+    endRow = 0
   for i in range(days):
     d = str(i + 1)
     if (len(d) == 1):
