@@ -15,7 +15,8 @@ def toDec(n):
   exp = 0
   n.reverse()
   for i in range(len(n) - 1):
-    if (n[i] == 1): decN += (2 ** exp)
+    if (n[i] == 1):
+      decN += (2 ** exp)
     exp += 1
   if (n[-1] == 1):
     decN -= (2 ** exp)
@@ -24,8 +25,10 @@ def toDec(n):
 def toTwosComp(n):
   twosCompN = toBin(abs(n))
   for i in range(len(twosCompN)):
-    if (twosCompN[i] == 1): twosCompN[i] = 0
-    else: twosCompN[i] = 1
+    if (twosCompN[i] == 1):
+      twosCompN[i] = 0
+    else:
+      twosCompN[i] = 1
   added = False
   i = -1
   while (not added):
@@ -36,9 +39,3 @@ def toTwosComp(n):
       twosCompN[i] = 1
       added = True
   return twosCompN
-
-print(toBin(31))
-print(toBin(32))
-print(toDec(toBin(32)))
-print(toTwosComp(-6))
-print(toDec(toTwosComp(-6)))
