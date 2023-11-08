@@ -64,6 +64,7 @@ def getWordFreqs(fname):
   return lemWordFreq
 
 def main():
-  dict1 = getlemdict("../lab06_graeber/obama-2013.txt")
+  dict1 = getWordFreqs("../lab06_graeber/obama-2013.txt")
+  print(dict1)
 
 main()
