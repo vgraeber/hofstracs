@@ -13,20 +13,14 @@ def isWords(ui):
   if ((ui != '') and (ui not in string.punctuation)):
     return True
   else:
-   return False
+    return False
 
 def cleanInput(ui):
-  ui = ui.splitlines()
-  ui = list(filter(isWords, ui))
-  nui = []
   string.punctuation += '—'
-  for paragraph in ui:
-    paragraph = paragraph.split()
-    words = list(filter(isWords, paragraph))
-    for i in words:
-      i = i.strip(string.punctuation)
-      nui.append(i)
-  return nui
+  ui = ui.translate(str.maketrans('','', string.punctuation))
+  ui = ui.split()
+  ui = list(filter(isWords, ui))
+  return ui
 
 # from https://www.geeksforgeeks.org/python-lemmatization-approaches-with-examples/
 def pos_tagger(nltk_tag):
@@ -35,8 +29,8 @@ def pos_tagger(nltk_tag):
 
 def wordnet_tagger(ui):
   wordnet_tagged = []
-  for line in ui:
-    pos_tagged = nltk.pos_tag(nltk.word_tokenize(line))
+  for wrd in ui:
+    pos_tagged = nltk.pos_tag(nltk.word_tokenize(wrd))
     for word, tag in pos_tagged:
       wordnet_tagged.append([word, pos_tagger(tag)])
   return wordnet_tagged
@@ -50,7 +44,7 @@ def lemmatizer(wordnet_tagged):
       lemmatized.append(WordNetLemmatizer().lemmatize(word, tag))
   return lemmatized
 
-def lemWordFreq(lemmatized):
+def wordFreqs(lemmatized):
   lemdict = {}
   for word in lemmatized:
     if word in lemdict:
@@ -59,15 +53,17 @@ def lemWordFreq(lemmatized):
       lemdict[word] = 1
   return lemdict
 
-def main():
-  inputfile = open("../lab06_graeber/obama-2013.txt", 'r')
+def getWordFreqs(fname):
+  inputfile = open(fname, 'r')
   ui = inputfile.read().lower()
   inputfile.close()
   ui = cleanInput(ui)
-  print(ui)
-  sent_wordnet_tagged = wordnet_tagger(ui)
-  sent_leminput = lemmatizer(sent_wordnet_tagged)
-  sent_lemdict = lemWordFreq(sent_leminput)
-  print(sent_lemdict)
+  taggedinput = wordnet_tagger(ui)
+  leminput = lemmatizer(taggedinput)
+  lemWordFreq = wordFreqs(leminput)
+  return lemWordFreq
+
+def main():
+  dict1 = getlemdict("../lab06_graeber/obama-2013.txt")
 
 main()
