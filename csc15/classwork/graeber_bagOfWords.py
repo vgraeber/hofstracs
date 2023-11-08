@@ -4,9 +4,9 @@
 
 import nltk
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
-from nltk.corpus import wordnet
 
 lemtzr = WordNetLemmatizer()
 

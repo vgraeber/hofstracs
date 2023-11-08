@@ -8,7 +8,7 @@ import random
 # checks if a number is prime
 def isAPrimeNumber(n):
   rtnum = math.sqrt(n)
-  if ((rtn % 1) == 0):
+  if ((rtnum % 1) == 0):
     return False
   rtnum = math.floor(rtnum)
   if ((n % 2) == 0):
