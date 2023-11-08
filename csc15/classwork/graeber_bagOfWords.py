@@ -2,38 +2,57 @@
 # Date: 11/08/23
 # Description: Bag of words topic modeling practice
 
+import string
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
 
-lemtzr = WordNetLemmatizer()
+def isWords(ui):
+  if ((ui != '') and (ui not in string.punctuation)):
+    return True
+  else:
+   return False
+
+def cleanInput(ui):
+  ui = ui.splitlines()
+  ui = list(filter(isWords, ui))
+  nui = []
+  string.punctuation += '—'
+  for paragraph in ui:
+    paragraph = paragraph.split()
+    words = list(filter(isWords, paragraph))
+    for i in words:
+      i = i.strip(string.punctuation)
+      nui.append(i)
+  return nui
 
 # from https://www.geeksforgeeks.org/python-lemmatization-approaches-with-examples/
 def pos_tagger(nltk_tag):
   tag_dict = {'J': wordnet.ADJ, 'N': wordnet.NOUN, 'V': wordnet.VERB, 'R': wordnet.ADV}
   return tag_dict.get(nltk_tag[0])
 
-def wordnet_tagged(ui):
-  pos_tagged = nltk.pos_tag(nltk.word_tokenize(ui))
-  wordnet_tags = []
-  for word, tag in pos_tagged:
-    wordnet_tags.append([word, pos_tagger(tag)])
-  return wordnet_tags
+def wordnet_tagger(ui):
+  wordnet_tagged = []
+  for line in ui:
+    pos_tagged = nltk.pos_tag(nltk.word_tokenize(line))
+    for word, tag in pos_tagged:
+      wordnet_tagged.append([word, pos_tagger(tag)])
+  return wordnet_tagged
 
-def leminput(wordnet_tagged):
-  lemtzdinput = []
+def lemmatizer(wordnet_tagged):
+  lemmatized = []
   for word, tag in wordnet_tagged:
     if tag is None:
-      lemtzdinput.append(word)
+      lemmatized.append(word)
     else:
-      lemtzdinput.append(lemtzr.lemmatize(word, tag))
-  return lemtzdinput
+      lemmatized.append(WordNetLemmatizer().lemmatize(word, tag))
+  return lemmatized
 
-def lemdict(lemtzdinput):
+def lemWordFreq(lemmatized):
   lemdict = {}
-  for word in lemtzdinput:
+  for word in lemmatized:
     if word in lemdict:
       lemdict[word] += 1
     else:
@@ -41,13 +60,14 @@ def lemdict(lemtzdinput):
   return lemdict
 
 def main():
-  sent = "the cat is sitting with the bats on the striped mat under many badly flying geese"
-  sent_wordnet_tagged = wordnet_tagged(sent)
-  sent_leminput = leminput(sent_wordnet_tagged)
-  sent_lemdict = lemdict(sent_leminput)
-  print(sent)
-  print(sent_wordnet_tagged)
-  print(sent_leminput)
+  inputfile = open("../lab06_graeber/obama-2013.txt", 'r')
+  ui = inputfile.read().lower()
+  inputfile.close()
+  ui = cleanInput(ui)
+  print(ui)
+  sent_wordnet_tagged = wordnet_tagger(ui)
+  sent_leminput = lemmatizer(sent_wordnet_tagged)
+  sent_lemdict = lemWordFreq(sent_leminput)
   print(sent_lemdict)
 
 main()
