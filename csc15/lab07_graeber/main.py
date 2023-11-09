@@ -33,7 +33,8 @@ def getTermFreqs(allWordFreqs):
 def main():
   allWordFreqs = getAllWordFreqs()
   termFreqs = getTermFreqs(allWordFreqs)
-  print(termFreqs)
+  comb = open("termFreqs.txt", 'w')
+  comb.write(str(termFreqs))
+  comb.close()
 
-# - - run main() - -
-s = main()
+main()
