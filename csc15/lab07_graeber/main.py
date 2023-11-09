@@ -21,7 +21,7 @@ def getAllWordFreqs():
   wordFreqs = []
   for fname in fnames:
     filename = "./data/" + fname
-    wordFreqs.append(getWordFreqs(filename))
+    wordFreqs.append(Counter(getWordFreqs(filename)))
   return wordFreqs
 
 def getTermFreqs(allWordFreqs):

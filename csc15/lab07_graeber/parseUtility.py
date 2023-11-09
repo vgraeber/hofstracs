@@ -1,9 +1,8 @@
 # Author: Vivian Graeber
-# Date: 11/08/23
+# Date: 11/09/23
 # Description: Bag of words topic modeling practice
 
 import string
-from collections import Counter
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
@@ -53,7 +52,7 @@ def wordFreqs(lemmatized): # creates a dictionary of the word vocabs that has th
       lemdict[word] += 1
     else:
       lemdict[word] = 1
-  return Counter(lemdict)
+  return lemdict
 
 def getWordFreqs(fname): # returns the dictionary of the word frequency for the given file
   inputfile = open(fname, 'r')
