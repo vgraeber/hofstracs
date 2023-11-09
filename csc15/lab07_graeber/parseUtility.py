@@ -10,20 +10,21 @@ from nltk.corpus import wordnet
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
 
-def areWords(ui):
+def notEmpty(ui): # determines empty strings
   if (ui != ''):
     return True
   else:
     return False
 
-def cleanInput(ui):
+def cleanInput(ui): # removes punctuation and splits the string at every word
   string.punctuation += '—'
   ui = ui.translate(str.maketrans('','', string.punctuation))
   ui = ui.split()
-  ui = list(filter(areWords, ui))
+  ui = list(filter(notEmpty, ui))
   return ui
 
 # from https://www.geeksforgeeks.org/python-lemmatization-approaches-with-examples/
+# following 3 functions are for lemmatizing, or condensing, words
 def pos_tagger(nltk_tag):
   tag_dict = {'J': wordnet.ADJ, 'N': wordnet.NOUN, 'V': wordnet.VERB, 'R': wordnet.ADV}
   return tag_dict.get(nltk_tag[0])
@@ -45,7 +46,7 @@ def lemmatizer(wordnet_tagged):
       lemmatized.append(WordNetLemmatizer().lemmatize(word, tag))
   return lemmatized
 
-def wordFreqs(lemmatized):
+def wordFreqs(lemmatized): # creates a dictionary of the word vocabs that has their frequency as the values
   lemdict = {}
   for word in lemmatized:
     if word in lemdict:
@@ -54,7 +55,7 @@ def wordFreqs(lemmatized):
       lemdict[word] = 1
   return Counter(lemdict)
 
-def getWordFreqs(fname):
+def getWordFreqs(fname): # returns the dictionary of the word frequency for the given file
   inputfile = open(fname, 'r')
   ui = inputfile.read().lower()
   inputfile.close()
