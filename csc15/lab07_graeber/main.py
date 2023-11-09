@@ -3,14 +3,13 @@
 # Implement function abstraction
 #
 # Team Members:
-#
-#
+# Vivian Graeber
+# Justin Telhu
 #
 # Revision History
 # -    -    -    -    -    -    -    -    -    -    -
-# name      date        comment
-# scl       11/4/2023   Initial code framework for students
-#
+# Name      Date         Comment
+# Vivian    11/09/2023   Completed all parsing and frequency code
 #
 
 from parseUtility import getWordFreqs
