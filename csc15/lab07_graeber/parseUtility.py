@@ -3,14 +3,15 @@
 # Description: Bag of words topic modeling practice
 
 import string
+from collections import Counter
 import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
 
-def isWords(ui):
-  if ((ui != '') and (ui not in string.punctuation)):
+def areWords(ui):
+  if (ui != ''):
     return True
   else:
     return False
@@ -19,7 +20,7 @@ def cleanInput(ui):
   string.punctuation += '—'
   ui = ui.translate(str.maketrans('','', string.punctuation))
   ui = ui.split()
-  ui = list(filter(isWords, ui))
+  ui = list(filter(areWords, ui))
   return ui
 
 # from https://www.geeksforgeeks.org/python-lemmatization-approaches-with-examples/
@@ -51,7 +52,7 @@ def wordFreqs(lemmatized):
       lemdict[word] += 1
     else:
       lemdict[word] = 1
-  return lemdict
+  return Counter(lemdict)
 
 def getWordFreqs(fname):
   inputfile = open(fname, 'r')

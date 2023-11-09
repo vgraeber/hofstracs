@@ -1,6 +1,6 @@
 # Description Lab 7
 # Create a Bag Of Words Model from speeches
-# Implement function abstraction 
+# Implement function abstraction
 #
 # Team Members:
 #
@@ -13,24 +13,28 @@
 #
 #
 
-from parseUtility import testFunction
+from parseUtility import getWordFreqs
+from collections import Counter
+import os
 
-def getFileNames():
-    list_of_files = []
+def getAllWordFreqs():
+  fnames = os.listdir("./data")
+  wordFreqs = []
+  for fname in fnames:
+    filename = "./data/" + fname
+    wordFreqs.append(getWordFreqs(filename))
+  return wordFreqs
 
-    return list_of_files
-
-def createCorpus():
-    # concat the files to make on text file
-
-    return corpus
-
+def getTermFreqs(allWordFreqs):
+  termFreqs = Counter({})
+  for dict in allWordFreqs:
+    termFreqs += dict
+  return termFreqs
 
 def main():
-    status = testFunction()
-    print(status)
-
-    return status
+  allWordFreqs = getAllWordFreqs()
+  termFreqs = getTermFreqs(allWordFreqs)
+  print(termFreqs)
 
 # - - run main() - -
 s = main()
