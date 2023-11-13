@@ -46,5 +46,5 @@ def clock(form):
 
 def main():
   clockform = input("Please enter a clock format: ")
-  clockform = ckeckInput(clockform)
+  clockform = checkInput(clockform)
   clock(clockform)
