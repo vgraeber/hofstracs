@@ -62,7 +62,7 @@ def printTable(termFreqs, allWordFreqs):
     for c in range(len(fnames)):
       table += buffer
       num = allWordFreqs[c].get(word) # gets the number of times the word appears in the given file
-      if (num == None): # changes the formatting if the word does not appear in the file
+      if (num is None): # changes the formatting if the word does not appear in the file
         num = 0
       table += str(num).center(headerlens[c])
     table += nl
