@@ -14,7 +14,7 @@ def isnum(ui):
   try:
     int(ui)
     return True
-  except:
+  except (TypeError, ValueError):
     return False
 
 def checkkey(ui):
