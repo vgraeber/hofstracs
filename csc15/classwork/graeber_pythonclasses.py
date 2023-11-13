@@ -1,4 +1,4 @@
-class student():
+class Student():
   def __init__(self, name, major, grades):
     self.name = name
     self.major = major
@@ -22,5 +22,29 @@ class student():
         pointvals.append(0.0)
     return round((sum(pointvals) / len(pointvals)), 2)
 
-me = student("Vivian", "Comp sci", [100, 97, 82])
-print(me)
+class Document():
+  def __init__(self, title, authors, type, pubyear, publisher):
+    self.title = title
+    self.authors = self.getauthors(authors)
+    self.type = type
+    self.pubyear = pubyear
+    self.publisher = publisher
+
+  def __str__(self):
+    return f"{self.title}, a {self.type} created by {self.authors} and published by {self.publisher} in {self.pubyear}."
+
+  def getauthors(self, authors):
+    allAuthors = ""
+    if (len(authors) > 2):
+      for i in range(len(authors) - 1):
+        allAuthors += authors[i]
+        allAuthors += ", "
+      allAuthors += "and " + authors[-1]
+    elif (len(authors) == 2):
+      allAuthors += authors[0] + " and " + authors[1]
+    else:
+      allAuthors += authors[0]
+    return allAuthors
+
+goodbook = Document("Good Omens: the Nice and Accurate Prophecies of Agnes Nutter, Witch", ["Neil Gaiman", "Terry Pratchett"], "fantasy novel", "2006", "New York: William Morrow")
+print(goodbook)
