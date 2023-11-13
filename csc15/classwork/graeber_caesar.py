@@ -58,6 +58,7 @@ def unenc(encMessage):
           num = ((upper[1] + 1) - (upper[0] - num))
       unEncMessage += chr(num)
     unEncMessages.append(unEncMessage)
+  unEncMessages.reverse()
   return unEncMessages
 
 def main():
