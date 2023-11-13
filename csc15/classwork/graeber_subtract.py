@@ -6,7 +6,6 @@ import random
 
 Lnum = random.randint(0, 9)
 Snum = random.randint(0, 9)
-
 if (Lnum < Snum):
   Lnum, Snum = Snum, Lnum
 ques = "What is " + str(Lnum) + " - " + str(Snum) + '?'

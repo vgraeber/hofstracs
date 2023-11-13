@@ -95,13 +95,13 @@ def conv(dorw, mori, it, uin):
       ft = ""
       yds = ""
       if (it == 'm'):
-        i += str(uin * dec.Decimal("39.3700787402"))
-        ft += str(uin * dec.Decimal("3.28083989501"))
-        yds += str(uin * dec.Decimal("1.0936132983"))
+        i += str(uin / dec.Decimal(".0254"))
+        ft += str(uin / dec.Decimal(".3048"))
+        yds += str(uin / dec.Decimal(".9144"))
       elif (it == "cm"):
-        i += str(uin * dec.Decimal(".393700787402"))
-        ft += str(uin * dec.Decimal(".0328083989501"))
-        yds += str(uin * dec.Decimal(".010936132983"))
+        i += str(uin / dec.Decimal("2.54"))
+        ft += str(uin / dec.Decimal("30.48"))
+        yds += str(uin / dec.Decimal("91.44"))
       i += "in"
       ft += "ft"
       yds += "yds"

@@ -55,4 +55,3 @@ def main():
   drawFlower()
 
 main()
-  

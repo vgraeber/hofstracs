@@ -1,6 +1,12 @@
 import time
 import turtle as tr
 
+def checkInput(ui):
+  while ((ui != "12hr") and (ui != "24hr")):
+    print("Invalid clock format. Please enter either '12hr' or '24hr'.")
+    ui = input("Please enter a clock format.")
+  return ui
+
 def checkLen(t):
   if (len(t) == 1):
     return ('0' + t)
@@ -38,4 +44,7 @@ def clock(form):
         time.sleep(1)
         tr.clear()
 
-clock("12hr")
+def main():
+  clockform = input("Please enter a clock format: ")
+  clockform = ckeckInput(clockform)
+  clock(clockform)
