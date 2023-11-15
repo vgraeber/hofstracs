@@ -1,9 +1,26 @@
 # hofstracs
 
-## header for code
+## header for individual code
 
 ### Author: Vivian Graeber
 ### Date: xx/xx/xx
-### Description: 
+### Description: xxxxxxxxx
+
+## header for group code
+
+### Description INSERT PROJECT NAME HERE
+### xxxxxxxxxxxxxxxxxxx
+### xxxxxxxxxxxxxxxxxxx
+###
+### Team Members:
+### Vivian Graeber
+### xxxxxxxxxxxxxx
+### xxxxxxxxxxxxxx
+###
+### Revision History
+### -    -    -    -    -    -    -    -    -    -    -    -    -    -
+### Name(s)            Date        Comment
+### xxxxxxxxxxxxxxxxx  xx/xx/xx    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+### xxxxxxxxxxxxxxxxx  xx/xx/xx    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ## links to copy over
