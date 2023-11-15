@@ -11,9 +11,18 @@ def check(ui):
 def multiTable(ui):
   table = ""
   for i in range(ui):
+    row = ""
+    buffer = ""
     for j in range(ui):
       mult = str((i + 1) * (j + 1))
-      table += mult.center(len(str(ui)) * 2)
+      centering = (2 * len(str(ui))) + 1
+      row += mult.center(centering)
+      buffer += '-' * centering
+      row += '|'
+      buffer += '|'
+    table += row
+    table += "\n"
+    table += buffer
     table += "\n"
   print(table)
 
