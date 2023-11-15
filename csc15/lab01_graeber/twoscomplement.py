@@ -52,7 +52,7 @@ def toTwosComp(n):
   return twosCompN
 
 def main():
-  num = int(input("Please enter the number you wish to convert to binary: "))
+  num = input("Please enter the number you wish to convert to binary: ")
   num = checkNum(num)
   binN = convertDecToBin(num)
   decN = convertBinToDec(binN)

@@ -1,7 +1,7 @@
 import math
 
 def addPrimes(primes, n):
-  for i in range(primes[-1], n):
+  for i in range(primes[-1], (n + 1)):
     prime = True
     for p in primes:
       if ((i % p) == 0):
@@ -11,12 +11,8 @@ def addPrimes(primes, n):
       primes.append(i)
   return primes
 
-def isPrime(n):
-  maxDiv = math.sqrt(n)
-  if ((maxDiv % 1) == 0):
-    return False
-  maxDiv = math.floor(maxDiv)
-  nums = open("prime_numbers.txt", 'r+')
+def getPrimes(maxDiv):
+  nums = open("primes.txt", 'r+')
   pNums = nums.read()
   primeNums = pNums.split(',')
   primeNums.pop()
@@ -28,6 +24,14 @@ def isPrime(n):
       nums.write(str(i) + ',')
     nums.truncate()
   nums.close()
+  return primeNums
+
+def isPrime(n):
+  maxDiv = math.sqrt(n)
+  if ((maxDiv % 1) == 0):
+    return False
+  maxDiv = math.floor(maxDiv)
+  primeNums = getPrimes(maxDiv)
   for i in primeNums:
     if ((n % i) == 0):
       return False
@@ -44,4 +48,5 @@ def main():
   ui = check(ui)
   print(str(ui) + " is prime: " + str(isPrime(ui)))
 
-main()
+if __name__ == "__main__":
+  main()
