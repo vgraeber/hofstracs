@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 
 def addPrimes(primes, n):
   for i in range(primes[-1], (n + 1)):
@@ -12,7 +13,8 @@ def addPrimes(primes, n):
   return primes
 
 def getPrimes(maxDiv):
-  nums = open("primes.txt", 'r+')
+  path = Path(__file__).parent / "primes.txt"
+  nums = open(path, 'r+')
   pNums = nums.read()
   primeNums = pNums.split(',')
   primeNums.pop()

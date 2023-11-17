@@ -5,26 +5,35 @@
 import calcPrimality as prime
 import math
 
+def intCheck(num):
+  if ((num % 1) == 0):
+    return True
+  return False
+
 def gcd(snum, lnum):
   if (snum > lnum):
     snum, lnum = lnum, snum
   elif (snum == lnum):
     return snum
-  if (prime.isPrime(snum) or prime.isPrime(lnum)):
+  if prime.isPrime(snum) or prime.isPrime(lnum):
     return 1
   elif (snum == 0):
     return lnum
-  elif (((lnum / snum) % 1) == 0):
+  elif intCheck(lnum / snum):
     return snum
   maxDiv = math.sqrt(snum)
   pNums = prime.getPrimes(maxDiv)
+  gcd = 1
   for n in pNums:
-    if ((((snum / n) % 1) == 0) and (((lnum / n) % 1) == 0)):
-      if ((snum / n) > n):
-        return int(snum / n)
-      else:
-        return n
-  return 1
+    sdiv = snum / n
+    ldiv = lnum / n
+    if intCheck(sdiv) and intCheck(ldiv):
+      sdiv /= n
+      ldiv /= n
+      while ((intCheck(sdiv) and intCheck(ldiv)) and (not prime.isPrime(sdiv)) and (not prime.isPrime(ldiv))):
+        gcd *= n
+      gcd *= n
+  return gcd
 
 def main():
   n1 = input("Please enter your first number: ")

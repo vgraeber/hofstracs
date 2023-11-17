@@ -2,7 +2,7 @@
 # Date: 11/15/23
 # Description: lab 8
 
-from parseUtility import getDocInfo
+from parseUtility import Document
 import os
 
 def getFileNames():
@@ -13,7 +13,7 @@ def getAllDocInfo():
   allDocInfo = []
   for fname in fnames:
     filename = "./data/" + fname
-    allDocInfo.append(getDocInfo(filename))
+    allDocInfo.append(Document(filename))
   return allDocInfo
 
 def main():
