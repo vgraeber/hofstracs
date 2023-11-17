@@ -2,25 +2,26 @@
 # Date: 11/15/23
 # Description: lab 8
 
-from parseUtility import Document
+from docclass import getDocInfo
+from pathlib import Path
 import os
 
 def getFileNames():
-  return os.listdir("./data")
+  path = Path(__file__).parent / "data"
+  return os.listdir(path)
 
 def getAllDocInfo():
   fnames = getFileNames()
   allDocInfo = []
+  path = Path(__file__).parent / "data"
   for fname in fnames:
-    filename = "./data/" + fname
-    allDocInfo.append(Document(filename))
+    filename = str(path) + '/' + fname
+    allDocInfo.append(getDocInfo(filename))
   return allDocInfo
 
 def main():
   allDocInfo = getAllDocInfo()
-  for doc in range(len(allDocInfo)):
-    print(getFileNames()[doc])
-    print(allDocInfo[doc]["avgWordsPerSent"])
-    print(allDocInfo[doc]["avgPunctPerSent"])
+  for doc in allDocInfo:
+    print(doc)
 
 main()

@@ -13,17 +13,20 @@
 # Vivian and Justin  11/13/2023   Created the table output
 
 from parseUtility import getWordFreqs
+from pathlib import Path
 from collections import Counter
 import os
 
 def getFileNames():
-  return os.listdir("./data")
+  path = path = Path(__file__).parent / "data"
+  return os.listdir(path)
 
 def getAllWordFreqs():
   fnames = getFileNames()
   wordFreqs = []
+  path = Path(__file__).parent / "data"
   for fname in fnames:
-    filename = "./data/" + fname
+    filename = str(path) + '/' + fname
     wordFreqs.append(Counter(getWordFreqs(filename)))
   return wordFreqs
 
