@@ -12,16 +12,17 @@ def getFileNames():
 
 def getAllDocInfo():
   fnames = getFileNames()
-  allDocInfo = []
+  fnames.sort()
+  allDocInfo = {}
   path = Path(__file__).parent / "data"
   for fname in fnames:
     filename = str(path) + '/' + fname
-    allDocInfo.append(getDocInfo(filename))
+    allDocInfo[fname] = getDocInfo(filename)
   return allDocInfo
 
 def main():
   allDocInfo = getAllDocInfo()
-  for doc in allDocInfo:
-    print(doc)
+  for fname, docInfo in allDocInfo.items():
+    print(fname + ": " + str(docInfo) + "\n")
 
 main()

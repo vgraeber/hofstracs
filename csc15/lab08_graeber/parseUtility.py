@@ -64,16 +64,28 @@ def getWordFreqs(ui): # returns the dictionary of the word frequency for the giv
   lemWordFreq = wordFreqs(leminput)
   return lemWordFreq
 
+def notNotEndSent(word):
+  perlocs = []
+  if ((len(word) > 3) and (word[-3:] == "...")):
+    word = word[:-3]
+  for i in range(len(word)):
+    if (word[i] == '.'):
+      perlocs.append(i)
+  if (len(perlocs) > 1):
+      return False
+  return True
+
 def getSents(ui):
   endSent = ['.', '!', '?']
   titles = ["dr.", "esq.", "hon.", "jr.", "mr.", "mrs.", "ms.", "mx.", "messrs.", "mmes.", "msgr.", "rt.", "sr.", "st.", "ald.", "sen.", "gen.", "rep.", "gov.", "pres.", "col.", "lt.", "insp.", "asst.", "assoc.", "rev."]
-  degrees = ["b.a.", "b.s.", "ph.d.", "m.d.", "b.f.a.", "b.s.b.a.", "b.s.ed.", "b.s.n.", "b.s.w.", "m.a.", "m.a.t.", "m.c.s.", "m.ed.", "m.f.a.", "m.h.s.a.", "m.l.s.", "m.mus.", "m.s.m.", "m.s.s.", "m.s.", "ed.d.", "d.p.c.", "ed.s.", "b.s.e.", "b.m.", "b.s.e.e.", "d.a.", "d.b.a.", "d.d.s.", "j.d.", "m.b.a.", "ed.m.", "d.m.l.", "d.min", "d.p.t.", "m.div.", "m.m.", "m.p.a.", "m.phil.", "m.s.a.", "m.s.e.e.", "m.s.l.i.s.", "m.s.p.t.", "m.th.", "r.n.", "s.t.m.", "th.d."]
   if ui[-1] not in endSent:
     ui += '.'
   ui = ui.split()
   for i in range(len(ui)):
-    if (((ui[i][-1] in endSent) and (len(ui[i]) > 1) and (ui[i][-2] not in endSent)) and (ui[i].lower() not in titles and ui[i].lower() not in degrees)):
+    if ((ui[i][-1] in endSent) and (len(ui[i]) > 1) and notNotEndSent(ui[i]) and (ui[i].lower() not in titles)):
       ui[i] = ui[i][:-1] + "~~~"
+    elif ((len(ui[i]) > 1) and (ui[i][-1] in string.punctuation) and (ui[i][-2] in endSent)):
+      ui[i] += "~~~"
   ui = ' '.join(ui)
   ui = ui.split("~~~")
   return ui
