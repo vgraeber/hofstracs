@@ -1,7 +1,6 @@
 # Author: Vivian Graeber
-# Date: 11/17/23
+# Date: 11/20/23
 # Description: Utility code for getting data given a text file
-# Base code for vocab copied from lab 7
 # Base code for avg words per sent copied from lab 3
 
 import string
@@ -12,15 +11,19 @@ nltk.download("wordnet")
 nltk.download("averaged_perceptron_tagger")
 nltk.download("punkt")
 
+string.punctuation += '—'
+
 def notEmpty(ui): # determines empty strings
   if (ui != ''):
     return True
   else:
     return False
 
-def cleanInput(ui): # removes punctuation and splits the string at every word
-  string.punctuation += '—'
+def remPunct(ui):
   ui = ui.translate(str.maketrans('','', string.punctuation))
+  return ui
+
+def splitInput(ui):
   ui = ui.split()
   ui = list(filter(notEmpty, ui))
   return ui
@@ -48,21 +51,57 @@ def lemmatizer(wordnet_tagged):
       lemmatized.append(WordNetLemmatizer().lemmatize(word, tag))
   return lemmatized
 
-def wordFreqs(lemmatized): # creates a dictionary of the word vocabs that has their frequency as the values
-  lemdict = {}
-  for word in lemmatized:
-    if word in lemdict:
-      lemdict[word] += 1
-    else:
-      lemdict[word] = 1
-  return lemdict
+# ADJ 	adjective 	new, good, high, special, big, local
+# ADP 	adposition 	on, of, at, with, by, into, under
+# ADV 	adverb 	really, already, still, early, now
+# CONJ 	conjunction 	and, or, but, if, while, although
+# DET 	determiner, article 	the, a, some, most, every, no, which
+# NOUN 	noun 	year, home, costs, time, Africa
+# NUM 	numeral 	twenty-four, fourth, 1991, 14:24
+# PRT 	particle 	at, on, out, over per, that, up, with
+# PRON 	pronoun 	he, their, her, its, my, I, us
+# VERB 	verb 	is, say, told, given, playing, would
+# . 	punctuation marks 	. , ; !
+# X 	other 	ersatz, esprit, dunno, gr8, univeristy
 
-def getWordFreqs(ui): # returns the dictionary of the word frequency for the given text
-  ui = cleanInput(ui)
-  taggedinput = wordnet_tagger(ui)
-  leminput = lemmatizer(taggedinput)
-  lemWordFreq = wordFreqs(leminput)
-  return lemWordFreq
+def nltk_tagger(ui):
+  nltk_tagged = []
+  for word in ui:
+    pos_tagged = nltk.pos_tag(nltk.word_tokenize(word))
+    nltk_tagged.append(pos_tagged)
+  return nltk_tagged
+
+def tagsOnly(ui):
+  tags = []
+  for pair in ui:
+    for i in pair:
+      tags.append(i[1])
+  return tags
+
+def freqsDict(ui): # creates a dictionary of the inputs that has their frequencies as the values
+  freqdict = {}
+  for i in ui:
+    if i in freqdict:
+      freqdict[i] += 1
+    else:
+      freqdict[i] = 1
+  return freqdict
+
+def getVocabFreqs(ui): # returns the dictionary of the vocab frequency for the given text
+  lowerui = ui.lower()
+  nopunctui = remPunct(lowerui)
+  splitui = splitInput(nopunctui)
+  taggedui = wordnet_tagger(splitui)
+  lemui = lemmatizer(taggedui)
+  vocabfreqs = freqsDict(lemui)
+  return vocabfreqs
+
+def getTypeFreqs(ui):
+  splitui = splitInput(ui)
+  taggedui = nltk_tagger(splitui)
+  tags = tagsOnly(taggedui)
+  tagfreqs = freqsDict(tags)
+  return tagfreqs
 
 def notNotEndSent(word):
   perlocs = []
@@ -135,7 +174,8 @@ def avgCharsPerWord(words):
   return (sum(achpw) / len(achpw))
 
 def getCharsPerWord(ui):
-  ui = cleanInput(ui)
+  ui = remPunct(ui)
+  ui = splitInput(ui)
   achpw = avgCharsPerWord(ui)
   return achpw
 
