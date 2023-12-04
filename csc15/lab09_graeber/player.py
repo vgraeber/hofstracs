@@ -3,7 +3,7 @@
 # Description: Player class file
 
 class Player():
-  def __init__(self, name, id startingBankBalance=100):
+  def __init__(self, name, id, startingBankBalance=100):
     self.name = name
     self.id = id
     self.bankBalance = startingBankBalance

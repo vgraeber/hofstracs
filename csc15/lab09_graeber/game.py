@@ -30,7 +30,7 @@ class Game():
       playerlist.append(Player(name, i, startingBankBalance))
     return playerlist
 
-  def isInt(num):
+  def isInt(self, num):
     try:
       int(num)
       return True
@@ -38,7 +38,7 @@ class Game():
       return False
 
   def checkInitBet(self, betAmount):
-    while (not isInt(betAmount) and (betAmount < self.minimumBet)):
+    while (not self.isInt(betAmount) and (betAmount < self.minimumBet)):
       print(f"That is not a valid bet. Bets must be integers and greater than {self.minimumBet}")
       betAmount = input("Please input your starting bet: ")
     return betAmount
@@ -52,7 +52,7 @@ class Game():
       pool += betAmount
     return pool
 
-  def cleaninput(doroll):
+  def cleaninput(self, doroll):
     doroll = doroll.lower()
     acceptable = ['y', 'n']
     while doroll not in acceptable:
@@ -60,7 +60,7 @@ class Game():
       doroll = input("Do you want to roll? ")
     return doroll
 
-  def removePlayer(person):
+  def removePlayer(self, person):
     ind = 0
     for i in range(len(self.playerlist)):
       if (self.playerlist[i].id == person.id):
@@ -101,7 +101,7 @@ class Game():
     self.currentRound += 1
     for person in self.playerlist:
       doroll = input(f"{person.name}, do you want to roll? (Y/N) ")
-      doroll = cleaninput(doroll)
+      doroll = self.cleaninput(doroll)
       if (doroll == 'y'):
         diceRoll = self.gameDice.roll(self.currentRound)
         person.addRoll(diceRoll)
@@ -110,7 +110,7 @@ class Game():
     for person in self.playerlist:
       if (person.rollSum > self.diceLimit):
         person.lost = True
-        self.removePlayer(player)
+        self.removePlayer(person)
     if self.endGame():
       winner = self.getwinner()
       if (winner != "House"):
