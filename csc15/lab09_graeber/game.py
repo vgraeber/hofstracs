@@ -34,10 +34,10 @@ class Game():
     try:
       int(num)
       return True
-    except (valueError, TypeError):
+    except (ValueError, TypeError):
       return False
 
-  def checkInitBet(betAmount):
+  def checkInitBet(self, betAmount):
     while (not isInt(betAmount) and (betAmount < self.minimumBet)):
       print(f"That is not a valid bet. Bets must be integers and greater than {self.minimumBet}")
       betAmount = input("Please input your starting bet: ")
@@ -47,7 +47,7 @@ class Game():
     pool = 0
     for person in self.playerlist:
       betAmount = input(f"{person.name}, please input your starting bet: ")
-      betAmount = checkInitBet(betAmount)
+      betAmount = self.checkInitBet(betAmount)
       person.initBet(betAmount)
       pool += betAmount
     return pool
@@ -87,13 +87,13 @@ class Game():
 
   def getWinner(self):
     highestplayers = self.gethighestplayers()
-    if ((highestplayers == 1) or (len(playerlist) == 1)):
+    if ((highestplayers == 1) or (len(self.playerlist) == 1)):
       return highestplayers[0]
     else:
       return "House"
 
   def endGame(self):
-    if ((self.currentRound == self.totRounds) or (len(playerlist) == 0) or (len(playerlist) == 1) or self.checklocked()):
+    if ((self.currentRound == self.totRounds) or (len(self.playerlist) == 0) or (len(self.playerlist) == 1) or self.checklocked()):
       return True
     return False
 
