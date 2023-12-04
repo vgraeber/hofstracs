@@ -19,15 +19,11 @@ class Dice():
     rollDiceWord = "dice"
     wordEach = "each "
     diceWord = "dice"
-    wordValues = "values"
-    wordAre = "are"
     if (self.rpr == 1):
       rollDiceWord = "die"
       wordEach = ""
     if (self.numDice == 1):
       diceWord = "die"
-      wordValues = "value"
-      wordAre = "is"
     return f"You are rolling {self.rpr} {rollDiceWord} per round, {wordEach}with {self.numSides}. Currently, you are rolling {self.numDice} {diceWord}."
 
   def calcRPR(self, round):
