@@ -1,0 +1,3 @@
+Author: Vivian Graeber
+Date: 01/30/2024
+Description: Hello world in C++
