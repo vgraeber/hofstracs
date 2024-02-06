@@ -42,7 +42,6 @@ int main() {
   if (origNum < 0) {
     binN = toTwosComp(binN);
   }
-  cout << "Original Number: " << origNum << endl;
-  cout << "Original Number in Binary: " << binN << endl;
+  cout << "Number in Binary (Two's Complement): " << binN << endl;
   return 0;
 }
