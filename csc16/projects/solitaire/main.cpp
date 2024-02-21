@@ -1,10 +1,15 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <random>
 using namespace std;
 
 struct Deck {
   string arr[52];
+};
+
+struct Header {
+  string arr[7];
 };
 
 struct Tableau {
@@ -23,6 +28,11 @@ Deck carddeck() {
     }
   }
   return cards;
+}
+
+Header solitaireheader() {
+  Header header = {"***", "---", "   ", " 0S", " 0H", " 0C", " 0D"};
+  return header;
 }
 
 Tableau cardtableau() {
@@ -44,13 +54,20 @@ string fullname(string card) {
   return name;
 }
 
-void printtableau(string tableau[20][7]) {
+void printheader(Header header) {
+  for (int i = 0; i < 7; i++) {
+    cout << header.arr[i] << " ";
+  }
+  cout << endl << endl;
+}
+
+void printtableau(Tableau tableau) {
   for (int r = 0; r < 20; r++) {
     for (int c = 0; c < 7; c++) {
       if (r == 19) {
-        cout << tableau[r][c] << " ";
-      } else if (tableau[r + 1][c] == "   ") {
-        cout << tableau[r][c] << " ";
+        cout << tableau.arr[r][c] << " ";
+      } else if (tableau.arr[r + 1][c] == "   ") {
+        cout << tableau.arr[r][c] << " ";
       } else {
         cout << "***" << " ";
       }
@@ -61,19 +78,19 @@ void printtableau(string tableau[20][7]) {
 
 int main() {
   Deck cards = carddeck();
-  string tableau[20][7];
-  for (int r = 0; r < 20; r++) {
-    fill_n(tableau[r], 7, "   ");
-  }
-//  random_shuffle(&deck[0], &deck[52]);
+  Header header = solitaireheader();
+  Tableau tableau = cardtableau();
+  random_device rd;
+  mt19937 g(rd());
+  shuffle(begin(cards.arr), end(cards.arr), g);
   int counter = 0;
   for (int r = 0; r < 7; r++) {
     for (int c = r; c < 7; c++) {
-      tableau[r][c] = cards.arr[counter];
+      tableau.arr[r][c] = cards.arr[counter];
       counter += 1;
     }
   }
-  cout << "*** ***      0S  0H  0C  0D" << endl << endl;
+  printheader(header);
   printtableau(tableau);
   return 0;
 }
