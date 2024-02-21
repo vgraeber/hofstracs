@@ -58,7 +58,7 @@ void printrules() {
   cout << "This game is meant to be played in a command-line interface, a.k.a. a terminal, using keyboard input." << endl;
   cout << "If you are not playing this game with these, please switch now, as playing in a different environment is untested and may have bugs." << endl << endl;
   cout << "Note: For both space and display reasons, cards will be displayed in a condensed format. All cards will take up 3 spaces." << endl << "The following is a quick guide to what this shorthand means." << endl << "'***' means a card is face-down" << endl << "'---' means that spot has no cards" << endl << "' 6D', '10S', 'J H', and 'Q C' mean '6 of Diamonds', '10 of Spades', 'Jack of Hearts', and 'Queen of Clubs', respectively. These are examples of the cards." << endl << endl;
-  cout << "How To Play:" << endl << "Type either in the name of the card you would like to move and where, or stock to flip a new card." << endl << "Keep going until you either win or can't go any further." << "You may type 'exit' at any time to quit the game." << endl << "If you wish to see these instructions again, just type 'print rules'." << endl << endl << endl;
+  cout << "How To Play:" << endl << "Type either in the name of the card you would like to move and where, or stock to flip a new card." << endl << "Keep going until you either win or can't go any further." << endl << "You may type 'exit' at any time to quit the game." << endl << "If you wish to see these instructions again, just type 'print rules'." << endl << endl << endl;
 }
 
 string fullname(string card) {
@@ -120,6 +120,9 @@ int main() {
   do {
     printgame(header, tableau);
     getline(cin, userinput);
+    if (userinput == "print rules") {
+      printrules();
+    }
   } while (userinput != "exit");
   return 0;
 }
