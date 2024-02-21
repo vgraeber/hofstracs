@@ -25,6 +25,16 @@ Deck carddeck() {
   return cards;
 }
 
+Tableau cardtableau() {
+  Tableau tableau;
+  for (int r = 0; r < 20; r++) {
+    for (int c = 0; c < 7; c++) {
+      tableau.arr[r][c] = "   ";
+    }
+  }
+  return tableau;
+}
+
 string fullname(string card) {
   string suit;
   char cardsuit = card[card.length() - 1];
