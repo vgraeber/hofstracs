@@ -9,7 +9,8 @@ struct Deck {
 };
 
 struct Header {
-  string arr[7];
+  string arr[2][7];
+  string div = "~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 };
 
 struct Tableau {
@@ -31,7 +32,7 @@ Deck carddeck() {
 }
 
 Header solitaireheader() {
-  Header header = {"***", "---", "   ", "---", "---", "---", "---"};
+  Header header = {"***", "---", "   ", "---", "---", "---", "---", " C1", " C2", " C3", " C4", " C5", " C6", " C7"};
   return header;
 }
 
@@ -57,7 +58,7 @@ void printrules() {
   cout << "This game is meant to be played in a command-line interface, a.k.a. a terminal, using keyboard input." << endl;
   cout << "If you are not playing this game with these, please switch now, as playing in a different environment is untested and may have bugs." << endl << endl;
   cout << "Note: For both space and display reasons, cards will be displayed in a condensed format. All cards will take up 3 spaces." << endl << "The following is a quick guide to what this shorthand means." << endl << "'***' means a card is face-down" << endl << "'---' means that spot has no cards" << endl << "' 6D', '10S', 'J H', and 'Q C' mean '6 of Diamonds', '10 of Spades', 'Jack of Hearts', and 'Queen of Clubs', respectively. These are examples of the cards." << endl << endl;
-  cout << "How To Play:" << endl << "Type either in the name of the card you would like to move and where, or stock to flip a new card." << endl << "Keep going until you either win or can't go any further." << "You may type 'exit' at any time to quit the game." << endl << "If you wish to see these instructions again, just type 'print rules'." << endl << endl;
+  cout << "How To Play:" << endl << "Type either in the name of the card you would like to move and where, or stock to flip a new card." << endl << "Keep going until you either win or can't go any further." << "You may type 'exit' at any time to quit the game." << endl << "If you wish to see these instructions again, just type 'print rules'." << endl << endl << endl;
 }
 
 string fullname(string card) {
@@ -70,10 +71,16 @@ string fullname(string card) {
 }
 
 void printheader(Header header) {
-  for (int i = 0; i < 7; i++) {
-    cout << header.arr[i] << " ";
+  for (int r = 0; r < 2; r++) {
+    for (int i = 0; i < 7; i++) {
+      cout << header.arr[r][i] << " ";
+    }
+    cout << endl;
+    if (r == 0) {
+      cout << endl;
+    }
   }
-  cout << endl << endl;
+  cout << header.div << endl;
 }
 
 void printtableau(Tableau tableau) {
