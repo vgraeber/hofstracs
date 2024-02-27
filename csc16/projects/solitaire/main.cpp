@@ -34,24 +34,19 @@ class Game {
     inline static const string buffer = "  ";
     class Header {
       public:
-        string newcards[3] = {"***", "---", "   "};
-        string foundation[4] = {"---", "---", "---", "---"};
-        string colnums[7] = {" C1", " C2", " C3", " C4", " C5", " C6", " C7"};
-        string divs[7] = {"~~~", "~~~", "~~~", "~~~", "~~~", "~~~", "~~~"};
+        vector<vector<string>> header = makeheader();
+        vector<vector<string>> makeheader() {
+          header.resize(3);
+          header[0] = {"***", "---", "   ", "---", "---", "---", "---"};
+          header[1] = {" C1", " C2", " C3", " C4", " C5", " C6", " C7"};
+          header[2] = {"~~~", "~~~", "~~~", "~~~", "~~~", "~~~", "~~~"};
+          return header;
+        }
         void printheader() {
-          for (int i = 0; i < 3; i++) {
-            cout << newcards[i] << buffer;
-          }
-          for (int i = 0; i < 4; i++) {
-            cout << foundation[i] << buffer;
-          }
-          cout << endl;
-          for (int i = 0; i < 7; i++) {
-            cout << colnums[i] << buffer;
-          }
-          cout << endl;
-          for (int i = 0; i < 7; i++) {
-            cout << divs[i] << buffer;
+          for (int i = 0; i < header.size(); i++) {
+            for (int j = 0; j < header[i].size(); j++) {
+              cout << header[i][j] << buffer;
+            }
           }
           cout << endl;
         }
