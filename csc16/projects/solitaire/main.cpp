@@ -58,7 +58,7 @@ class Header {
       return header;
     }
     bool canaddtofoundation(string card, vector<vector<string>> header) {
-      unordered_map<string, string> nextcard = {{"--", "A "}, {"A ", " 2"}, {" 2", " 3"}, {" 3", " 4"}, {" 4", " 5"}, {" 5", " 6"}, {" 6", " 7"}, {" 7", " 8"}, {" 8", " 9"}, {" 9", "10"}, {"10", "J "}, {"J ", "Q "}, {"Q ", "K "}, {" K", "None"}};
+      unordered_map<string, string> nextcard = {{"--", "A "}, {"A ", " 2"}, {" 2", " 3"}, {" 3", " 4"}, {" 4", " 5"}, {" 5", " 6"}, {" 6", " 7"}, {" 7", " 8"}, {" 8", " 9"}, {" 9", "10"}, {"10", "J "}, {"J ", "Q "}, {"Q ", "K "}, {"K ", "--"}};
       for (int i = 0; i < 4; i++) {
         string cardnum = header[0][3 + i].substr(0 ,2);
         string reqcard = nextcard[cardnum] + header[0][3 + i][header[0][3 + i].length() - 1];
@@ -78,10 +78,10 @@ class Header {
       }
     }
     vector<vector<string>> remfromwaste(vector<string> cards, int cardind, vector<vector<string>> header) {
-      if (cardind == 1) {
+      if (cardind == 0) {
         header[0][1] = "---";
       } else {
-        header[0][1] = cards[cardind - 2];
+        header[0][1] = cards[cardind - 1];
       }
       return header;
     }
@@ -113,11 +113,12 @@ class Body {
       return tableau;
     }
     vector<vector<tuple<string, bool, bool>>> fillstarttableau(vector<string> cards, vector<vector<tuple<string, bool, bool>>> tableau) {
+      int cardind = 0;
       for (int i = 0; i < 7; i++) {
         for (int j = i; j < 7; j++) {
-          int cardind = (i * 7) + j;
           get<0>(tableau[i][j]) = cards[cardind];
           get<1>(tableau[i][j]) = false;
+          cardind += 1;
         }
       }
       for (int i = 0; i < 7; i++) {
@@ -147,7 +148,7 @@ class Body {
       }
       return true;
     }
-    vector<vector<tuple<string, bool, bool>>> remrow(vector<vector<tuple<string, bool, bool>>> tableau) {
+    vector<vector<tuple<string, bool, bool>>> remlastrow(vector<vector<tuple<string, bool, bool>>> tableau) {
       int currrows = tableau.size();
       tableau.resize(currrows - 1);
       return tableau;
@@ -161,7 +162,11 @@ class Body {
       }
       return tableau;
     }
-    vector<vector<tuple<string, bool, bool>>> addcard(int row, int col, string card, vector<vector<tuple<string, bool, bool>>> tableau) {
+    vector<vector<tuple<string, bool, bool>>> addcard(int col, string card, vector<vector<tuple<string, bool, bool>>> tableau) {
+      int row = findemptyrowincol(col, tableau);
+      if (row == tableau.size()) {
+        tableau = addrow(tableau);
+      }
       tableau[row][col] = make_tuple(card, true, true);
       get<2>(tableau[row - 1][col]) = false;
       return tableau;
@@ -196,9 +201,43 @@ class Body {
       }
       cout << endl;
     }
+    vector<int> getvalcols(string card, vector<vector<tuple<string, bool, bool>>> tableau) {
+      unordered_map<string, string> prevcardnums = {{"--", "None"}, {"A ", " 2"}, {" 2", " 3"}, {" 3", " 4"}, {" 4", " 5"}, {" 5", " 6"}, {" 6", " 7"}, {" 7", " 8"}, {" 8", " 9"}, {" 9", "10"}, {"10", "J "}, {"J ", "Q "}, {"Q ", "K "}, {"K ", "--"}};
+      unordered_map<char, vector<string>> prevsuits = {{'S', {"H", "D"}}, {'H', {"S", "C"}}, {'C', {"H", "D"}}, {'D', {"S", "C"}}, {'-', {"-", "-"}}};
+      string cardnum = card.substr(0, 2);
+      char cardsuit = card[card.length() - 1];
+      string prevcard1 = prevcardnums[cardnum] + prevsuits[cardsuit][0];
+      string prevcard2 = prevcardnums[cardnum] + prevsuits[cardsuit][1];
+      if (cardnum == "K ") {
+        prevcard1 = "---";
+        prevcard2 = "---";
+      }
+      vector<int> valcols;
+      for (int i = 0; i < 7; i++) {
+        int j = findemptyrowincol(i, tableau);
+        if (j != 0) {
+          j -= 1;
+        }
+        if ((get<0>(tableau[j][i]) == prevcard1) || (get<0>(tableau[j][i]) == prevcard2)) {
+          valcols.push_back(i);
+        }
+      }
+      return valcols;
+    }
+    vector<string> getvalcols(vector<vector<tuple<string, bool, bool>>> tableau) {
+      vector<string> valstrings;
+      for (int i = 0; i < tableau.size(); i++) {
+        for (int j = 0; j < tableau[i].size(); j++) {
+          if (get<1>(tableau[i][j])) {
+            valstrings.push_back(get<0>(tableau[i][j]));
+          }
+        }
+      }
+      return valstrings;
+    }
 };
 
-//class objects for our game :) - KEEP GLOBAL, MUCH EASIER THIS WAY
+//class objects for our game :) - KEEP GLOBAL, NEEDED FOR NEXT SECTION
 Deck deck;
 Header head;
 Body body;
@@ -229,15 +268,20 @@ void checktableau() {
     }
     colcheck.erase(colcheck.begin());
   }
+  while (body.checklastrow(tableau)) {
+    tableau = body.remlastrow(tableau);
+  }
 }
 
-void checkheader(int cardind) {
-  if (head.canaddtofoundation(header[0][1], header)) {
+int checkheader(int cardind) {
+  while (head.canaddtofoundation(header[0][1], header)) {
     header = head.addtofoundation(header[0][1], header);
+    cardind -= 1;
     header = head.remfromwaste(cards, cardind, header);
     cards = deck.remcard(cardind, cards);
     dispgame();
   }
+  return cardind;
 }
 
 int flipstock(int cardind) {
@@ -250,21 +294,65 @@ int flipstock(int cardind) {
   return cardind;
 }
 
+int movefromwaste(int cardind, int col) {
+  cardind -= 1;
+  tableau = body.addcard(col, header[0][1], tableau);
+  header = head.remfromwaste(cards, cardind, header);
+  cards = deck.remcard(cardind, cards);
+  dispgame();
+  return cardind;
+}
+
 int main() {
   int cardind = 0;
   tableau = body.fillstarttableau(cards, tableau);
+  for (int i = 0; i < 28; i++) {
+    cards = deck.remcard(0, cards);
+  }
   dispgame();
   string uin = "";
   while (uin != "exit") {
+    cardind = checkheader(cardind);
     checktableau();
-    checkheader(cardind);
     getline(cin, uin);
     if (uin == "stock") {
       cardind = flipstock(cardind);
     } else if (uin == "waste") {
-      
+      vector<int> valcols = body.getvalcols(header[0][1], tableau);
+      if (valcols.empty()) {
+        cout << "Sorry, that's not possible." << endl;
+        dispgame();
+      } else if (valcols.size() == 1) {
+        cardind = movefromwaste(cardind, valcols[0]);
+      } else {
+        cout << "Which column?" << endl;
+        for (int i = 0; i < valcols.size(); i++) {
+          cout << "'" << header[2][valcols[i]] << "'" << ", ";
+        }
+        cout << endl;
+        getline(cin, uin);
+      }
     } else if (uin != "exit") {
-      
+      vector<string> valstrings = body.getvalstrings(tableau);
+      if (find(valstrings.begin(), valstrings.end(), uin) != valstrings.end()) {
+        vector<int> valcols = body.getvalcols(uin, tableau);
+        if (valcols.empty()) {
+          cout << "Sorry, that's not possible." << endl;
+          dispgame();
+        } else if (valcols.size() == 1) {
+          cardind = movefromwaste(cardind, valcols[0]);
+        } else {
+          cout << "Which column?" << endl;
+          for (int i = 0; i < valcols.size(); i++) {
+           cout << "'" << header[2][valcols[i]] << "'" << ", ";
+          }
+          cout << endl;
+          getline(cin, uin);
+        }
+      } else {
+        cout << "Sorry, that's not possible." << endl;
+        dispgame();
+      }
     }
   }
   return 0;
