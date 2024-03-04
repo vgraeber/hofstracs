@@ -6,6 +6,7 @@
 #include <random>
 using namespace std;
 
+//this is the buffer between columns - DO NOT GO BELOW 2 SPACES
 string buffer = "  ";
 
 class Deck {
@@ -39,7 +40,7 @@ class Header {
     vector<vector<string>> makeheader() {
       vector<vector<string>> header;
       header.resize(4);
-      header[0] = {"***", "---", "   ", "---", "---", "---", "---"};
+      header[0] = {"***", "---", "   ", "--S", "--H", "--C", "--D"};
       header[1] = {"   ", "   ", "   ", "   ", "   ", "   ", "   "};
       header[2] = {" C1", " C2", " C3", " C4", " C5", " C6", " C7"};
       header[3] = {"~~~", "~~~", "~~~", "~~~", "~~~", "~~~", "~~~"};
@@ -56,6 +57,17 @@ class Header {
       header[0][3 + foundind] = card;
       return header;
     }
+    bool canaddtofoundation(string card, vector<vector<string>> header) {
+      unordered_map<string, string> nextcard = {{"--", "A "}, {"A ", " 2"}, {" 2", " 3"}, {" 3", " 4"}, {" 4", " 5"}, {" 5", " 6"}, {" 6", " 7"}, {" 7", " 8"}, {" 8", " 9"}, {" 9", "10"}, {"10", "J "}, {"J ", "Q "}, {"Q ", "K "}, {" K", "None"}};
+      for (int i = 0; i < 4; i++) {
+        string cardnum = header[0][3 + i].substr(0 ,2);
+        string reqcard = nextcard[cardnum] + header[0][3 + i][header[0][3 + i].length() - 1];
+        if (card == reqcard) {
+          return true;
+        }
+      }
+      return false;
+    }
     void printheader(vector<vector<string>> header) {
       cout << endl;
       for (int i = 0; i < header.size(); i++) {
@@ -65,7 +77,28 @@ class Header {
         cout << endl;
       }
     }
+    vector<vector<string>> remfromwaste(vector<string> cards, int cardind, vector<vector<string>> header) {
+      if (cardind == 1) {
+        header[0][1] = "---";
+      } else {
+        header[0][1] = cards[cardind - 2];
+      }
+      return header;
+    }
+    vector<vector<string>> addtowaste(vector<string> cards, int cardind, vector<vector<string>> header) {
+      if (cardind == cards.size()) {
+        header[0][0] = "***";
+        header[0][1] = "---";
+        return header;
+      }
+      header[0][1] = cards[cardind];
+      if (cardind == (cards.size() - 1)) {
+        header[0][0] = "---";
+      }
+      return header;
+    }
 };
+
 class Body {
   public:
     vector<vector<tuple<string, bool, bool>>> maketableau() {
@@ -89,6 +122,7 @@ class Body {
       }
       for (int i = 0; i < 7; i++) {
         get<1>(tableau[i][i]) = true;
+        get<2>(tableau[i][i]) = true;
       }
       return tableau;
     }
@@ -101,7 +135,9 @@ class Body {
           return (i + 1);
         }
       }
+      return -1;
     }
+    //checks to see if the last row can be removed
     bool checklastrow(vector<vector<tuple<string, bool, bool>>> tableau) {
       int row = tableau.size() - 1;
       for (int j = 0; j < tableau[row].size(); j++) {
@@ -162,16 +198,74 @@ class Body {
     }
 };
 
-int main() {
-  int cardind = 0;
-  Deck deck;
-  Header head;
-  Body body;
-  vector<string> cards = deck.shuffledeck(deck.filldeck());
-  vector<vector<string>> header = head.makeheader();
-  vector<vector<tuple<string, bool, bool>>> tableau = body.maketableau();
-  tableau = body.fillstarttableau(cards, tableau);
+//class objects for our game :) - KEEP GLOBAL, MUCH EASIER THIS WAY
+Deck deck;
+Header head;
+Body body;
+
+//the things the game will be based off of - NEED TO BE GLOBAL, WORKAROUNDS ARE TOO DIFFICULT BC WE NEED THESE PRETTY MUCH EVERYWHERE
+vector<string> cards = deck.shuffledeck(deck.filldeck());
+vector<vector<string>> header = head.makeheader();
+vector<vector<tuple<string, bool, bool>>> tableau = body.maketableau();
+
+void dispgame() {
   head.printheader(header);
   body.printbody(tableau);
+}
+
+void checktableau() {
+  vector<int> colcheck = {0, 1, 2, 3, 4, 5, 6};
+  while (colcheck.size() > 0) {
+    int i = colcheck[0];
+    int j = body.findemptyrowincol(i, tableau) - 1;
+    if (j == -1) {
+      j = 0;
+    }
+    if (head.canaddtofoundation(get<0>(tableau[j][i]), header)) {
+      header = head.addtofoundation(get<0>(tableau[j][i]), header);
+      tableau = body.remcard(get<0>(tableau[j][i]), tableau);
+      colcheck.push_back(i);
+      dispgame();
+    }
+    colcheck.erase(colcheck.begin());
+  }
+}
+
+void checkheader(int cardind) {
+  if (head.canaddtofoundation(header[0][1], header)) {
+    header = head.addtofoundation(header[0][1], header);
+    header = head.remfromwaste(cards, cardind, header);
+    cards = deck.remcard(cardind, cards);
+    dispgame();
+  }
+}
+
+int flipstock(int cardind) {
+  header = head.addtowaste(cards, cardind, header);
+  cardind += 1;
+  if (cardind == (cards.size() + 1)) {
+    cardind = 0;
+  }
+  dispgame();
+  return cardind;
+}
+
+int main() {
+  int cardind = 0;
+  tableau = body.fillstarttableau(cards, tableau);
+  dispgame();
+  string uin = "";
+  while (uin != "exit") {
+    checktableau();
+    checkheader(cardind);
+    getline(cin, uin);
+    if (uin == "stock") {
+      cardind = flipstock(cardind);
+    } else if (uin == "waste") {
+      
+    } else if (uin != "exit") {
+      
+    }
+  }
   return 0;
 }
