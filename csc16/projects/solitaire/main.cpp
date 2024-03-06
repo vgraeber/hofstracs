@@ -136,7 +136,6 @@ class Body {
           return (i + 1);
         }
       }
-      return -1;
     }
     //checks to see if the last row can be removed
     bool checklastrow(vector<vector<tuple<string, bool, bool>>> tableau) {
@@ -168,7 +167,9 @@ class Body {
         tableau = addrow(tableau);
       }
       tableau[row][col] = make_tuple(card, true, true);
-      get<2>(tableau[row - 1][col]) = false;
+      if (row != 0) {
+        get<2>(tableau[row - 1][col]) = false;
+      }
       return tableau;
     }
     vector<vector<tuple<string, bool, bool>>> remcard(string card, vector<vector<tuple<string, bool, bool>>> tableau) {
@@ -224,7 +225,7 @@ class Body {
       }
       return valcols;
     }
-    vector<string> getvalcols(vector<vector<tuple<string, bool, bool>>> tableau) {
+    vector<string> getvalstrings(vector<vector<tuple<string, bool, bool>>> tableau) {
       vector<string> valstrings;
       for (int i = 0; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[i].size(); j++) {
@@ -234,6 +235,16 @@ class Body {
         }
       }
       return valstrings;
+    }
+    vector<int> findcardpos(string card, vector<vector<tuple<string, bool, bool>>> tableau) {
+      for (int i = 0; i < tableau.size(); i++) {
+        for (int j = 0; j < tableau[i].size(); j++) {
+          if (get<0>(tableau[i][j]) == card) {
+            vector<int> cardpos = {i, j};
+            return cardpos;
+          }
+        }
+      }
     }
 };
 
@@ -246,6 +257,7 @@ Body body;
 vector<string> cards = deck.shuffledeck(deck.filldeck());
 vector<vector<string>> header = head.makeheader();
 vector<vector<tuple<string, bool, bool>>> tableau = body.maketableau();
+int cardind = 0;
 
 void dispgame() {
   head.printheader(header);
@@ -273,7 +285,7 @@ void checktableau() {
   }
 }
 
-int checkheader(int cardind) {
+void checkheader() {
   while (head.canaddtofoundation(header[0][1], header)) {
     header = head.addtofoundation(header[0][1], header);
     cardind -= 1;
@@ -281,30 +293,76 @@ int checkheader(int cardind) {
     cards = deck.remcard(cardind, cards);
     dispgame();
   }
-  return cardind;
 }
 
-int flipstock(int cardind) {
+void flipstock() {
   header = head.addtowaste(cards, cardind, header);
   cardind += 1;
   if (cardind == (cards.size() + 1)) {
     cardind = 0;
   }
   dispgame();
-  return cardind;
 }
 
-int movefromwaste(int cardind, int col) {
+void movefromwaste(int col) {
   cardind -= 1;
   tableau = body.addcard(col, header[0][1], tableau);
   header = head.remfromwaste(cards, cardind, header);
   cards = deck.remcard(cardind, cards);
   dispgame();
-  return cardind;
+}
+
+void moveintableau(string card, int col) {
+  vector<int> cardpos = body.findcardpos(card, tableau);
+  int end = body.findemptyrowincol(cardpos[1], tableau);
+  vector<string> cards;
+  for (int i = cardpos[0]; i < end; i++) {
+    cards.push_back(get<0>(tableau[i][cardpos[1]]));
+  }
+  for (int i = cards.size(); i > 0; i--) {
+    tableau = body.remcard(cards[i - 1], tableau);
+  }
+  for (int i = 0; i < cards.size(); i++) {
+    tableau = body.addcard(col, cards[i], tableau);
+  }
+  dispgame();
+}
+
+void invalid() {
+  cout << "Sorry, that's not possible." << endl;
+  dispgame();
+}
+
+void movecard(string card, vector<int> valcols, bool waste) {
+  if (valcols.empty()) {
+    invalid();
+  } else if (valcols.size() == 1) {
+    (waste) ? movefromwaste(valcols[0]) : moveintableau(card, valcols[0]);
+  } else {
+    cout << "Which column?" << endl;
+    vector<string> valstrcols;
+    string uin = "";
+    for (int i = 0; i < valcols.size(); i++) {
+      cout << "'" << header[2][valcols[i]] << "'";
+      valstrcols.push_back(header[2][valcols[i]]);
+      if (i != (valcols.size() - 1)){
+        cout << ", ";
+      }
+    }
+    cout << endl;
+    getline(cin, uin);
+    if (find(valstrcols.begin(), valstrcols.end(), uin) != valstrcols.end()) {
+      int col = int(uin[uin.length() - 1]);
+      (waste) ? movefromwaste(col) : moveintableau(card, col);
+    } else if (find(valcols.begin(), valcols.end(), (stoi(uin) - 1)) != valcols.end()) {
+      (waste) ? movefromwaste(stoi(uin) - 1) : moveintableau(card, stoi(uin) - 1);
+    } else {
+      invalid();
+    }
+  }
 }
 
 int main() {
-  int cardind = 0;
   tableau = body.fillstarttableau(cards, tableau);
   for (int i = 0; i < 28; i++) {
     cards = deck.remcard(0, cards);
@@ -312,46 +370,24 @@ int main() {
   dispgame();
   string uin = "";
   while (uin != "exit") {
-    cardind = checkheader(cardind);
+    checkheader();
     checktableau();
     getline(cin, uin);
     if (uin == "stock") {
-      cardind = flipstock(cardind);
+      flipstock();
     } else if (uin == "waste") {
       vector<int> valcols = body.getvalcols(header[0][1], tableau);
-      if (valcols.empty()) {
-        cout << "Sorry, that's not possible." << endl;
-        dispgame();
-      } else if (valcols.size() == 1) {
-        cardind = movefromwaste(cardind, valcols[0]);
-      } else {
-        cout << "Which column?" << endl;
-        for (int i = 0; i < valcols.size(); i++) {
-          cout << "'" << header[2][valcols[i]] << "'" << ", ";
-        }
-        cout << endl;
-        getline(cin, uin);
-      }
+      movecard(header[0][1], valcols, true);
+    } else if (uin == "help") {
+      continue;
     } else if (uin != "exit") {
       vector<string> valstrings = body.getvalstrings(tableau);
       if (find(valstrings.begin(), valstrings.end(), uin) != valstrings.end()) {
+        string card = uin;
         vector<int> valcols = body.getvalcols(uin, tableau);
-        if (valcols.empty()) {
-          cout << "Sorry, that's not possible." << endl;
-          dispgame();
-        } else if (valcols.size() == 1) {
-          cardind = movefromwaste(cardind, valcols[0]);
-        } else {
-          cout << "Which column?" << endl;
-          for (int i = 0; i < valcols.size(); i++) {
-           cout << "'" << header[2][valcols[i]] << "'" << ", ";
-          }
-          cout << endl;
-          getline(cin, uin);
-        }
+        movecard(card, valcols, false);
       } else {
-        cout << "Sorry, that's not possible." << endl;
-        dispgame();
+        invalid();
       }
     }
   }
