@@ -25,7 +25,7 @@ class Deck {
       shuffle(cards.begin(), cards.end(), rng);
     }
     void remstartcards() {
-      cards.erase(cards.begin() + 0, cards.begin() + 29);
+      cards.erase(cards.begin() + 0, cards.begin() + 28);
     }
     void remdiscard() {
       if (dispcard != "---") {
