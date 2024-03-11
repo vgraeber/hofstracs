@@ -1,9 +1,9 @@
-name: GitHub Actions Python and C++ Linting
+name: GitHub Marketplace Actions for Python and C++ Linting
 run-name: Syntax Check
 on: [push]
 
 jobs:
-  Check-Python-Syntax:
+  Check-Syntax:
     runs-on: ubuntu-latest
 
     steps:
