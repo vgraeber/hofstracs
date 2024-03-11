@@ -9,7 +9,5 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
-      - name: Python Linter
-        uses: sunnysid3up/python-linter@v0.1-beta.7
       - name: C/C++ Linter
         uses: cpp-linter/cpp-linter-action@v2.10.0
