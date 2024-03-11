@@ -14,14 +14,29 @@ Body body;
 void disprules() {
   cout << "Welcome to vgraeber's version of Klondike Solitaire!" << endl;
   cout << "Please note that in order to play this, you must be capable of giving keyboard input." << endl;
-  cout << "We reccommend that you familiarize yourself with the terms 'stock', 'waste', and 'tableau' before starting." << endl;
+  cout << "Here is a visual guide to the game with the areas some common terms refer to boxed in:" << endl << endl
+       << "stock ┌-discard     foundation" << endl
+       << "┌-┴-┐┌┴--┐     ┌--------┴---------┐" << endl
+       << "|***||---|     |--S  --H  --C  --D|" << endl
+       << "└---┘└---┘     └------------------┘" << endl
+       << "  C1   C2   C3   C4   C5   C6   C7" << endl
+       << " ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~" << endl
+       << "┌---------------------------------┐" << endl
+       << "|***  ***  ***  ***  ***  ***  ***|" << endl
+       << "|     ***  ***  ***  ***  ***  ***|" << endl
+       << "|          ***  ***  ***  ***  ***|" << endl
+       << "|               ***  ***  ***  ***├-tableau" << endl
+       << "|                    ***  ***  ***|" << endl
+       << "|                         ***  ***|" << endl
+       << "|                              ***|" << endl
+       << "└---------------------------------┘" << endl << endl;
   cout << "Here are the commands you can use:" << endl;
-  cout << "1. 'stock' - flips a card from the stock to the waste" << endl;
-  cout << "2. 'waste' - moves a card from the waste to the tableau" << endl;
-  cout << "3. 'help' - displays the commands again" << endl;
+  cout << "1. 'stock' - flips a card from the stock to the discard" << endl;
+  cout << "2. 'discard' - moves a card from the discard to the tableau" << endl;
+  cout << "3. 'help' - displays this text again" << endl;
   cout << "4. 'exit' - quits the game" << endl;
-  cout << "5. *insert card name here* - moves a card around on the tableau" << endl;
-  cout << "Note that all spacing and capitalization is significant, and that if you do not format your commands as displayed, they will not work." << endl;
+  cout << "5. '2 H', '5 C', '7 D', etc. - moves the specified card around on the tableau" << endl;
+  cout << "Note that all spacing is significant, and that if you do not format your commands correctly, they will not work." << endl;
   cout << "We hope you enjoy!" << endl;
 }
 
@@ -52,17 +67,17 @@ void checktableau() {
 }
 
 void checkheader() {
-  while (head.canaddtofound(deck.dispcard)) {
-    head.addtofound(deck.dispcard);
+  while (head.canaddtofound(deck.getdispcard())) {
+    head.addtofound(deck.getdispcard());
     deck.remdiscard();
-    head.discard(deck.dispcard);
+    head.discard(deck.getdispcard());
     dispgame();
   }
 }
 
 void flipstock() {
   deck.flipstock();
-  head.discard(deck.dispcard);
+  head.discard(deck.getdispcard());
   if (deck.endstock()) {
     head.togglestock();
   }
@@ -70,9 +85,9 @@ void flipstock() {
 }
 
 void movefromdiscard(int col) {
-  body.addcard(col, deck.dispcard);
+  body.addcard(col, deck.getdispcard());
   deck.remdiscard();
-  head.discard(deck.dispcard);
+  head.discard(deck.getdispcard());
   dispgame();
 }
 
@@ -136,14 +151,16 @@ int main() {
     checkheader();
     checktableau();
     getline(cin, uin);
+    transform(uin.begin(), uin.end(), uin.begin(), ::tolower);
     if (uin == "stock") {
       flipstock();
-    } else if (uin == "waste") {
-      vector<int> valcols = body.getvalcols(deck.dispcard);
-      movecard(deck.dispcard, valcols, true);
+    } else if (uin == "discard") {
+      vector<int> valcols = body.getvalcols(deck.getdispcard());
+      movecard(deck.getdispcard(), valcols, true);
     } else if (uin == "help") {
       disprules();
     } else if (uin != "exit") {
+      transform(uin.begin(), uin.end(), uin.begin(), ::toupper);
       vector<string> valstrings = body.getvalstrings();
       if (find(valstrings.begin(), valstrings.end(), uin) != valstrings.end()) {
         string card = uin;

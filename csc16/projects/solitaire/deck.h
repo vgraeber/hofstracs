@@ -7,8 +7,8 @@ using namespace std;
 class Deck {
     vector<string> cards;
     int nextcardind;
-  public:
     string dispcard;
+  public:
     void filldeck() {
       string suits[4] = {"S", "H", "C", "D"};
       string ranks[13] = {"A ", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", "10", "J ", "Q ", "K "};
@@ -49,6 +49,9 @@ class Deck {
     }
     bool endstock() {
       return (nextcardind == cards.size());
+    }
+    string getdispcard() {
+      return dispcard;
     }
     vector<string> getcards() {
       return cards;
