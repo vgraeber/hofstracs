@@ -1,3 +1,6 @@
+#ifndef BODY_H
+#define BODY_H
+
 #include <iostream>
 #include <vector>
 #include <tuple>
@@ -152,3 +155,5 @@ class Body {
       maketableau();
     }
 };
+
+#endif

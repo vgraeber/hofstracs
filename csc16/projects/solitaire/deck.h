@@ -1,3 +1,6 @@
+#ifndef DECK_H
+#define DECK_H
+
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -63,3 +66,5 @@ class Deck {
       nextcardind = 0;
     }
 };
+
+#endif

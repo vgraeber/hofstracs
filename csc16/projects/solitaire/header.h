@@ -1,3 +1,6 @@
+#ifndef HEADER_H
+#define HEADER_H
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -68,3 +71,5 @@ class Header {
       makeheader();
     }
 };
+
+#endif
