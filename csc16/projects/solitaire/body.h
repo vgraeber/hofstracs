@@ -9,6 +9,7 @@
 class Body {
   vector<vector<tuple<string, bool, bool>>> tableau;
   public:
+    //creates an empty tableau
     void maketableau() {
       tableau.resize(7);
       for (int i = 0; i < tableau.size(); i++) {
@@ -18,6 +19,7 @@ class Body {
         }
       }
     }
+    //fills the tableau at the start
     void fillstarttableau(vector<string> cards) {
       int cardind = 0;
       for (int i = 0; i < 7; i++) {
@@ -32,6 +34,7 @@ class Body {
         get<2>(tableau[i][i]) = true;
       }
     }
+    //finds the index of the next available space in a column
     int findemptyrowincol(int col) {
       for (int i = 0; i < tableau.size(); i++) {
         if (get<2>(tableau[i][col])) {
@@ -52,10 +55,12 @@ class Body {
       }
       return true;
     }
+    //removes the last row of the tableau
     void remlastrow() {
       int currrows = tableau.size();
       tableau.resize(currrows - 1);
     }
+    //adds a row to the tableau
     void addrow() {
       int currrows = tableau.size();
       tableau.resize(currrows + 1);
@@ -64,6 +69,7 @@ class Body {
         tableau[currrows][j] = make_tuple("   ", true, false);
       }
     }
+    //adds the given card to the tableau in the given column
     void addcard(int col, string card) {
       int row = findemptyrowincol(col);
       if (row == tableau.size()) {
@@ -74,6 +80,7 @@ class Body {
         get<2>(tableau[row - 1][col]) = false;
       }
     }
+    //removes the given card from the tableau
     void remcard(string card) {
       for (int i = 0; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[i].size(); j++) {
@@ -90,6 +97,7 @@ class Body {
         }
       }
     }
+    //prints the tableau
     void printbody() {
       string buffer = "  ";
       for (int i = 0; i < tableau.size(); i++) {
@@ -104,9 +112,11 @@ class Body {
       }
       cout << endl;
     }
+    //gets the card at the given coordinates
     string getcard(int row, int col) {
       return get<0>(tableau[row][col]);
     }
+    //gets the columns that the given card can be added to
     vector<int> getvalcols(string card) {
       unordered_map<string, string> prevcardnums = {{"--", "None"}, {"A ", " 2"}, {" 2", " 3"}, {" 3", " 4"}, {" 4", " 5"}, {" 5", " 6"}, {" 6", " 7"}, {" 7", " 8"}, {" 8", " 9"}, {" 9", "10"}, {"10", "J "}, {"J ", "Q "}, {"Q ", "K "}, {"K ", "--"}};
       unordered_map<char, vector<string>> prevsuits = {{'S', {"H", "D"}}, {'H', {"S", "C"}}, {'C', {"H", "D"}}, {'D', {"S", "C"}}, {'-', {"-", "-"}}};
@@ -130,17 +140,19 @@ class Body {
       }
       return valcols;
     }
+    //returns a list of cards that are face up on the tableau
     vector<string> getvalstrings() {
       vector<string> valstrings;
       for (int i = 0; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[i].size(); j++) {
-          if (get<1>(tableau[i][j])) {
+          if (get<1>(tableau[i][j]) and (get<0>(tableau[i][j]) != "   ")) {
             valstrings.push_back(get<0>(tableau[i][j]));
           }
         }
       }
       return valstrings;
     }
+    //finds the row and column of the given card
     vector<int> findcardpos(string card) {
       for (int i = 0; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[i].size(); j++) {

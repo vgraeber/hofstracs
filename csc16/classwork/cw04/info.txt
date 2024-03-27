@@ -1,0 +1,3 @@
+Author: Vivian Graeber
+Date: 02/26/2024
+Description: Examples of static and dynamic arrays

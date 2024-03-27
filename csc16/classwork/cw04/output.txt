@@ -1,0 +1,2 @@
+7
+Please enter an array size: 7

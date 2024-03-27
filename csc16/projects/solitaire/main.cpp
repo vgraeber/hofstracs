@@ -6,11 +6,12 @@
 #include <string>
 using namespace std;
 
-//class objects for our game :) - KEEP GLOBAL, NEEDED
+//class objects for our game :) - KEEP GLOBAL
 Deck deck;
 Header head;
 Body body;
 
+//displays the rules of the game, along with a diagram of what some terms refer to
 void disprules() {
   cout << "Welcome to vgraeber's version of Klondike Solitaire!" << endl;
   cout << "Please note that in order to play this, you must be capable of giving keyboard input." << endl;
@@ -33,18 +34,21 @@ void disprules() {
   cout << "Here are the commands you can use:" << endl;
   cout << "1. 'stock' - flips a card from the stock to the discard" << endl;
   cout << "2. 'discard' - moves a card from the discard to the tableau" << endl;
+  cout << "2.1. typing in the card in the discard (ex. 'K C', '10H') will function the same as typing 'discard'" << endl;
   cout << "3. 'help' - displays this text again" << endl;
   cout << "4. 'exit' - quits the game" << endl;
-  cout << "5. '2 H', '5 C', '7 D', etc. - moves the specified card around on the tableau" << endl;
+  cout << "5. '2H', '5C', '7D', etc. - moves the specified card around on the tableau" << endl;
   cout << "Note that all spacing is significant, and that if you do not format your commands correctly, they will not work." << endl;
   cout << "We hope you enjoy!" << endl;
 }
 
+//displays the current game
 void dispgame() {
   head.printheader();
   body.printbody();
 }
 
+//checks if a card on the tableau can be added to the foundation, and if yes, adds it to the foundation
 void checktableau() {
   vector<int> colcheck = {0, 1, 2, 3, 4, 5, 6};
   while (colcheck.size() > 0) {
@@ -66,6 +70,7 @@ void checktableau() {
   }
 }
 
+//checks if the card in the discard can be added to the foundation, and if yes, adds it to the foundation
 void checkheader() {
   while (head.canaddtofound(deck.getdispcard())) {
     head.addtofound(deck.getdispcard());
@@ -75,6 +80,7 @@ void checkheader() {
   }
 }
 
+//moves a card from the face-down stock pile to the face-up discard pile
 void flipstock() {
   deck.flipstock();
   head.discard(deck.getdispcard());
@@ -84,6 +90,7 @@ void flipstock() {
   dispgame();
 }
 
+//moves a card from the discard pile to the tableau
 void movefromdiscard(int col) {
   body.addcard(col, deck.getdispcard());
   deck.remdiscard();
@@ -91,6 +98,7 @@ void movefromdiscard(int col) {
   dispgame();
 }
 
+//moves a card or a stack of cards from one column on the tableau to another
 void moveintableau(string card, int col) {
   vector<int> cardpos = body.findcardpos(card);
   int end = body.findemptyrowincol(cardpos[1]);
@@ -107,11 +115,15 @@ void moveintableau(string card, int col) {
   dispgame();
 }
 
+//gets called when the user tries to input an invalid command
 void invalid() {
   cout << "Sorry, that's not possible." << endl;
   dispgame();
 }
 
+//gets called whenever the user wants to move a card
+//if there is only one option, it immediately delegates to the relevant function
+//otherwise, it first clarifies which column the user wants to move the card to, then delegates
 void movecard(string card, vector<int> valcols, bool waste) {
   if (valcols.empty()) {
     invalid();
@@ -151,6 +163,7 @@ int main() {
     checkheader();
     checktableau();
     getline(cin, uin);
+    uin.erase(remove(uin.begin(), uin.end(), ' '), uin.end());
     transform(uin.begin(), uin.end(), uin.begin(), ::tolower);
     if (uin == "stock") {
       flipstock();
@@ -161,13 +174,19 @@ int main() {
       disprules();
     } else if (uin != "exit") {
       transform(uin.begin(), uin.end(), uin.begin(), ::toupper);
-      vector<string> valstrings = body.getvalstrings();
-      if (find(valstrings.begin(), valstrings.end(), uin) != valstrings.end()) {
-        string card = uin;
-        vector<int> valcols = body.getvalcols(uin);
-        movecard(card, valcols, false);
+      unordered_map<char, string> cardnum = {{'A', "A "}, {'2', " 2"}, {'3', " 3"}, {'4', " 4"}, {'5', " 5"}, {'6', " 6"}, {'7', " 7"}, {'8', " 8"}, {'9', " 9"}, {'1', "10"}, {'J', "J "}, {'Q', "Q "}, {'K', "K "}};
+      string card = cardnum[uin[0]] + uin.substr(1);
+      if (card == deck.getdispcard()) {
+        vector<int> valcols = body.getvalcols(deck.getdispcard());
+        movecard(deck.getdispcard(), valcols, true);
       } else {
-        invalid();
+        vector<string> valstrings = body.getvalstrings();
+        if (find(valstrings.begin(), valstrings.end(), card) != valstrings.end()) {
+          vector<int> valcols = body.getvalcols(card);
+          movecard(card, valcols, false);
+        } else {
+          invalid();
+        }
       }
     }
     cout << endl;
