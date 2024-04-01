@@ -1,0 +1,8 @@
+Default constructor called for test1 in main
+In main function
+Default constructor called for test2 in subFunc
+In sub function
+Default constructor called for test3 in subFunc
+Destructor called for test3 in subFunc
+Destructor called for test2 in subFunc
+Destructor called for test1 in main
