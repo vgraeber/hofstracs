@@ -23,11 +23,6 @@ class Link {
       data = newdata;
       next = newnext;
     }
-/*
-    ~Link() {
-      
-    }
-*/
 };
 
 #endif
