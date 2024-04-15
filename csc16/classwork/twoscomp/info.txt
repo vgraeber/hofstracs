@@ -1,3 +1,0 @@
-Author: Vivian Graeber
-Date: 02/06/2024
-Description: Two's Complement in C++
