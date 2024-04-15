@@ -7,28 +7,29 @@ using namespace std;
 
 class LinkedList {
     Link *first;
-  public:
     bool isempty() {
       return (first == 0);
     }
-    void prepend(dtype data) {
+    void poserr(int reason) {
+      string reasons[3] = {"list does not exist", "less than 0", "greater than length of list"};
+      cerr << "invalid pos: " << reasons[reason] << endl;
+    }
+    void startlist(dtype data) {
       Link *newlink = new Link(data, first);
       this -> first = newlink;
     }
-    void poserr() {
-      cerr << "invalid pos" << endl;
-    }
+  public:
     void insert(dtype data, int pos) {
       if (pos < 0) {
-        poserr();
+        poserr(1);
       } else if (isempty()) {
-        prepend(data);
+        startlist(data);
       } else {
         Link *temp = first;
         for (int i = 0; i < (pos - 1); i++) {
           temp = temp -> getnext();
           if (temp == 0) {
-            poserr();
+            poserr(2);
           }
         }
         Link *newlink = new Link(data, (temp -> getnext()));
@@ -37,7 +38,7 @@ class LinkedList {
     }
     void append(dtype data) {
       if (isempty()) {
-        prepend(data);
+        startlist(data);
       } else {
         Link *temp = first;
         while ((temp -> getnext()) != 0) {
@@ -48,8 +49,10 @@ class LinkedList {
       }
     }
     void remove(int pos) {
-      if ((pos < 0) or isempty()) {
-        poserr();
+      if (isempty()) {
+        poserr(0);
+      } else if (pos < 0) {
+        poserr(1);
       } else if (pos == 0) {
         Link *temp = first;
         first = temp -> getnext();
@@ -59,12 +62,16 @@ class LinkedList {
         for (int i = 0; i < (pos - 1); i ++) {
           temp = temp -> getnext();
           if (temp == 0) {
-            poserr();
+            poserr(2);
           }
         }
         Link *remlink = temp -> getnext();
-        temp -> setnext(remlink -> getnext());
-        delete remlink;
+        if (remlink == 0) {
+          poserr(2);
+        } else {
+          temp -> setnext(remlink -> getnext());
+          delete remlink;
+        }
       }
     }
     void display() {

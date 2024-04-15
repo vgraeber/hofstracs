@@ -9,7 +9,7 @@ int main() {
     list.append(i);
   }
   list.display();
-  for (int i = 1; i < num; i++) {
+  for (int i = 0; i < num; i++) {
     list.insert(i, (i * 2));
   }
   list.display();
