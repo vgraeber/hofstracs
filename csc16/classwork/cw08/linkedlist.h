@@ -86,6 +86,8 @@ class LinkedList {
         delete remlink;
       }
       delete temp;
+      delete first;
+      first = 0;
     }
 };
 
