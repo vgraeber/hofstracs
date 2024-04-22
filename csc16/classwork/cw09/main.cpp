@@ -17,16 +17,16 @@ int evalexpr(char opp, int n1, int n2) {
       return n1 / n2;
     case '%':
       return n2 % n1;
-    default: 
+    default:
       cerr << "unsupported operator" << endl;
       return -1;
   }
 }
 
 void handleopp(char opp, Stack &name) {
-  int n1 = name.top();
-  name.pop();
   int n2 = name.top();
+  name.pop();
+  int n1 = name.top();
   name.pop();
   int res = evalexpr(opp, n1, n2);
   name.push(res);
