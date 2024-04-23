@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-typedef int stackele;
+template <typename stackele>
 
 class Stack {
   class Node {
@@ -29,7 +29,7 @@ class Stack {
     return (topptr == 0);
   }
   void stackerr() {
-    cerr << "Stack is empty" << std::endl;
+    std::cerr << "Stack is empty" << std::endl;
   }
   public:
     void push(stackele data) {
@@ -55,8 +55,9 @@ class Stack {
     void display() {
       Node *currptr;
       for (currptr = topptr; currptr != 0; currptr = (currptr -> getnext())) {
-        std::cout << currptr -> getdata() << std::endl;
+        std::cout << currptr -> getdata();
       }
+      std::cout << std::endl;
     }
     Stack &operator=(Stack &orig) {
       topptr = 0;

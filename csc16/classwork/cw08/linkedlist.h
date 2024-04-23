@@ -12,7 +12,7 @@ class LinkedList {
     }
     void poserr(int reason) {
       string reasons[3] = {"list does not exist", "less than 0", "greater than length of list"};
-      cerr << "invalid pos: " << reasons[reason] << std::endl;
+      std::cerr << "invalid pos: " << reasons[reason] << std::endl;
     }
     void startlist(dtype data) {
       Link *newlink = new Link(data, first);
