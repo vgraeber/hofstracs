@@ -2,7 +2,6 @@
 #define STACK_H
 
 #include <iostream>
-using namespace std;
 
 typedef int stackele;
 
@@ -30,7 +29,7 @@ class Stack {
     return (topptr == 0);
   }
   void stackerr() {
-    cerr << "Stack is empty" << endl;
+    cerr << "Stack is empty" << std::endl;
   }
   public:
     void push(stackele data) {
@@ -56,7 +55,7 @@ class Stack {
     void display() {
       Node *currptr;
       for (currptr = topptr; currptr != 0; currptr = (currptr -> getnext())) {
-        cout << currptr -> getdata() << endl;
+        std::cout << currptr -> getdata() << std::endl;
       }
     }
     Stack &operator=(Stack &orig) {

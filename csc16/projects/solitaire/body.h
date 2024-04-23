@@ -103,14 +103,14 @@ class Body {
       for (int i = 0; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[i].size(); j++) {
           if (get<1>(tableau[i][j])) {
-            cout << get<0>(tableau[i][j]) << buffer;
+            std::cout << get<0>(tableau[i][j]) << buffer;
           } else {
-            cout << "***" << buffer;
+            std::cout << "***" << buffer;
           }
         }
-        cout << endl;
+        std::cout << std::endl;
       }
-      cout << endl;
+      std::cout << std::endl;
     }
     //gets the card at the given coordinates
     string getcard(int row, int col) {

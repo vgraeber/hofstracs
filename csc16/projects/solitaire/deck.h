@@ -5,7 +5,6 @@
 #include <string>
 #include <algorithm>
 #include <random>
-using namespace std;
 
 class Deck {
     vector<string> cards;

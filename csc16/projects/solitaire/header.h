@@ -68,12 +68,12 @@ class Header {
     //prints the header
     void printheader() {
       string buffer = "  ";
-      cout << endl;
+      std::cout << std::endl;
       for (int i = 0; i < header.size(); i++) {
         for (int j = 0; j < header[i].size(); j++) {
-          cout << header[i][j] << buffer;
+          std::cout << header[i][j] << buffer;
         }
-        cout << endl;
+        std::cout << std::endl;
       }
     }
     Header() {
