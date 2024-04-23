@@ -37,7 +37,7 @@ class Queue {
       if (isempty()) {
         frontptr = new Node(data);
         endptr = frontptr;
-      } else{
+      } else {
         Node *newptr = new Node(data);
         endptr -> setnext(newptr);
         endptr = newptr;
