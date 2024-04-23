@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-  Queue name;
+  Queue<int> name;
   cout << "Testing the queue" << endl;
   cout << "Enqueueing: " << endl;
   for (int i = 0; i < 10; i++) {

@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-typedef int qele;
+template <typename qele>
 
 class Queue {
   class Node {
