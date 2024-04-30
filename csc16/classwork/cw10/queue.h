@@ -64,7 +64,7 @@ class Queue {
     void display() {
       Node *currptr;
       if ((typeid(qele) == typeid(float)) || (typeid(qele) == typeid(double))) {
-        std::cout<< std::fixed << std::setprecision(2);
+        std::cout << std::fixed << std::setprecision(2);
       }
       for (currptr = frontptr; currptr != endptr; currptr = (currptr -> getnext())) {
         std::cout << currptr -> getdata() << ", ";
