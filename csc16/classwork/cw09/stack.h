@@ -2,8 +2,9 @@
 #define STACK_H
 
 #include <iostream>
+#include <iomanip>
 
-template <typename stackele>
+template <typename stackele = int>
 
 class Stack {
   class Node {
@@ -54,6 +55,9 @@ class Stack {
     }
     void display() {
       Node *currptr;
+      if ((typeid(qele) == typeid(float)) || (typeid(qele) == typeid(double))) {
+        std::cout<< std::fixed << std::setprecision(2);
+      }
       for (currptr = topptr; currptr != 0; currptr = (currptr -> getnext())) {
         std::cout << currptr -> getdata();
       }

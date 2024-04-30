@@ -2,8 +2,9 @@
 #define QUEUE_H
 
 #include <iostream>
+#include <iomanip>
 
-template <typename qele>
+template <typename qele = int>
 
 class Queue {
   class Node {
@@ -62,6 +63,9 @@ class Queue {
     }
     void display() {
       Node *currptr;
+      if ((typeid(qele) == typeid(float)) || (typeid(qele) == typeid(double))) {
+        std::cout<< std::fixed << std::setprecision(2);
+      }
       for (currptr = frontptr; currptr != endptr; currptr = (currptr -> getnext())) {
         std::cout << currptr -> getdata() << ", ";
       }
