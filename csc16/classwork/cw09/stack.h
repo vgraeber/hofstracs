@@ -55,7 +55,7 @@ class Stack {
     }
     void display() {
       Node *currptr;
-      if ((typeid(qele) == typeid(float)) || (typeid(qele) == typeid(double))) {
+      if ((typeid(stackele) == typeid(float)) || (typeid(stackele) == typeid(double))) {
         std::cout << std::fixed << std::setprecision(2);
       }
       for (currptr = topptr; currptr != 0; currptr = (currptr -> getnext())) {

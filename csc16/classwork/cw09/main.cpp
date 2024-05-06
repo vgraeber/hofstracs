@@ -54,6 +54,7 @@ int main() {
   string uin;
   getline(cin, uin, '\n');
   stringstream strstream(uin);
+  cout << uin << endl;
   while (!strstream.eof()) {
     int ch = strstream.peek();
     if (isspace(ch)) {
