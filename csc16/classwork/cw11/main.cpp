@@ -3,10 +3,10 @@
 #include <vector>
 using namespace std;
 
-template <typename vectype>
+template <typename param>
 
-void display(vector<vectype> &vec) {
-  if ((typeid(vectype) == typeid(float)) || (typeid(vectype) == typeid(double))) {
+void display(param &vec) {
+  if ((typeid(param) == typeid(float)) || (typeid(param) == typeid(double))) {
     cout << fixed << setprecision(2);
   }
   for (int i = 0; i < (vec.size() - 1); i++) {
