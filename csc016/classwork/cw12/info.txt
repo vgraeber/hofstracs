@@ -1,0 +1,3 @@
+Author: Vivian Graeber
+Date: 04/30/2024
+Description: Working with vectors
