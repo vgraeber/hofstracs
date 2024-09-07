@@ -198,7 +198,7 @@ class DTeam extends Team {
         System.out.print(" - ");
         System.out.print(String.format("%" + 2 + "s", orderedTeams[i].losses));
         System.out.print(" - ");
-        System.out.print(String.format("%" + 2 + "s", orderedTeams[i].draws));
+        System.out.print(String.format("%" + 1 + "s", orderedTeams[i].draws));
         System.out.print("  win rate: ");
         System.out.println(Math.floor(orderedTeams[i].winRate * 100) / 100);
       }
