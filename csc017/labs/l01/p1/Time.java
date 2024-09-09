@@ -45,10 +45,8 @@ public class Time {
     for (int i = 0; i < times.length; i++) {
       sum = sum.add(times[i]);
     }
-    System.out.print("total time: ");
-    System.out.println(sum.toStr());
-    System.out.print("can still compare HTimes: ");
-    System.out.println(sum.compare(t2));
+    System.out.printf("total time: %s%n", sum.toStr());
+    System.out.printf("can still compare HTimes: %s%n", sum.compare(t2));
     System.out.println(new HTime(1, 0, 0).compare(new Time(60, 0)));
   }
   public static void main(String[] args) {
@@ -56,16 +54,11 @@ public class Time {
     t1.tick();
     Time t2 = new Time(1, 44);
     Time t3 = t1.add(t2);
-    System.out.print("t1: ");
-    System.out.println(t1.toStr());
-    System.out.print("t2: ");
-    System.out.println(t2.toStr());
-    System.out.print("sum Time: ");
-    System.out.println(t3.toStr());
-    System.out.print("compare t1 and t2: ");
-    System.out.println(t1.compare(t2));
-    System.out.print("compare t1 with equivalent value: ");
-    System.out.println(t1.compare(new Time(0, 136)));
+    System.out.printf("t1: %s%n", t1.toStr());
+    System.out.printf("t2: %s%n", t2.toStr());
+    System.out.printf("sum Time: %s%n", t3.toStr());
+    System.out.printf("compare t1 and t2: %s%n", t1.compare(t2));
+    System.out.printf("compare t1 with equivalent value: %s%n", t1.compare(new Time(0, 136)));
     main2();
   }
 }

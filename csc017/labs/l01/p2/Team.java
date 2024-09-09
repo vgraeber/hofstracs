@@ -1,6 +1,14 @@
 import java.util.*;
 
-public class Team {
+interface Playable {
+  void win();
+  void lose();
+  void printRecord();
+  void play(Team other);
+  double calcWinRate();
+}
+
+public class Team implements Playable{
   static String[] teamNames = {"49ers", "Bills", "Broncos", "Chargers", "Chiefs", "Cowboys", "Dolphins", "Eagles", "Falcons", "Giants", "Jets", "Packers", "Patriots", "Raiders", "Rams", "Saints", "Seahawks", "Steelers"};
   double winRate;
   int wins;
@@ -13,23 +21,20 @@ public class Team {
     winRate = 0;
     name = teamName;
   }
-  public void calcWinRate() {
+  public double calcWinRate() {
     double totGames = 0.0 + wins + losses;
-    winRate = wins / totGames;
+    return wins / totGames;
   }
   public void win() {
     wins += 1;
-    calcWinRate();
+    winRate = calcWinRate();
   }
   public void lose() {
     losses += 1;
-    calcWinRate();
+    winRate = calcWinRate();
   }
   public void printRecord() {
-    System.out.print("W-L-D: ");
-    System.out.print(wins);
-    System.out.print("-");
-    System.out.print(losses);
+    System.out.printf("W-L: %d%s%d", wins, "-", losses);
   }
   public void play(Team other) {
     Random randGen = new Random();
@@ -39,13 +44,11 @@ public class Team {
     if (rNum1 > rNum2) {
       this.win();
       other.lose();
-      //System.out.print(this.name);
-      //System.out.println(" win");
+      //System.out.printf("%s%s%n", this.name, " win");
     } else {
       this.lose();
       other.win();
-      //System.out.print(other.name);
-      //System.out.println(" win");
+      //System.out.printf("%s%s%n", other.name, " win");
     }
   }
   public static Team[] makeTeams(String[] teamNames) {
@@ -90,12 +93,8 @@ public class Team {
     } else {
       for (int i = 0; i < teams.length; i++) {
         System.out.print(String.format("%-" + longestStr + "s", orderedTeams[i].name));
-        System.out.print(" W-L: ");
-        System.out.print(String.format("%" + 2 + "s", orderedTeams[i].wins));
-        System.out.print(" - ");
-        System.out.print(String.format("%" + 2 + "s", orderedTeams[i].losses));
-        System.out.print("  win rate: ");
-        System.out.println(Math.floor(orderedTeams[i].winRate * 100) / 100);
+        System.out.printf(" W-L: %02d%s%02d", orderedTeams[i].wins, " - ", orderedTeams[i].losses);
+        System.out.printf("   win rate: %#.2f%n", orderedTeams[i].winRate);
       }
     }
   }
@@ -118,19 +117,19 @@ public class Team {
   }
 }
 
-class DTeam extends Team {
+class DTeam extends Team implements Playable {
   int draws;
   public DTeam(String teamName) {
     super(teamName);
     draws = 0;
   }
-  public void calcWinRate() {
+  public double calcWinRate() {
     double totGames = 0.0 + wins + losses + draws;
-    winRate = wins / totGames;
+    return wins / totGames;
   }
   public void draw() {
     draws += 1;
-    calcWinRate();
+    winRate = calcWinRate();
   }
   public void play(DTeam other) {
     Random randGen = new Random();
@@ -142,13 +141,11 @@ class DTeam extends Team {
     } else if (rNum1 > rNum2) {
       this.win();
       other.lose();
-      //System.out.print(this.name);
-      //System.out.println(" win");
+      //System.out.printf("%s%s%n", this.name, " win");
     } else {
       this.lose();
       other.win();
-      //System.out.print(other.name);
-      //System.out.println(" win");
+      //System.out.printf("%s%s%n", other.name, " win");
     }
   }
   public static DTeam[] makeTeams(String[] teamNames) {
@@ -188,19 +185,12 @@ class DTeam extends Team {
     }
     longestStr += 2;
     if (topOnly) {
-      System.out.print("The team with the highest win rate this season is the ");
-      System.out.println(orderedTeams[0].name);
+      System.out.printf("The team with the highest win rate this season is the %s%n", orderedTeams[0].name);
     } else {
       for (int i = 0; i < teams.length; i++) {
         System.out.print(String.format("%-" + longestStr + "s", orderedTeams[i].name));
-        System.out.print(" W-L-D: ");
-        System.out.print(String.format("%" + 2 + "s", orderedTeams[i].wins));
-        System.out.print(" - ");
-        System.out.print(String.format("%" + 2 + "s", orderedTeams[i].losses));
-        System.out.print(" - ");
-        System.out.print(String.format("%" + 1 + "s", orderedTeams[i].draws));
-        System.out.print("  win rate: ");
-        System.out.println(Math.floor(orderedTeams[i].winRate * 100) / 100);
+        System.out.printf(" W-L-D: %02d%s%02d%s%02d", orderedTeams[i].wins, " - ", orderedTeams[i].losses, " - ", orderedTeams[i].draws);
+        System.out.printf("   win rate: %#.2f%n", orderedTeams[i].winRate);
       }
     }
   }

@@ -51,75 +51,47 @@ public class Funcs {
     return false;
   }
   public static void printQ1(String testStr, String[] inputStrs) {
-    System.out.print("the string \"");
-    System.out.print(testStr);
-    System.out.print("\" is ");
+    System.out.printf("the string \"%s%s", testStr, "\" is ");
     if (!inArr(testStr, inputStrs)) {
       System.out.print("not ");
     }
     System.out.print("in the array of strings ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(inputStrs[i]);
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", inputStrs[i], "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(inputStrs[inputStrs.length - 1]);
-    System.out.println("\"");
+    System.out.printf("and \"%s%s%n", inputStrs[inputStrs.length - 1], "\"");
   }
   public static void printQ2A(int[] inputInts) {
     System.out.print("the sum of the integers ");
     for (int i = 0; i < inputInts.length - 1; i++) {
-      System.out.print(inputInts[i]);
-      System.out.print(", ");
+      System.out.printf("%d%s", inputInts[i], ", ");
     }
-    System.out.print("and ");
-    System.out.print(inputInts[inputInts.length - 1]);
-    System.out.print(" is ");
-    System.out.println(sum(inputInts));
+    System.out.printf("and %s%s%s%n", inputInts[inputInts.length - 1], " is ", sum(inputInts));
   }
   public static void printQ2B(String[] inputStrs) {
     System.out.print("the smallest string in the array of strings ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(inputStrs[i]);
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", inputStrs[i], "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(inputStrs[inputStrs.length - 1]);
-    System.out.print("\" is \"");
-    System.out.print(smallest(inputStrs));
-    System.out.println("\"");
+    System.out.printf("and \"%s%s%s%s%n", inputStrs[inputStrs.length - 1], "\" is \"", smallest(inputStrs), "\"");
   }
   public static void printQ3A(String[] inputStrs) {
     System.out.print("the array of strings ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(inputStrs[i]);
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", inputStrs[i], "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(inputStrs[inputStrs.length - 1]);
-    System.out.print("\" in reverse is ");
+    System.out.printf("and \"%s%s", inputStrs[inputStrs.length - 1], "\" in reverse is ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(reverse(inputStrs[i]));
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", reverse(inputStrs[i]), "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(reverse(inputStrs[inputStrs.length - 1]));
-    System.out.println("\"");
+    System.out.printf("and \"%s%s%n", reverse(inputStrs[inputStrs.length - 1]), "\"");
   }
   public static void printQ3B(String[] inputStrs) {
     System.out.print("the palindromes in the array of strings ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(inputStrs[i]);
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", inputStrs[i], "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(inputStrs[inputStrs.length - 1]);
-    System.out.print("\"");
+    System.out.printf("and \"%s%s", inputStrs[inputStrs.length - 1], "\"");
     int palindromes = 0;
     for (int i = 0; i < inputStrs.length; i++) {
       if (palindrome(inputStrs[i])) {
@@ -132,18 +104,14 @@ public class Funcs {
     } else if (palindromes == 1) {
       for (int i = 0; i < inputStrs.length; i++) {
         if (palindrome(inputStrs[i])) {
-          System.out.print("\"");
-          System.out.print(inputStrs[i]);
-          System.out.println("\"");
+          System.out.printf("\"%s%s%n", inputStrs[i], "\"");
         }
       }
     } else {
       int i = 0;
       while (palindromes > 0) {
         if (palindrome(inputStrs[i])) {
-          System.out.print("\"");
-          System.out.print(inputStrs[i]);
-          System.out.print("\"");
+          System.out.printf("\"%s%s", inputStrs[i], "\"");
           palindromes -= 1;
           if (palindromes > 0) {
             System.out.print(", ");
@@ -160,13 +128,9 @@ public class Funcs {
   public static void printQ4(String[] inputStrs) {
     System.out.print("the array of strings ");
     for (int i = 0; i < inputStrs.length - 1; i++) {
-      System.out.print("\"");
-      System.out.print(inputStrs[i]);
-      System.out.print("\", ");
+      System.out.printf("\"%s%s", inputStrs[i], "\", ");
     }
-    System.out.print("and \"");
-    System.out.print(inputStrs[inputStrs.length - 1]);
-    System.out.print("\"");
+    System.out.printf("and \"%s%s", inputStrs[inputStrs.length - 1], "\"");
     if (duplicate(inputStrs)) {
       System.out.println(" contains duplicates");
     } else {
