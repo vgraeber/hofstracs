@@ -45,7 +45,9 @@ public class maze extends mazebase {
   }
   @Override
   public void customize() {
-    mheight = 41;
-    mwidth = 45;
+    mheight = 55;
+    mwidth = 55;
+    bh = 15;
+    bw = 15;
   }
 }
