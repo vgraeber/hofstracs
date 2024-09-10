@@ -8,7 +8,7 @@ interface Playable {
   double calcWinRate();
 }
 
-public class Team implements Playable{
+public class Team {
   static String[] teamNames = {"49ers", "Bills", "Broncos", "Chargers", "Chiefs", "Cowboys", "Dolphins", "Eagles", "Falcons", "Giants", "Jets", "Packers", "Patriots", "Raiders", "Rams", "Saints", "Seahawks", "Steelers"};
   static int namePadLen;
   double winRate;
@@ -16,6 +16,12 @@ public class Team implements Playable{
   int losses;
   int draws;
   String name;
+  public Team() {
+    wins = 0;
+    losses = 0;
+    winRate = 0;
+    name = "Default name";
+  }
   public Team(String teamName) {
     wins = 0;
     losses = 0;
@@ -111,12 +117,16 @@ public class Team implements Playable{
     sortTeams(teams);
     seasonResults(teams, true);
     seasonResults(teams, false);
-    DTeam.main(args);
+    DTeam.main2();
   }
 }
 
-class DTeam extends Team implements Playable {
+class DTeam extends Team {
   int draws;
+  public DTeam() {
+    super();
+    draws = 0;
+  }
   public DTeam(String teamName) {
     super(teamName);
     draws = 0;
@@ -128,6 +138,7 @@ class DTeam extends Team implements Playable {
     }
     return teams;
   }
+  @Override
   public double calcWinRate() {
     double totGames = 0.0 + wins + losses + draws;
     return wins / totGames;
@@ -160,6 +171,7 @@ class DTeam extends Team implements Playable {
       }
     }
   }
+  @Override
   public void printRecord() {
     System.out.printf("%-" + namePadLen + "s%s%02d%s%02d%s%02d%s%#.2f%n", name, " W-L-D: ", wins, " - ", losses, " - ", draws, "   win rate: ", winRate);
   }
@@ -172,7 +184,7 @@ class DTeam extends Team implements Playable {
       }
     }
   }
-  public static void main(String[] args) {
+  public static void main2() {
     DTeam[] teams = makeTeams(teamNames);
     season(teams);
     sortTeams(teams);
