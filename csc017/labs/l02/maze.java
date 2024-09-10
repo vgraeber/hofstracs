@@ -3,9 +3,9 @@ public class maze extends mazebase {
   static int[] dirs = {0, 1, 2, 3};
   static int[] rowChange = {-1, 1, 0, 0};
   static int[] colChange = {0, 0, 1, -1};
-  /*public maze() {
+  public maze() {
     super();
-  }*/
+  }
   public void shuffleDirs(int[] dirs) {
     for (int i = dirs.length - 1; i > 0; i--) {
       int j = (int)(Math.random() * (i + 1));
@@ -15,7 +15,7 @@ public class maze extends mazebase {
     }
   }
   public boolean inBounds(int row, int col) {
-    if (((0 < row) && (row < mwidth - 1)) && ((0 < col) && (col < mheight - 1))) {
+    if (((0 < row) && (row < mheight - 1)) && ((0 < col) && (col < mwidth - 1))) {
       return true;
     }
     return false;
@@ -40,13 +40,12 @@ public class maze extends mazebase {
       }
     }
   }
-  public static void main(String[] av) {
+  public static void main(String[] args) {
 	  new maze();
   }
-  // other hints:  override customize to change maze parameters:
   @Override
   public void customize() {
-    mwidth = 41;
     mheight = 41;
+    mwidth = 45;
   }
 }
