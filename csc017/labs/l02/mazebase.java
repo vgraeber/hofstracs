@@ -46,7 +46,8 @@ protected int bh = 20; 	// height of a graphical block
 protected int bw = 20;	// width of a graphical block
 private int ah, aw;	// height and width of graphical maze (don't change)
     /** "y-offset", which is required on some systems that automatically displays a title bar for every window. */
-protected int yoff = 40;    // init y-cord of maze
+protected int yoff = 70;    // init y-cord of maze
+protected int xoff = 50;
 private Image screen1;    // static background buffer
 private Image screen2;    // animation frame buffer
 private Graphics g;  // draw to screen1
@@ -86,13 +87,13 @@ protected int startdigy = 1;
    ah = bh*mheight;
    aw = bw*mwidth;
    M = new int[mheight][mwidth];  // initialize maze (all  0's - walls).
-   this.setBounds(0,0,aw+10,10+ah+yoff);	
+   this.setBounds(0,0,aw+50+xoff,50+ah+yoff);	
    this.setVisible(true);
    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
    this.addKeyListener(this);
    try{Thread.sleep(500);} catch(Exception e) {} // Synch with system
-   screen1 = createImage(aw+10,10+ah+yoff);
-   screen2 = createImage(aw+10,10+ah+yoff);   
+   screen1 = createImage(aw+10+xoff,10+ah+yoff);
+   screen2 = createImage(aw+10+xoff,10+ah+yoff);   
    g = screen1.getGraphics();
    g2 = screen2.getGraphics();   
    dg = getGraphics();    //g.setColor(Color.red);
@@ -116,7 +117,7 @@ public void paint(Graphics g) {} // override automatic repaint
 private void setup()
    {
      g.setColor(wallcolor);
-     g.fill3DRect(0,yoff,aw,ah,true);  // fill raised rectangle
+     g.fill3DRect(xoff,yoff,aw,ah,true);  // fill raised rectangle
      g.setColor(pathcolor);
      try {
         g.setFont(new Font("Serif",Font.BOLD,bh*3/4));      // might not work
@@ -179,11 +180,11 @@ public void drawblock(int y, int x)
 private void drawblock(Graphics g,int y, int x)
     {
 	g.setColor(pathcolor);
-	g.fillRect(x*bw,yoff+(y*bh),bw,bh);
+	g.fillRect(xoff+(x*bw),yoff+(y*bh),bw,bh);
 	g.setColor(pencolor);
 	// following line displays value of M[y][x] in the graphical maze:
 	if (showvalue)
-	  g.drawString(""+M[y][x],(x*bw)+(bw/2-4),yoff+(y*bh)+(bh/2+6));
+	  g.drawString(""+M[y][x],xoff+(x*bw)+(bw/2-4),yoff+(y*bh)+(bh/2+6));
     }    
 
     /** draws a solid circle of color {@link dotcolor} corresponding to matrix
@@ -198,7 +199,7 @@ private void drawdot(Graphics g, int y, int x)
     {
 	if (usegif && animatedgif!=null)
 	    {
-		g.drawImage(animatedgif,x*bw,yoff+(y*bh),bw,bh,null);
+		g.drawImage(animatedgif,xoff+(x*bw),yoff+(y*bh),bw,bh,null);
 	    }
 	else
 	    {
@@ -214,14 +215,14 @@ protected void drawgif2(int y,Image gif,int x) { drawgif(g2,gif,y,x);}
 
 private void drawgif(Graphics g, Image gif, int y, int x)
     {
-        g.drawImage(gif,x*bw,yoff+(y*bh),bw,bh,null);        
+        g.drawImage(gif,xoff+(x*bw),yoff+(y*bh),bw,bh,null);        
     }
 
     /** displays string message m at top row of maze */
 public void drawMessage(String m)
     {
 	g.setColor(wallcolor);
-	g.fillRect(0,yoff,bw*mwidth,bh);
+	g.fillRect(xoff,yoff,bw*mwidth,bh);
 	g.setColor(pencolor); // erase line
         g.drawString(m,10,yoff+bh-4);	
     }
