@@ -1,9 +1,9 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class maze extends mazebase {
   static int[] rowChange = {-1, 1, 0, 0};
   static int[] colChange = {0, 0, 1, -1};
+  static ArrayList<int[]> solution = new ArrayList<int[]>();
   public maze() {
     super();
   }
@@ -56,7 +56,6 @@ public class maze extends mazebase {
         if ((potDirs > 2) && (M[row][col] >= 1)) {
           potDirs -= 1;
           M[row][col] = potDirs;
-          //System.out.printf("%s%02d%s%02d%s%d%n", "row: ", row, " col: ", col, " potDirs: ", potDirs);
           drawblock(row, col);
           nextframe();
         }
@@ -85,40 +84,27 @@ public class maze extends mazebase {
     int endCol = mwidth - 2;
     countMaze();
     int[] dirs = {0, 1, 2, 3};
-    int[][] Maze = new int[M.length][];
-    for (int i = 0; i < M.length; i++) {
-      Maze[i] = Arrays.copyOf(M[i], M.length);
-    }
-    ArrayList<int[]> solution = new ArrayList<int[]>();
     while (!solved(currRow, currCol, endRow, endCol)) {
       boolean moved = true;
       while (!solved(currRow, currCol, endRow, endCol) && moved) {
         for (int dir = 0; dir < dirs.length; dir++) {
           int newRow = currRow + rowChange[dir];
           int newCol = currCol + colChange[dir];
-          if ((Maze[newRow][newCol] > 0) && notPrevSpace(newRow, newCol, solution)) {
-            Maze[currRow][currCol] -= 1;
-            int[] info = {currRow, currCol, Maze[currRow][currCol]};
+          if ((M[newRow][newCol] > 0) && notPrevSpace(newRow, newCol, solution)) {
+            M[currRow][currCol] -= 1;
+            int[] info = {currRow, currCol, M[currRow][currCol]};
             solution.add(info);
-            drawdot(currRow, currCol);
-            nextframe(40);
             currRow = newRow;
             currCol = newCol;
             break;
           } else if (dir == (dirs.length - 1)) {
-            Maze[currRow][currCol] -= 1;
+            M[currRow][currCol] -= 1;
             moved =  false;
-            drawdot(currRow, currCol);
-            nextframe(80);
-            drawblock(currRow, currCol);
-            nextframe(40);
           }
         }
       }
       if (!solved(currRow, currCol, endRow, endCol)) {
         while (solution.get(solution.size() - 1)[2] == 0) {
-          drawblock(solution.get(solution.size() - 1)[0], solution.get(solution.size() - 1)[1]);
-          nextframe(40);
           solution.remove(solution.size() - 1);
         }
         currRow = solution.get(solution.size() - 1)[0];
@@ -126,8 +112,24 @@ public class maze extends mazebase {
         solution.remove(solution.size() - 1);
       }
     }
-    drawdot(currRow, currCol);
-    nextframe();
+    int[] info = {currRow, currCol, M[currRow][currCol]};
+    solution.add(info);
+  }
+  @Override
+  public void trace() {
+    for (int row = 0; row < M.length; row++) {
+      for (int col = 0; col < M[row].length; col++) {
+        if (M[row][col] > 0) {
+          drawblock(row, col);
+          nextframe();
+        }
+      }
+    }
+    for (int i = 0; i < solution.size(); i++) {
+      int[] info = solution.get(i);
+      drawdot(info[0], info[1]);
+      nextframe(40);
+    }
   }
   public static void main(String[] args) {
 	  new maze();
