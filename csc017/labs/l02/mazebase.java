@@ -204,7 +204,7 @@ private void drawdot(Graphics g, int y, int x)
 	else
 	    {
 		g.setColor(dotcolor);
-		g.fillOval(x*bw,yoff+(y*bh),bw,bh);
+		g.fillOval(xoff+(x*bw),yoff+(y*bh),bw,bh);
 	    }
         if (autodelay) try{Thread.sleep(dtime);} catch(Exception e) {} 
     }
