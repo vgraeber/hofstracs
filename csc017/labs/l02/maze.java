@@ -57,7 +57,7 @@ public class maze extends mazebase {
           potDirs -= 1;
           M[row][col] = potDirs;
           drawblock(row, col);
-          nextframe();
+          //nextframe();
         }
       }
     }
@@ -68,7 +68,7 @@ public class maze extends mazebase {
     }
     return false;
   }
-  public boolean notPrevSpace(int row, int col, ArrayList<int[]> solution) {
+  public boolean notPrevSpace(int row, int col) {
     if (solution.size() == 0) {
       return true;
     } else if ((row != solution.get(solution.size() - 1)[0]) || (col != solution.get(solution.size() - 1)[1])) {
@@ -81,8 +81,12 @@ public class maze extends mazebase {
     int currRow = 1;
     int currCol = 1;
     int endRow = mheight - 2;
-    int endCol = mwidth - 2;
+    int endCol = mwidth - 1;
+    M[endRow][endCol] = 1;
+    drawblock(endRow, endCol);
     countMaze();
+    drawdot(currRow, currCol);
+    nextframe(40);
     int[] dirs = {0, 1, 2, 3};
     while (!solved(currRow, currCol, endRow, endCol)) {
       boolean moved = true;
@@ -90,7 +94,10 @@ public class maze extends mazebase {
         for (int dir = 0; dir < dirs.length; dir++) {
           int newRow = currRow + rowChange[dir];
           int newCol = currCol + colChange[dir];
-          if ((M[newRow][newCol] > 0) && notPrevSpace(newRow, newCol, solution)) {
+          if ((M[newRow][newCol] > 0) && notPrevSpace(newRow, newCol)) {
+            drawdot(newRow, newCol);
+            drawblock(currRow, currCol);
+            nextframe(40);
             M[currRow][currCol] -= 1;
             int[] info = {currRow, currCol, M[currRow][currCol]};
             solution.add(info);
@@ -99,12 +106,18 @@ public class maze extends mazebase {
             break;
           } else if (dir == (dirs.length - 1)) {
             M[currRow][currCol] -= 1;
+            drawdot(solution.get(solution.size() - 1)[0], solution.get(solution.size() - 1)[1]);
+            drawblock(currRow, currCol);
+            nextframe(40);
             moved =  false;
           }
         }
       }
       if (!solved(currRow, currCol, endRow, endCol)) {
         while (solution.get(solution.size() - 1)[2] == 0) {
+          drawdot(solution.get(solution.size() - 2)[0], solution.get(solution.size() - 2)[1]);
+          drawblock(solution.get(solution.size() - 1)[0], solution.get(solution.size() - 1)[1]);
+          nextframe(40);
           solution.remove(solution.size() - 1);
         }
         currRow = solution.get(solution.size() - 1)[0];
@@ -117,6 +130,7 @@ public class maze extends mazebase {
   }
   @Override
   public void trace() {
+    /*
     for (int row = 0; row < M.length; row++) {
       for (int col = 0; col < M[row].length; col++) {
         if (M[row][col] > 0) {
@@ -125,7 +139,8 @@ public class maze extends mazebase {
         }
       }
     }
-    for (int i = 0; i < solution.size(); i++) {
+    */
+    for (int i = solution.size() - 1; i >= 0; i--) {
       int[] info = solution.get(i);
       drawdot(info[0], info[1]);
       nextframe(40);
@@ -136,10 +151,12 @@ public class maze extends mazebase {
   }
   @Override
   public void customize() {
+    /*
     mheight = 51;
     mwidth = 51;
     bh = 15;
     bw = 15;
-    showvalue = true;
+    */
+    //showvalue = true;
   }
 }
