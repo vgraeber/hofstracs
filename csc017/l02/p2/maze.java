@@ -2,14 +2,14 @@ import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 
-public class mazegame extends mazebase {
+public class maze extends mazebase {
   static int[] rowChange = {-1, 1, 0, 0};
   static int[] colChange = {0, 0, 1, -1};
   static ArrayList<int[]> solution = new ArrayList<int[]>();
   static int playerRow = 1;
   static int playerCol = 1;
   static int playerSolve = 0;
-  public mazegame() {
+  public maze() {
     super();
   }
   public void shuffleDirs(int[] dirs) {
@@ -146,24 +146,27 @@ public class mazegame extends mazebase {
     int newCol = playerCol;
     for (int dir : dirs) {
       if (key == arrows[dir]) {
-        newRow += rowChange[dir];
-        newCol += colChange[dir];
+        newRow += rowChange[dirs[dir]];
+        newCol += colChange[dirs[dir]];
       } else if (key == wsad[dir]) {
-        newRow += rowChange[dir];
-        newCol += colChange[dir];
+        newRow += rowChange[dirs[dir]];
+        newCol += colChange[dirs[dir]];
       }
     }
     if (M[newRow][newCol] == 0) {
-      drawMessage("Wall");
+      drawMessage("WALL");
     } else {
       if (solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
         drawMessage("Congrats!");
       } else if (M[newRow][newCol] > 0) {
-        drawMessage("Wrong way");
+        drawMessage("WRONG WAY");
       } else {
-        int[] info = solution.get(playerSolve + 1);
-        if ((newRow != info[0]) || (newCol != info[1])) {
-          drawMessage("Going backwards");
+        int[] currInfo = solution.get(playerSolve);
+        int[] newInfo = solution.get(playerSolve + 1);
+        if ((newRow == currInfo[0]) && (newCol == currInfo[1])) {
+          drawMessage("");
+        } else if ((newRow != newInfo[0]) || (newCol != newInfo[1])) {
+          drawMessage("BACKWARDS");
           playerSolve -= 1;
         } else {
           drawMessage("");
@@ -174,9 +177,9 @@ public class mazegame extends mazebase {
       playerRow = newRow;
       playerCol = newCol;
       drawdot(playerRow, playerCol);
-      nextframe();
-      delay(1000);
     }
+    nextframe();
+    delay(250);
   }
   @Override
   public void play() {
@@ -188,6 +191,6 @@ public class mazegame extends mazebase {
   }
   @Override
   public void customize() {
-    //showvalue = true;
+    pencolor = Color.black;
   }
 }
