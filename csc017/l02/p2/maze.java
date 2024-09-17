@@ -144,42 +144,44 @@ public class maze extends mazebase {
     int[] dirs = {0, 1, 3, 2};
     int newRow = playerRow;
     int newCol = playerCol;
-    for (int dir : dirs) {
-      if (key == arrows[dir]) {
-        newRow += rowChange[dirs[dir]];
-        newCol += colChange[dirs[dir]];
-      } else if (key == wsad[dir]) {
-        newRow += rowChange[dirs[dir]];
-        newCol += colChange[dirs[dir]];
-      }
-    }
-    if (M[newRow][newCol] == 0) {
-      drawMessage("WALL");
-    } else {
-      if (solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
-        drawMessage("Congrats!");
-      } else if (M[newRow][newCol] > 0) {
-        drawMessage("WRONG WAY");
-      } else {
-        int[] currInfo = solution.get(playerSolve);
-        int[] newInfo = solution.get(playerSolve + 1);
-        if ((newRow == currInfo[0]) && (newCol == currInfo[1])) {
-          drawMessage("");
-        } else if ((newRow != newInfo[0]) || (newCol != newInfo[1])) {
-          drawMessage("BACKWARDS");
-          playerSolve -= 1;
-        } else {
-          drawMessage("");
-          playerSolve += 1;
+    if (!solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
+      for (int dir : dirs) {
+        if (key == arrows[dir]) {
+          newRow += rowChange[dirs[dir]];
+          newCol += colChange[dirs[dir]];
+        } else if (key == wsad[dir]) {
+          newRow += rowChange[dirs[dir]];
+          newCol += colChange[dirs[dir]];
         }
       }
-      drawblock(playerRow, playerCol);
-      playerRow = newRow;
-      playerCol = newCol;
-      drawdot(playerRow, playerCol);
+      if (M[newRow][newCol] == 0) {
+        drawMessage("WALL");
+      } else {
+        if (solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
+          drawMessage("CONGRATS!");
+        } else if (M[newRow][newCol] > 0) {
+          drawMessage("WRONG WAY");
+        } else {
+          int[] currInfo = solution.get(playerSolve);
+          int[] newInfo = solution.get(playerSolve + 1);
+          if ((newRow == currInfo[0]) && (newCol == currInfo[1])) {
+            drawMessage("");
+          } else if ((newRow != newInfo[0]) || (newCol != newInfo[1])) {
+            drawMessage("BACKWARDS");
+            playerSolve -= 1;
+          } else {
+            drawMessage("");
+            playerSolve += 1;
+          }
+        }
+        drawblock(playerRow, playerCol);
+        playerRow = newRow;
+        playerCol = newCol;
+        drawdot(playerRow, playerCol);
+      }
+      nextframe();
+      delay(250);
     }
-    nextframe();
-    delay(250);
   }
   @Override
   public void play() {
@@ -192,5 +194,7 @@ public class maze extends mazebase {
   @Override
   public void customize() {
     pencolor = Color.black;
+    mheight = 21;
+    mwidth = 31;
   }
 }

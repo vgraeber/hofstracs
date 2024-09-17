@@ -224,7 +224,7 @@ public void drawMessage(String m)
 	g.setColor(wallcolor);
 	g.fillRect(xoff,yoff,bw*mwidth,bh);
 	g.setColor(pencolor); // erase line
-        g.drawString(m,xoff+50,yoff+bh-4);	
+        g.drawString(m,xoff+bw-4,yoff+bh-4);	
     }
 
 ////// the following functions are to be overriden in subclass:
