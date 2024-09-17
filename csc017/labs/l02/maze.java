@@ -57,7 +57,6 @@ public class maze extends mazebase {
           potDirs -= 1;
           M[row][col] = potDirs;
           drawblock(row, col);
-          //nextframe();
         }
       }
     }
@@ -109,7 +108,7 @@ public class maze extends mazebase {
             M[currRow][currCol] -= 1;
             drawdot(solution.getLast()[0], solution.getLast()[1]);
             drawblock(currRow, currCol);
-            nextframe(2*nextFrameDelay);
+            nextframe(2 * nextFrameDelay);
             moved =  false;
           }
         }
@@ -131,16 +130,6 @@ public class maze extends mazebase {
   }
   @Override
   public void trace() {
-    /*
-    for (int row = 0; row < M.length; row++) {
-      for (int col = 0; col < M[row].length; col++) {
-        if (M[row][col] > 0) {
-          drawblock(row, col);
-          nextframe();
-        }
-      }
-    }
-    */
     for (int i = solution.size() - 1; i >= 0; i--) {
       int[] info = solution.get(i);
       drawdot(info[0], info[1]);
@@ -158,6 +147,6 @@ public class maze extends mazebase {
     bh = 15;
     bw = 15;
     */
-    //showvalue = true;
+    showvalue = true;
   }
 }
