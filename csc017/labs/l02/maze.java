@@ -86,18 +86,19 @@ public class maze extends mazebase {
     drawblock(endRow, endCol);
     countMaze();
     drawdot(currRow, currCol);
-    nextframe(40);
+    int nextFrameDelay = 40;
+    nextframe(nextFrameDelay);
     int[] dirs = {0, 1, 2, 3};
     while (!solved(currRow, currCol, endRow, endCol)) {
       boolean moved = true;
-      while (!solved(currRow, currCol, endRow, endCol) && moved) {
+      while (moved && !solved(currRow, currCol, endRow, endCol)) {
         for (int dir = 0; dir < dirs.length; dir++) {
           int newRow = currRow + rowChange[dir];
           int newCol = currCol + colChange[dir];
           if ((M[newRow][newCol] > 0) && notPrevSpace(newRow, newCol)) {
             drawdot(newRow, newCol);
             drawblock(currRow, currCol);
-            nextframe(40);
+            nextframe(nextFrameDelay);
             M[currRow][currCol] -= 1;
             int[] info = {currRow, currCol, M[currRow][currCol]};
             solution.add(info);
@@ -106,23 +107,23 @@ public class maze extends mazebase {
             break;
           } else if (dir == (dirs.length - 1)) {
             M[currRow][currCol] -= 1;
-            drawdot(solution.get(solution.size() - 1)[0], solution.get(solution.size() - 1)[1]);
+            drawdot(solution.getLast()[0], solution.getLast()[1]);
             drawblock(currRow, currCol);
-            nextframe(40);
+            nextframe(2*nextFrameDelay);
             moved =  false;
           }
         }
       }
       if (!solved(currRow, currCol, endRow, endCol)) {
         while (solution.get(solution.size() - 1)[2] == 0) {
-          drawdot(solution.get(solution.size() - 2)[0], solution.get(solution.size() - 2)[1]);
-          drawblock(solution.get(solution.size() - 1)[0], solution.get(solution.size() - 1)[1]);
-          nextframe(40);
-          solution.remove(solution.size() - 1);
+          drawblock(solution.getLast()[0], solution.getLast()[1]);
+          solution.removeLast();
+          drawdot(solution.getLast()[0], solution.getLast()[1]);
+          nextframe(nextFrameDelay);
         }
-        currRow = solution.get(solution.size() - 1)[0];
-        currCol = solution.get(solution.size() - 1)[1];
-        solution.remove(solution.size() - 1);
+        currRow = solution.getLast()[0];
+        currCol = solution.getLast()[1];
+        solution.removeLast();
       }
     }
     int[] info = {currRow, currCol, M[currRow][currCol]};
