@@ -1,9 +1,14 @@
 import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.*;
 
 public class maze extends mazebase {
   static int[] rowChange = {-1, 1, 0, 0};
   static int[] colChange = {0, 0, 1, -1};
   static ArrayList<int[]> solution = new ArrayList<int[]>();
+  static int playerRow = 1;
+  static int playerCol = 1;
+  static int playerSolve = 0;
   public maze() {
     super();
   }
@@ -91,20 +96,14 @@ public class maze extends mazebase {
     M[endRow][endCol] = 1;
     drawblock(endRow, endCol);
     countMaze();
-    drawdot(currRow, currCol);
-    int nextFrameDelay = 40;
-    nextframe(nextFrameDelay);
     int[] dirs = {0, 1, 2, 3};
     while (!solved(currRow, currCol, endRow, endCol)) {
       boolean moved = true;
       while (moved && !solved(currRow, currCol, endRow, endCol)) {
-        for (int dir = 0; dir < dirs.length; dir++) {
+        for (int dir : dirs) {
           int newRow = currRow + rowChange[dir];
           int newCol = currCol + colChange[dir];
           if ((M[newRow][newCol] > 1) && notPrevSpace(newRow, newCol)) {
-            drawdot(newRow, newCol);
-            drawblock(currRow, currCol);
-            nextframe(nextFrameDelay);
             M[currRow][currCol] -= 1;
             int[] info = {currRow, currCol, M[currRow][currCol]};
             solution.add(info);
@@ -113,19 +112,13 @@ public class maze extends mazebase {
             break;
           } else if (dir == (dirs.length - 1)) {
             M[currRow][currCol] -= 1;
-            drawdot(solution.getLast()[0], solution.getLast()[1]);
-            drawblock(currRow, currCol);
-            nextframe(2 * nextFrameDelay);
             moved =  false;
           }
         }
       }
       if (!solved(currRow, currCol, endRow, endCol)) {
         while (solution.get(solution.size() - 1)[2] == 1) {
-          drawblock(solution.getLast()[0], solution.getLast()[1]);
           solution.removeLast();
-          drawdot(solution.getLast()[0], solution.getLast()[1]);
-          nextframe(nextFrameDelay);
         }
         currRow = solution.getLast()[0];
         currCol = solution.getLast()[1];
@@ -139,15 +132,69 @@ public class maze extends mazebase {
   public void trace() {
     for (int i = solution.size() - 1; i >= 0; i--) {
       int[] info = solution.get(i);
-      drawdot(info[0], info[1]);
-      nextframe(40);
+      M[info[0]][info[1]] = -1;
     }
+  }
+  @Override
+  public void keyPressed(KeyEvent e) {
+    int key = e.getKeyCode();
+    //up, down, left, right
+    int[] arrows  = {38, 40, 37, 39};
+    int[] wsad = {87, 83, 65, 68};
+    int[] dirs = {0, 1, 3, 2};
+    int newRow = playerRow;
+    int newCol = playerCol;
+    if (!solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
+      for (int dir : dirs) {
+        if (key == arrows[dir]) {
+          newRow += rowChange[dirs[dir]];
+          newCol += colChange[dirs[dir]];
+        } else if (key == wsad[dir]) {
+          newRow += rowChange[dirs[dir]];
+          newCol += colChange[dirs[dir]];
+        }
+      }
+      if (M[newRow][newCol] == 0) {
+        drawMessage("WALL");
+      } else {
+        if (solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
+          drawMessage("CONGRATS!");
+        } else if (M[newRow][newCol] > 0) {
+          drawMessage("WRONG WAY");
+        } else {
+          int[] currInfo = solution.get(playerSolve);
+          int[] newInfo = solution.get(playerSolve + 1);
+          if ((newRow == currInfo[0]) && (newCol == currInfo[1])) {
+            drawMessage("");
+          } else if ((newRow != newInfo[0]) || (newCol != newInfo[1])) {
+            drawMessage("BACKWARDS");
+            playerSolve -= 1;
+          } else {
+            drawMessage("");
+            playerSolve += 1;
+          }
+        }
+        drawblock(playerRow, playerCol);
+        playerRow = newRow;
+        playerCol = newCol;
+        drawdot(playerRow, playerCol);
+      }
+      nextframe();
+      delay(250);
+    }
+  }
+  @Override
+  public void play() {
+    drawdot(playerRow, playerCol);
+    nextframe();
   }
   public static void main(String[] args) {
 	  new maze();
   }
   @Override
   public void customize() {
-    showvalue = true;
+    pencolor = Color.black;
+    mheight = 21;
+    mwidth = 31;
   }
 }
