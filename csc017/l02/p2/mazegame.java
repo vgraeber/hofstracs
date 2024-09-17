@@ -1,10 +1,15 @@
 import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.*;
 
-public class maze extends mazebase {
+public class mazegame extends mazebase {
   static int[] rowChange = {-1, 1, 0, 0};
   static int[] colChange = {0, 0, 1, -1};
   static ArrayList<int[]> solution = new ArrayList<int[]>();
-  public maze() {
+  static int playerRow = 1;
+  static int playerCol = 1;
+  static int playerSolve = 0;
+  public mazegame() {
     super();
   }
   public void shuffleDirs(int[] dirs) {
@@ -27,8 +32,7 @@ public class maze extends mazebase {
     drawblock(row, col);
     int[] dirs = {0, 1, 2, 3};
     shuffleDirs(dirs);
-    for (int i = 0; i < dirs.length; i++) {
-      int dir = dirs[i];
+    for (int dir : dirs) {
       int newRow = row + 2 * rowChange[dir];
       int newCol = col + 2 * colChange[dir];
       if (inBorder(newRow, newCol) && (M[newRow][newCol] == 0)) {
@@ -51,7 +55,7 @@ public class maze extends mazebase {
     for (int row = 0; row < mheight; row++) {
       for (int col = 0; col < mwidth; col++) {
         int potDirs = 0;
-        for (int dir = 0; dir < dirs.length; dir++) {
+        for (int dir : dirs) {
           int tempRow = row + rowChange[dir];
           int tempCol = col + colChange[dir];
           if (inBounds(tempRow, tempCol) && (M[tempRow][tempCol] >= 1)) {
@@ -96,7 +100,7 @@ public class maze extends mazebase {
     while (!solved(currRow, currCol, endRow, endCol)) {
       boolean moved = true;
       while (moved && !solved(currRow, currCol, endRow, endCol)) {
-        for (int dir = 0; dir < dirs.length; dir++) {
+        for (int dir : dirs) {
           int newRow = currRow + rowChange[dir];
           int newCol = currCol + colChange[dir];
           if ((M[newRow][newCol] > 1) && notPrevSpace(newRow, newCol)) {
@@ -132,14 +136,58 @@ public class maze extends mazebase {
     }
   }
   @Override
+  public void keyPressed(KeyEvent e) {
+    int key = e.getKeyCode();
+    //up, down, left, right
+    int[] arrows  = {38, 40, 37, 39};
+    int[] wsad = {87, 83, 65, 68};
+    int[] dirs = {0, 1, 3, 2};
+    int newRow = playerRow;
+    int newCol = playerCol;
+    for (int dir : dirs) {
+      if (key == arrows[dir]) {
+        newRow += rowChange[dir];
+        newCol += colChange[dir];
+      } else if (key == wsad[dir]) {
+        newRow += rowChange[dir];
+        newCol += colChange[dir];
+      }
+    }
+    if (M[newRow][newCol] == 0) {
+      drawMessage("Wall");
+    } else {
+      if (solved(newRow, newCol, solution.getLast()[0], solution.getLast()[1])) {
+        drawMessage("Congrats!");
+      } else if (M[newRow][newCol] > 0) {
+        drawMessage("Wrong way");
+      } else {
+        int[] info = solution.get(playerSolve + 1);
+        if ((newRow != info[0]) || (newCol != info[1])) {
+          drawMessage("Going backwards");
+          playerSolve -= 1;
+        } else {
+          drawMessage("");
+          playerSolve += 1;
+        }
+      }
+      drawblock(playerRow, playerCol);
+      playerRow = newRow;
+      playerCol = newCol;
+      drawdot(playerRow, playerCol);
+      nextframe();
+      delay(1000);
+    }
+  }
+  @Override
   public void play() {
-    //things
+    drawdot(playerRow, playerCol);
+    nextframe();
   }
   public static void main(String[] args) {
 	  new maze();
   }
   @Override
   public void customize() {
-    showvalue = true;
+    //showvalue = true;
   }
 }

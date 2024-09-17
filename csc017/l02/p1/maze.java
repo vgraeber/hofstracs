@@ -27,8 +27,7 @@ public class maze extends mazebase {
     drawblock(row, col);
     int[] dirs = {0, 1, 2, 3};
     shuffleDirs(dirs);
-    for (int i = 0; i < dirs.length; i++) {
-      int dir = dirs[i];
+    for (int dir : dirs) {
       int newRow = row + 2 * rowChange[dir];
       int newCol = col + 2 * colChange[dir];
       if (inBorder(newRow, newCol) && (M[newRow][newCol] == 0)) {
@@ -51,7 +50,7 @@ public class maze extends mazebase {
     for (int row = 0; row < mheight; row++) {
       for (int col = 0; col < mwidth; col++) {
         int potDirs = 0;
-        for (int dir = 0; dir < dirs.length; dir++) {
+        for (int dir : dirs) {
           int tempRow = row + rowChange[dir];
           int tempCol = col + colChange[dir];
           if (inBounds(tempRow, tempCol) && (M[tempRow][tempCol] >= 1)) {
