@@ -141,12 +141,6 @@ public class maze extends mazebase {
   }
   @Override
   public void customize() {
-    /*
-    mheight = 51;
-    mwidth = 51;
-    bh = 15;
-    bw = 15;
-    */
-    showvalue = true;
+    //showvalue = true;
   }
 }
