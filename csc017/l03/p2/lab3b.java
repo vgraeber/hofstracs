@@ -1,19 +1,20 @@
 import java.util.Comparator;
 import java.util.stream.*;
+import java.util.Iterator;
 
 interface OrderedQueue<T> {
-  boolean is_sorted(); // determines if queue is sorted in increasing order
-  int search(T x); // search for x, returns virtual index or -1 if not found
-  int insert_sorted(T x); // insert new x into a sorted queue
-  T remove_at(int i, boolean order);  // removes ith value (see below)
+  boolean is_sorted();
+  int search(T x);
+  int insert_sorted(T x);
+  T remove_at(int i, boolean order);
   default void sort() {
     if (!is_sorted()) {
       System.err.println("OrderedQueue::sort is not implemented");
     }
-  } // (OPTIONAL) sorts queue if it's not sorted
+  }
 }
 
-class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements OrderedQueue {
+class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements OrderedQueue<T> {
   protected boolean sorted = true;
   boolean locked = false;
   protected Comparator<T> cmp = (x,y) -> x.compareTo(y);
@@ -30,8 +31,15 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
     return (T[]) new Comparable[arrSize];
   }
   @Override
+  public Iterator<T> iterator() {
+    return new ProtectedCQiterator<T>(this);
+  }
+  @Override
   public boolean push(T x) {
-    if ((x == null) || locked) {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    if (x == null) {
       return false;
     }
     super.push(x);
@@ -41,8 +49,18 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
     return true;
   }
   @Override
+  public T pop() {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    return super.pop();
+  }
+  @Override
   public boolean enqueue(T x) {
-    if ((x == null) || locked) {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    if (x == null) {
       return false;
     }
     super.enqueue(x);
@@ -52,8 +70,18 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
     return true;
   }
   @Override
+  public T dequeue() {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    return super.dequeue();
+  }
+  @Override
   public T set(int i, T x) {
-    if ((i < 0) || (i >= size) || (x == null) || locked) {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    if ((i < 0) || (i >= size) || (x == null)) {
       System.err.println("CQ::set called on invalid args");
       return null;
     }
@@ -73,105 +101,164 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
       int answer = -1;
       while ((min < max) && (answer < 0)) {
         int mid = (min + max) / 2;
-        if (x == Q[aindex(mid)]) {
+        if (cmp.compare(x, Q[aindex(mid)]) == 0) {
           answer = mid;
-        } else if (x < Q[aindex(mid)]) {
+        } else if (cmp.compare(x, Q[aindex(mid)]) < 0) {
           max = mid;
         } else {
           min = mid + 1;
         }
       }
       return answer;
-    }
-    for (int i = 0; i < (size - 1); i++) {
-      int actInd = aindex(i);
-      if (Q[actInd] == x) {
-        return i;
+    } else {
+      for (int i = 0; i < (size - 1); i++) {
+        int actInd = aindex(i);
+        if (Q[actInd] == x) {
+          return i;
+        }
       }
+      return -1;
     }
-    return -1;
   }
   public int insert_sorted(T x) {
-    if (!is_sorted() || locked) {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    if (!is_sorted()) {
       return -1;
     }
     int min = 0;
-    int max = size;//if size is 8 and q looks like [0, 1, 2, 3, 4, 5, 6, 7] and you want to insert 5.5
+    int max = size;
     while (min < max) {
-      int mid = (min + max) / 2;//mid1 is 4 mid2 is 6 mid3 is 5
-      if (x == Q[aindex(mid)]) {
+      int mid = (min + max) / 2;
+      if (cmp.compare(x, Q[aindex(mid)]) == 0) {
         max = mid;
         min = mid + 1;
-      } else if (x < Q[aindex(mid)]) {
-        max = mid;//max becomes 6
+      } else if (cmp.compare(x, Q[aindex(mid)]) < 0) {
+        max = mid;
       } else {
-        min = mid + 1;//min becomes 5 and then 6
+        min = mid + 1;
       }
     }
     if (max < (size - min)) {
-      Q.push(Q[aindex(0)]);
+      push(Q[aindex(0)]);
       for (int i = 1; i < max; i++) {
-        Q.set(i, Q[aindex(i + 1)]);
+        set(i, Q[aindex(i + 1)]);
       }
-      Q.set(max, x);
+      set(max, x);
+      return max;
     } else {
-      Q.enqueue(Q[aindex(size - 1)]);//q looks like [0, 1, 2, 3, 4, 5, 6, 7, 7] and size is 9
-      for (int i = size - 2; i > min; i--) {//i starts at 7 and ends before 6
-        Q.set(i, Q[aindex(i - 1)]);//q looks like [0, 1, 2, 3, 4, 5, 6, 6, 7]
+      enqueue(Q[aindex(size - 1)]);
+      for (int i = size - 2; i > min; i--) {
+        set(i, Q[aindex(i - 1)]);
       }
-      Q.set(min, x);//q looks like [0, 1, 2, 3, 4, 5, 5.5, 6, 7]
+      set(min, x);
+      return min;
     }
   }
   public T remove_at(int i, boolean order) {
-    if ((i < 0) || (i >= size) || locked) {
+    if (locked) {
+      throw new RuntimeException("queue locked");
+    }
+    if ((i < 0) || (i >= size)) {
       System.err.println("CQ::remove called on invalid args");
       return null;
     }
     T answer = Q[aindex(i)];
     if (!order) {
-      Q.set(i, Q[aindex(0)]);
-      Q.pop();
+      set(i, Q[aindex(0)]);
+      pop();
     } else {
       for (int j = i; j < (size - 1); j++) {
-        Q.set(j, Q[aindex(j + 1)]);
+        set(j, Q[aindex(j + 1)]);
       }
-      Q.dequeue();
+      dequeue();
     }
     return answer;
   }
-}
-/*
-5. The Iterator implementation of the superclass CQ does not adequately 
-   protect against concurrent modification.  One should not be able to
-   modify the queue in any way while iterating over it.  Checking the
-   size is not enough.  It's not enough to defend against using the set
-   method, nor against something like:
-
-    for(var x:queue) {
-      queue.add(x);
-	    queue.pop();
+  public int hoare(int min, int max) {
+    T pivot = Q[aindex((min + max) / 2)];
+    int i = min;
+    int j = max;
+    do {
+      while (cmp.compare(Q[aindex(i)], pivot) < 0) {
+        i += 1;
+      }
+      while (cmp.compare(Q[aindex(j)], pivot) > 0) {
+        j -= 1;
+      }
+      T low = Q[aindex(i)];
+      T high = Q[aindex(j)];
+      if (i < j) {
+        T temp = low;
+        set(i, high);
+        set(j, temp);
+      }
+    } while (i < j);
+    return j;
+  }
+  public void qSort(int min, int max) {
+    if (min < max) {
+      int mid = hoare(min, max);
+      qSort(min, mid);
+      qSort(mid + 1, max);
     }
- 
-   This won't change the size of the queue between iterations but it still
-   distorts the queue and makes the iteration invalid.  You need to prevent
-   this from happening.  The idea is to insert a boolean flag `lock` into the
-   class (your subclass).  Then all methods that modify the queue must
-   check this flag, and if it is locked, then an exception should be thrown.
+  }
+  public void sort() {
+    if (!sorted) {
+      qSort(0, size - 1);
+    }
+  }
+  public boolean sortCheck() {
+    for (int i = 0; i < size - 1; i++) {
+      if (cmp.compare(Q[aindex(i)], Q[aindex(i + 1)]) > 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+  public T get(int i) {
+    return Q[aindex(i)];
+  }
+  public static void main(String[] args) {
+    OrderedCQ queueue = new OrderedCQ(8);
+    queueue.push(666);
+    queueue.push(888);
+    queueue.enqueue(999);
+    queueue.enqueue(333);
+    queueue.push(7);
+    queueue.push(9);
+    queueue.enqueue(3);
+    queueue.enqueue(2);
+    queueue.push(4);
+    queueue.push(444);
+    queueue.sort();
+    queueue.locked = true;
+    for (int i = 0; i < queueue.size; i++) {
+      System.out.printf("%d%s", queueue.get(i), ", ");
+    }
+    queueue.locked = false;
+    System.out.printf("sorted: %s%n", queueue.sortCheck());
+  }
+}
 
-6. public void sort(): (OPTIONAL)
-
-  This function sorts the Queue (destructively, in place).  This
-problem is optional.  However, if you do implement it you must use an
-algorithm with average-case time complexity of at most O(n log n). You
-need to adopt the algorithm to the circular queue setting.  Of course,
-if the boolean sorted flag is already true, sort() should do nothing.  
-If you choose not to do this option, the interface does contain a default
-dummy implementation just so your program will still compile.
-
----
-To test that your program is working correctly, you also need a function
-(not in the interface) that brute-forces a check of if the queue is sorted
-using a O(n) loop
-
-Be sure to test your implementions with appropriate test code.
-*/
+class ProtectedCQiterator<T> implements Iterator<T> {
+  OrderedCQ<? super T> q;
+  int i = 0;
+  int size;
+  public ProtectedCQiterator(OrderedCQ<? super T> q) {
+    this.q = q;
+    size = q.size();
+  }
+  @Override
+  public boolean hasNext() {
+    if (q.locked || (size != q.size())) {
+      throw new java.util.ConcurrentModificationException();
+    }
+    return (i < q.size());
+  }
+  @Override
+  public T next() {
+    return (T) q.get(i++);
+  }
+}

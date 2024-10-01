@@ -7,6 +7,7 @@ public class CQ<T> implements Iterable<T> {
   protected T[] Q;
   protected int front = 0;
   int size = 0;
+  public CQ () {}
   public CQ(int n) {
     if (n < 1) {
       n = 16;
@@ -108,6 +109,9 @@ public class CQ<T> implements Iterable<T> {
   public Stream<T> stream(boolean parallel) {
     return StreamSupport.stream(this.spliterator(),parallel);
   }
+  public Stream<T> toStream() {
+    return Stream.generate( ()->pop() ).limit(size);
+  }
   public static void main0(String[] args) {
     CQ<Integer> q = new CQ<Integer>(1);
     for(var x : new Integer[]{2,4,6,8,10}) {
@@ -145,7 +149,6 @@ public class CQ<T> implements Iterable<T> {
       .map(x -> (x * x))
       .filter(x -> ((x % 2) == 1))
       .forEach(System.out :: println);
-    // and don't change anything (no side effects, ideally not even print)
     var allpositive = 
     q.stream(false)
       .allMatch(x -> (x > 0));
@@ -156,13 +159,14 @@ public class CQ<T> implements Iterable<T> {
       .ifPresent(x -> System.out.println("found " + x));
   }
 }
+
 class CQiterator<T> implements Iterator<T> {
   CQ<T> q;
   int i = 0;
   int size;
   public CQiterator(CQ<T> q) {
-    this.q=q;
-    size=q.size();
+    this.q = q;
+    size = q.size();
   }
   public boolean hasNext() {
     //return ((size == q.size()) && (i < q.size()));
