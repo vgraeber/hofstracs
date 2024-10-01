@@ -32,6 +32,7 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
   }
   @Override
   public Iterator<T> iterator() {
+    locked = true;
     return new ProtectedCQiterator<T>(this);
   }
   @Override
@@ -250,14 +251,15 @@ class ProtectedCQiterator<T> implements Iterator<T> {
     this.q = q;
     size = q.size();
   }
-  @Override
   public boolean hasNext() {
     if (q.locked || (size != q.size())) {
       throw new java.util.ConcurrentModificationException();
     }
+    if (!(i < q.size())) {
+      q.locked = false;
+    }
     return (i < q.size());
   }
-  @Override
   public T next() {
     return (T) q.get(i++);
   }
