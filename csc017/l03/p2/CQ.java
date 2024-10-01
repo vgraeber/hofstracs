@@ -120,31 +120,6 @@ public class CQ<T> implements Iterable<T> {
     for(var x : new Integer[]{1,3,5,7,9}) {
       q.push(x);
     }
-    /*
-    while (q.size() > 1) {
-      System.out.println(q.pop());
-      System.out.println(q.dequeue());            
-    }
-    */        
-    // what's wrong with this loop????
-    /*
-    for(var x : q) {
-      q.push(x);
-    }
-
-    for(var x : q) {
-      System.out.println(x);
-    }
-    */
-    /*
-    var A = new java.util.Vector<Integer>();
-    A.enqueue(2);
-    A.enqueue(3);
-    for(var x : A) {
-      A.enqueue(x);
-    }
-    */
-    //q.set(6, (q.get(6) * 10) + 1);
     q.stream(true)
       .map(x -> (x * x))
       .filter(x -> ((x % 2) == 1))
@@ -169,7 +144,6 @@ class CQiterator<T> implements Iterator<T> {
     size = q.size();
   }
   public boolean hasNext() {
-    //return ((size == q.size()) && (i < q.size()));
     if (size != q.size()) {
       throw new java.util.ConcurrentModificationException();
     }
