@@ -252,9 +252,6 @@ class ProtectedCQiterator<T> implements Iterator<T> {
     size = q.size();
   }
   public boolean hasNext() {
-    if (q.locked || (size != q.size())) {
-      throw new java.util.ConcurrentModificationException();
-    }
     if (!(i < q.size())) {
       q.locked = false;
     }
