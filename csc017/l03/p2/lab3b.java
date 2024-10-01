@@ -234,11 +234,10 @@ class OrderedCQ<T extends Comparable<? super T>> extends CQ<T> implements Ordere
     queueue.push(4);
     queueue.push(444);
     queueue.sort();
-    queueue.locked = true;
-    for (int i = 0; i < queueue.size; i++) {
-      System.out.printf("%d%s", queueue.get(i), ", ");
+    Iterator iter = queueue.iterator();
+    while (iter.hasNext()) {
+      System.out.printf("%d%s", iter.next(), ", ");
     }
-    queueue.locked = false;
     System.out.printf("sorted: %s%n", queueue.sortCheck());
   }
 }
