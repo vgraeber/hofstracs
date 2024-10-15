@@ -1,7 +1,11 @@
+import java.util.HashMap;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
 record KVPair<KT, VT>(KT key, VT val) {
   @Override
 	public String toString() {
-    return key + ":" + val;
+    return key + " : " + val;
   }
 }
 
@@ -18,53 +22,70 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     if (!maxheap) {
       cmp = (a,b) -> b.val().compareTo(a.val());
     }
+    keymap = new HashMap<KT, Integer>();
     Entries = makearray(16);
   }
   public int size() {
     return size;
   }
-  protected boolean morespace() {
-    return ((size * 75) >= (Entries.length * 100));
+  void resize() {
+    if ((size * 75) >= (Entries.length * 100)) {
+      KVPair<KT, VT>[] newEntries = makearray(Entries.length * 2);
+      System.arraycopy(Entries, 0, newEntries, 0, size);
+      Entries = newEntries;
+    }
   }
-  protected void resize() {
-    KVPair<KT, VT>[] newEntries = makearray(Entries.legnth * 2);
-    System.arraycopy(Entries, 0, newEntries, 0, size);
-    Entries = newEntries;
+  int left(int pair) {
+    return ((2 * pair) + 1);
   }
-  public VT get(KT key) {
-    return Entries[keymap.get(key)].val();
+  int right(int pair) {
+    return ((2 * pair) + 2);
   }
-  protected int ind(KVPair<KT, VT> pair) {
-    return (int)keymap.ind(pair.key());
+  int parent(int pair) {
+    return ((pair - 1) / 2);
   }
-  protected KVPair<KT, VT> left(KVPair<KT, VT> pair) {
-    return Entries[((2 * ind(pair)) + 1)];
+  void swap(int pair, int swapPair) {
+    KVPair<KT, VT> temp = Entries[pair];
+    Entries[pair] = Entries[swapPair];
+    Entries[swapPair] = temp;
+    keymap.put(Entries[pair].key(), pair);
+    keymap.put(Entries[swapPair].key(), swapPair);
   }
-  protected KVPair<KT, VT> right(KVPair<KT, VT> pair) {
-    return Entries[((2 * ind(pair)) + 2)];
-  }
-  protected KVPair<KT, VT> parent(KVPair<KT, VT> pair) {
-    return Entries[((ind(pair) - 1) / 2)];
-  }
-  protected void set(KT key, Integer i) {
-    keymap.put(key, i);
-  }
-  protected void swap(KVPair<KT, VT> pair, KVPair<KT, VT> swappair) {
-    Entries[ind(pair)] = swappair;
-    Entries[ind(swappair)] = pair;
-    int ind = ind(swappair);
-    set(swappair.key(), ind(pair));
-    set(pair.key(), ind);
-  }
-  protected KVPair<KT, VT> swapUp(KVPair pair) {
-    if ((0 <= ind(pair)) && (ind(pair) < size)) {
-      KVPair<KT, VT> parentpair = parent(pair);
-      while ((ind(pair) > 0) && (cmp.compare(pair, parentpair) > 0)) {
-        swap(pair, parentpair);
-        parentpair = parent(pair);
+  int swapUp(int pair) {
+    if ((0 <= pair) && (pair < size)) {
+      int parentPair = parent(pair);
+      while ((pair > 0) && (cmp.compare(Entries[pair], Entries[parentPair]) > 0)) {
+        swap(pair, parentPair);
+        pair = parentPair;
+        parentPair = parent(pair);
       }
     }
     return pair;
+  }
+  int swapDown(int pair) {
+    int swapPair = 0;
+    while (swapPair >= 0) {
+      swapPair = -1;
+      int leftPair = left(pair);
+      int rightPair = right(pair);
+      if ((leftPair < size) && (cmp.compare(Entries[pair], Entries[leftPair]) < 0)) {
+        swapPair = leftPair;
+      }
+      if ((rightPair < size) && (cmp.compare(Entries[leftPair], Entries[rightPair]) < 0) &&(cmp.compare(Entries[pair], Entries[rightPair]) < 0)) {
+        swapPair = rightPair;
+      }
+      if (swapPair > 0) {
+        swap(pair, swapPair);
+      }
+    }
+    return pair;
+  }
+  public VT get(KT key) {
+    if (keymap.get(key) == null) {
+      return null;
+    } else {
+      return Entries[keymap.get(key)].val();
+    }
   }
   private void push(KT key, VT val) {
     if ((key == null) || (val == null)) {
@@ -73,38 +94,63 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     Entries[size] = new KVPair(key, val);
     keymap.put(key, size);
     size++;
-    if (morespace()) {
-      resize();
-    }
-    swapUp(Entries[size - 1]);
-  }
-  public KVPair<KT, VT> pop() {
-    KVPair<KT, VT> answer = null; // returned if heap is empty
-    /*
-    This function should remove the key-value pair that has the highest priority, and return it.  This dummy always returns null. The keymap must always be update accordingly.
-    */
-    return answer;
-  }// must run in O(log n) time
-  public KVPair<KT, VT> peek() {
-    //This function should return the highest priority pair without delete
-    return null;
+    resize();
+    swapUp(size - 1);
   }
   public VT remove(KT key) {
-    /*
-    Find the entry associated with the key and remove it by the following algorithm (similar to push):
-    Take the last value (Entries[size-1]) and place it where the deleted value is. Then either swap up or swap down the value until it's in the right place.
-    */
-    return null;
-  }// must run in O(log n) time
+    if ((keymap.get(key) != null) && (size > 1)) {
+      int remInd = keymap.get(key);
+      VT remVal = Entries[remInd].val();
+      Entries[remInd] = Entries[size - 1];
+      Entries[size - 1] = null;
+      size--;
+      keymap.remove(key);
+      keymap.put(Entries[remInd].key(), remInd);
+      int newRemInd = swapUp(remInd);
+      if (remInd == newRemInd) {
+        swapDown(remInd);
+      }
+      return remVal;
+    } else if (size == 1) {
+      VT remVal = Entries[0].val();
+      Entries[0] = null;
+      size--;
+      keymap.remove(key);
+      return remVal;
+    } else {
+      return null;
+    }
+  }
+  public KVPair<KT, VT> pop() {
+    if (size < 1) {
+      return null;
+    } else {
+      KVPair<KT, VT> answer = Entries[0];
+      remove(answer.key());
+      return answer;
+    }
+  }
+  public KVPair<KT, VT> peek() {
+    if (size < 1) {
+      return null;
+    } else {
+      return Entries[0];
+    }
+  }
   public VT set(KT key, VT val) {
-    /*
-    Change the value associated with the key.  Return the previous value.  First locate the entry using the keymap. After changing the value, you will need to either swap it up or down the tree.
-    If there is no such key in the structure, this function should behave like push.  Note that push is private and should not be called externally, lest it introduces conflicting keys into the structure.  Users must call set, which should guarantee that there are no duplicate keys.
-    */
-    return null;
-  }// must run in amortized worst-case O(log n) time.
-  // The following will create a consuming stream in order of
-  // priority, after you've completed the implementation
+    VT ans = get(key);
+    if (ans == null) {
+      push(key, val);
+    } else {
+      int ind = keymap.get(key);
+      Entries[ind] = new KVPair(key, val);
+      int newInd = swapUp(ind);
+      if (ind == newInd) {
+        swapDown(ind);
+      }
+    }
+    return ans;
+  }
   public Stream<KVPair<KT, VT>> priority_stream() {
     return Stream.generate( () -> pop() ).limit(size);
   }
@@ -114,14 +160,11 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     // this is optional
     return null;
   }
-  public static void this_can_be_your_main(String[] args) {
-    // the default constructor should create a maxheap
+  public static void main(String[] args) {
     var GPA = new HashedHeap<String,Double>(true); 
     String[] names = {"Mary", "Larz", "Narx", "Parv", "Haten", "Isa", "Nev"};
     for(var n:names) GPA.set(n, ((int)(Math.random() * 401)) / 100.0);
-    //  this should print from highest to lowest GPA
     //GPA.priority_stream().forEach(System.out::println);
-    //  but GPA will be empty afterwards.
     GPA.set("Nev", 0.0);
     GPA.set("Mary", 4.0);
     GPA.remove("Isa");  
@@ -131,6 +174,5 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     System.out.println(GPA.get("Isa"));	
 
     GPA.priority_stream().forEach(System.out::println);
-    // should reflect new priorities ...
   }
 }
