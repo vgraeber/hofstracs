@@ -154,8 +154,6 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
   public Stream<KVPair<KT, VT>> priority_stream() {
     return Stream.generate( () -> pop() ).limit(size);
   }
-  // Challenge: in addition to a a priority stream, you should implement
-  // a non-consuming stream of keys, in no particular order:
   public Stream<KT> key_stream() {
     return keymap.keySet().stream();
   }
