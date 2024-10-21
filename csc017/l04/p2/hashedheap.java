@@ -156,9 +156,8 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
   }
   // Challenge: in addition to a a priority stream, you should implement
   // a non-consuming stream of keys, in no particular order:
-  public Stream<KT> key_stream() { 
-    // this is optional
-    return null;
+  public Stream<KT> key_stream() {
+    return keymap.keySet().stream();
   }
   public static void main(String[] args) {
     var GPA = new HashedHeap<String,Double>(true); 
@@ -173,6 +172,6 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     System.out.println(GPA.get("Narx"));	
     System.out.println(GPA.get("Isa"));	
 
-    GPA.priority_stream().forEach(System.out::println);
+    GPA.key_stream().forEach(System.out::println);
   }
 }
