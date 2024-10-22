@@ -1,6 +1,8 @@
 import java.util.HashMap;
 import java.util.Comparator;
 import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.function.Function;
 
 record KVPair<KT, VT>(KT key, VT val) {
   @Override
@@ -9,7 +11,16 @@ record KVPair<KT, VT>(KT key, VT val) {
   }
 }
 
-class HashedHeap<KT, VT extends Comparable<? super VT>> {
+interface QuickHeap<KT, VT> {
+  int size();
+  Optional<KVPair<KT,VT>> pop();
+  Optional<KVPair<KT,VT>> peek();
+  Optional<VT> get(KT key);
+  Optional<VT> remove(KT key);
+  Optional<VT> findAndModify(KT key, VT default_val, Function<? super VT, ? extends VT> modifier);
+}
+
+class HashedHeap<KT, VT extends Comparable<? super VT>> implements QuickHeap<KT, VT> {
   KVPair<KT, VT>[] Entries;
   int size = 0;
   Comparator<KVPair<KT, VT>> cmp = (a,b) -> a.val().compareTo(b.val());
@@ -80,79 +91,75 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     }
     return pair;
   }
-  public VT get(KT key) {
+  public Optional<VT> get(KT key) {
     if (keymap.get(key) == null) {
-      return null;
+      return Optional.empty();
     } else {
-      return Entries[keymap.get(key)].val();
+      return Optional.of(Entries[keymap.get(key)].val());
     }
   }
   private void push(KT key, VT val) {
     if ((key == null) || (val == null)) {
-      throw new RuntimeException("null push");
+      System.out.println("null push");
+    } else {
+      Entries[size] = new KVPair(key, val);
+      keymap.put(key, size);
+      size++;
+      resize();
+      swapUp(size - 1);
     }
-    Entries[size] = new KVPair(key, val);
-    keymap.put(key, size);
-    size++;
-    resize();
-    swapUp(size - 1);
   }
-  public VT remove(KT key) {
-    if ((keymap.get(key) != null) && (size > 1)) {
+  public Optional<VT> remove(KT key) {
+    Optional<VT> remVal = Optional.empty();
+    if (keymap.get(key) != null) {
       int remInd = keymap.get(key);
-      VT remVal = Entries[remInd].val();
-      Entries[remInd] = Entries[size - 1];
-      Entries[size - 1] = null;
-      size--;
+      remVal = Optional.of(Entries[remInd].val());
       keymap.remove(key);
-      keymap.put(Entries[remInd].key(), remInd);
-      int newRemInd = swapUp(remInd);
-      if (remInd == newRemInd) {
-        swapDown(remInd);
+      System.out.println("remInd: " + remInd + " size: " + size + " entry: " + Entries[remInd]);
+      if (size > 1) {
+        Entries[remInd] = Entries[size - 1];
+        Entries[size - 1] = null;
+        keymap.put(Entries[remInd].key(), remInd);
+        int newRemInd = swapUp(remInd);
+        if (remInd == newRemInd) {
+          swapDown(remInd);
+        }
+      } else if (size == 1) {
+        Entries[0] = null;
       }
-      return remVal;
-    } else if (size == 1) {
-      VT remVal = Entries[0].val();
-      Entries[0] = null;
       size--;
-      keymap.remove(key);
-      return remVal;
-    } else {
-      return null;
     }
+    return remVal;
   }
-  public KVPair<KT, VT> pop() {
-    if (size < 1) {
-      return null;
-    } else {
-      KVPair<KT, VT> answer = Entries[0];
-      remove(answer.key());
-      return answer;
+  public Optional<KVPair<KT, VT>> pop() {
+    Optional<KVPair<KT, VT>> remVal = Optional.ofNullable(Entries[0]);
+    if (remVal.isPresent()) {
+      remove(Entries[0].key());
     }
+    return remVal;
   }
-  public KVPair<KT, VT> peek() {
-    if (size < 1) {
-      return null;
-    } else {
-      return Entries[0];
-    }
+  public Optional<KVPair<KT, VT>> peek() {
+    return Optional.ofNullable(Entries[0]);
   }
-  public VT set(KT key, VT val) {
-    VT ans = get(key);
-    if (ans == null) {
-      push(key, val);
-    } else {
+  public Optional<VT> findAndModify(KT key, VT defaultVal, Function<? super VT, ? extends VT> modifier) {
+    Optional<VT> prevVal = get(key);
+    if (prevVal.isPresent()) {
       int ind = keymap.get(key);
-      Entries[ind] = new KVPair(key, val);
+      Entries[ind] = new KVPair(key, modifier.apply(Entries[ind].val()));
       int newInd = swapUp(ind);
       if (ind == newInd) {
         swapDown(ind);
       }
+    } else {
+      push(key, defaultVal);
     }
-    return ans;
+    return prevVal;
   }
-  public Stream<KVPair<KT, VT>> priority_stream() {
-    return Stream.generate(() -> pop()).limit(size);
+  public Optional<VT> set(KT key, VT val) {
+    return this.findAndModify(key, val, (x -> val));
+  }
+  public Stream<KVPair<KT,VT>> priority_stream() {
+    return Stream.generate(() -> pop()).flatMap(option -> option.stream());
   }
   public Stream<KT> key_stream() {
     return keymap.keySet().stream();
@@ -167,9 +174,9 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
     GPA.remove("Isa");  
 
     System.out.println(GPA.get("Mary"));
-    System.out.println(GPA.get("Narx"));	
-    System.out.println(GPA.get("Isa"));	
-
-    GPA.key_stream().forEach(System.out::println);
+    System.out.println(GPA.get("Narx"));
+    System.out.println(GPA.get("Isa"));
+    System.out.println(GPA.get("Nev"));
+    GPA.priority_stream().forEach(System.out::println);
   }
 }
