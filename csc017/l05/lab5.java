@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.util.HashMap;
+import java.util.Comparator;
 
 record pair(int x, int y) {
   @Override
@@ -19,7 +20,7 @@ class FixedHeap<T extends Comparable<? super T>> {
     if (!maxheap) {
       cmp = (a, b) -> b.compareTo(a);
     }
-    Heap = (T[]) new T[size];
+    Heap = (T[]) new Comparable[size];
   }
   public int size() {
     return size;
@@ -95,6 +96,12 @@ class FixedHeap<T extends Comparable<? super T>> {
       return Optional.of(Heap[0]);
     }
   }
+  public boolean inBounds(T val) {
+    if ((val == null) || (size < 1)) {
+      return false;
+    }
+    return (cmp.compare(Heap[0], val) < 0);
+  }
 }
 
 public class lab5 {
@@ -152,11 +159,18 @@ public class lab5 {
     if ((arr == null) || (arr.length < n)) {
       return Optional.empty();
     }
-    nHeap = FixedHeap(arr.legnth, true);
-    for (int i = 0; i < n; i++) {
-      nHeap.push(arr[i]);
+    FixedHeap nHeap = new FixedHeap(arr.length, true);
+    int counter = 0;
+    while (nHeap.size() < n) {
+      nHeap.push(arr[counter]);
+      counter++;
     }
-    
+    for (int i = counter; i < arr.length; i++) {
+      if (nHeap.inBounds(arr[i])) {
+        nHeap.popAndPush(arr[i]);
+      }
+    }
+    return nHeap.peek();
   }
   /* Problem 3 (harder):
     Find and print the median number in a running stream of numbers.
