@@ -17,7 +17,13 @@ interface QuickHeap<KT, VT> {
   Optional<KVPair<KT,VT>> peek();
   Optional<VT> get(KT key);
   Optional<VT> remove(KT key);
-  Optional<VT> findAndModify(KT key, VT default_val, Function<? super VT, ? extends VT> modifier);
+  Optional<VT> find_n_modify(KT key, VT default_val, Function<? super VT, ? extends VT> modifier);
+  default Optional<VT> set(KT key, VT val) {
+    return this.find_n_modify(key, val, (x -> val));
+  }
+  default Stream<KVPair<KT,VT>> priority_stream() {
+    return Stream.generate(() -> pop()).flatMap(option -> option.stream()).limit(size());
+  }
 }
 
 class HashedHeap<KT, VT extends Comparable<? super VT>> implements QuickHeap<KT, VT> {
@@ -115,19 +121,18 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> implements QuickHeap<KT,
       int remInd = keymap.get(key);
       remVal = Optional.of(Entries[remInd].val());
       keymap.remove(key);
-      System.out.println("remInd: " + remInd + " size: " + size + " entry: " + Entries[remInd]);
-      if (size > 1) {
-        Entries[remInd] = Entries[size - 1];
-        Entries[size - 1] = null;
+      size--;
+      if (size > 0) {
+        Entries[remInd] = Entries[size];
+        Entries[size] = null;
         keymap.put(Entries[remInd].key(), remInd);
         int newRemInd = swapUp(remInd);
         if (remInd == newRemInd) {
           swapDown(remInd);
         }
-      } else if (size == 1) {
+      } else if (size == 0) {
         Entries[0] = null;
       }
-      size--;
     }
     return remVal;
   }
@@ -141,7 +146,7 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> implements QuickHeap<KT,
   public Optional<KVPair<KT, VT>> peek() {
     return Optional.ofNullable(Entries[0]);
   }
-  public Optional<VT> findAndModify(KT key, VT defaultVal, Function<? super VT, ? extends VT> modifier) {
+  public Optional<VT> find_n_modify(KT key, VT defaultVal, Function<? super VT, ? extends VT> modifier) {
     Optional<VT> prevVal = get(key);
     if (prevVal.isPresent()) {
       int ind = keymap.get(key);
@@ -155,11 +160,13 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> implements QuickHeap<KT,
     }
     return prevVal;
   }
+  /*
   public Optional<VT> set(KT key, VT val) {
-    return this.findAndModify(key, val, (x -> val));
+    return this.find_n_modify(key, val, (x -> val));
   }
+  */
   public Stream<KVPair<KT,VT>> priority_stream() {
-    return Stream.generate(() -> pop()).flatMap(option -> option.stream());
+    return Stream.generate(() -> pop()).flatMap(option -> option.stream()).limit(size);
   }
   public Stream<KT> key_stream() {
     return keymap.keySet().stream();
