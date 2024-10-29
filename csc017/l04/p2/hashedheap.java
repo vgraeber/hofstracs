@@ -20,7 +20,7 @@ class HashedHeap<KT, VT extends Comparable<? super VT>> {
   }
   public HashedHeap(boolean maxheap) {
     if (!maxheap) {
-      cmp = (a,b) -> b.val().compareTo(a.val());
+      cmp = (a, b) -> b.val().compareTo(a.val());
     }
     keymap = new HashMap<KT, Integer>();
     Entries = makearray(16);
