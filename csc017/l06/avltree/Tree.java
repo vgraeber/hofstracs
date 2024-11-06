@@ -11,6 +11,8 @@ public interface Tree<T> {
     return this;
   }
   void map_inorder(Consumer<? super T> cf);
+  void ifPresent(Consumer<? super T> cf);
+  <U> U match(Function<? super T, ? extends U> fn, Supplier<? extends U> fe);
   Optional<T> min();
   Optional<T> max();
   // Tree<T> clone();

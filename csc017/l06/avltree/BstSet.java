@@ -40,10 +40,19 @@ public class BstSet<T extends Comparable<? super T>> {
   public Optional<T> min() {
     return root.min();
   }
+  public Optional<T> max() {
+    return root.max();
+  }
   public void map_inorder(Consumer<? super T> cf) {
 	  if (cf != null) {
       root.map_inorder(cf);
     }
+  }
+  public void ifPresent(Consumer<? super T> cf) {
+    root.ifPresent(cf);
+  }
+  public <U> U match(Function<? super T,? extends U> fn, Supplier<? extends U> fe) { 
+	  return root.match(fn, fe);
   }
   class Nil implements Tree<T> {
     public boolean is_empty() {
@@ -66,6 +75,10 @@ public class BstSet<T extends Comparable<? super T>> {
       return Optional.empty();
     }
     public void map_inorder(Consumer<? super T> cf) {}
+    public void ifPresent(Consumer<? super T> cf) {}
+    public <U> U match(Function<? super T, ? extends U> fn, Supplier<? extends U> fe) {
+      return fe.get();
+    }
   }
   class Node implements Tree<T> {
     T item;
@@ -86,9 +99,13 @@ public class BstSet<T extends Comparable<? super T>> {
       int c = cmp.compare(x, item);
       return ((c == 0) || ((c < 0) && left.contains(x)) || ((c > 0) && right.contains(x)));
       /* for earthlings, the above line is equivalent to:
-         if (c==0) return true;
-         else if (c<0) return left.contains(x);
-         else return right.contains(x);
+        if (c == 0) {
+          return true;
+        } else if (c < 0) {
+          return left.contains(x);
+        } else {
+          return right.contains(x);
+        }
       */
     }
     public Tree<T> insert(T x) {
@@ -121,7 +138,14 @@ public class BstSet<T extends Comparable<? super T>> {
       cf.accept(this.item);
       right.map_inorder(cf);
     }
-    ///// for comparison, non-recursive version of insert
+    // these functions are not recursive: only works on item ...
+    public void ifPresent(Consumer<? super T> cf) {
+      cf.accept(this.item);
+    }
+    public <U> U match(Function<? super T,? extends U> fn, Supplier<? extends U> fe) {
+	    return fn.apply(this.item);
+    }
+    // for comparison, non-recursive version of insert
     public void add(T x) {
 	    Node current = this;
       boolean stop = false;
