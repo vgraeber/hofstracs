@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.*;
 
 public class BstSet<T extends Comparable<? super T>> {
-  final Tree<T> Empty = new Nil();
+  Tree<T> Empty = new Nil();
   Tree<T> root = Empty;
   int size = 0;
   Comparator<T> cmp = (x, y) -> x.compareTo(y);
@@ -64,6 +64,9 @@ public class BstSet<T extends Comparable<? super T>> {
     public boolean contains(T x) {
       return false;
     }
+    public Tree<T> clone() {
+      return Empty;
+    }
     public Tree<T> insert(T x) {
       size++;
       return new Node(x, Empty, Empty);
@@ -108,16 +111,18 @@ public class BstSet<T extends Comparable<? super T>> {
         }
       */
     }
+    public Tree<T> clone() {
+      return new Node(item, left.clone(), right.clone());
+    }
     public Tree<T> insert(T x) {
 	    int c = cmp.compare(x, item);
-        if (c < 0) {
-          left = left.insert(x);
-        } else if (c > 0) {
-          right = right.insert(x);
-        }
-        // else c==0 and x is a duplicate, ignore
-        adjust();
-        return this;
+      if (c < 0) {
+        left = left.insert(x);
+      } else if (c > 0) {
+        right = right.insert(x);
+      }
+      adjust();
+      return this;
     }
     public Optional<T> min() {
 	    if (left.is_empty()) {
@@ -138,14 +143,12 @@ public class BstSet<T extends Comparable<? super T>> {
       cf.accept(this.item);
       right.map_inorder(cf);
     }
-    // these functions are not recursive: only works on item ...
     public void ifPresent(Consumer<? super T> cf) {
       cf.accept(this.item);
     }
     public <U> U match(Function<? super T,? extends U> fn, Supplier<? extends U> fe) {
 	    return fn.apply(this.item);
     }
-    // for comparison, non-recursive version of insert
     public void add(T x) {
 	    Node current = this;
       boolean stop = false;
@@ -171,7 +174,21 @@ public class BstSet<T extends Comparable<? super T>> {
 	    }
     }
     void adjust() {}
-    //void LL() {}
-    //void RR() {}
+    void LL() {
+      Node lNode = (Node) left;
+      Node tempNode = this;
+      tempNode.left = lNode.right;
+      this.item = lNode.item;
+      this.left = lNode.left;
+      this.right = tempNode;
+    }
+    void RR() {
+      Node rNode = (Node) right;
+      Node tempNode = this;
+      tempNode.right = rNode.left;
+      this.item = rNode.item;
+      this.left = tempNode;
+      this.right = rNode.right;
+    }
   }
 }

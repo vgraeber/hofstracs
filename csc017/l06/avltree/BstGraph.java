@@ -10,7 +10,7 @@ public class BstGraph extends JFrame {
   public Graphics display;
   public Tree<?> currentTree;
   public int branchHeight = 50;
-  public int yOffset = 40;
+  public int yOffset = 100;
   public int xOffset = 8;
   public BstGraph(int x, int y) {
     xBound = x;
@@ -63,11 +63,11 @@ public class BstGraph extends JFrame {
     display.drawString(nodee.item + "", ((leftBound + rightBound) / 2) - 5, yOffset + 15 + (currLevel * branchHeight));
     display.setColor(Color.blue);
     if (!nodee.left.is_empty()) {
-      display.drawLine((leftBound + rightBound) / 2, yOffset + 10 + (currLevel * branchHeight), (((3 * leftBound) + rightBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
+      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * leftBound) + rightBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
       draw(nodee.left, currLevel + 1, leftBound, (leftBound + rightBound) / 2);
     }
     if (!nodee.right.is_empty()) {
-      display.drawLine((leftBound + rightBound) / 2, yOffset + 10 + (currLevel * branchHeight), (((3 * rightBound) + leftBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
+      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * rightBound) + leftBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
       draw(nodee.right, currLevel + 1, (leftBound + rightBound) / 2, rightBound);
     }
   }
