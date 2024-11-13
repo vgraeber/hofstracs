@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class avltest {
   public static void main(String[] args) {
     AVLSet<Integer> binSearchTree = new AVLSet<Integer>();
-    int n = 5;
+    int n = 50;
     if (args.length > 0) {
       n = Integer.parseInt(args[1]);
     }

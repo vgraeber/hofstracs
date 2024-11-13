@@ -43,8 +43,12 @@ public class BstSet<T extends Comparable<? super T>> {
     root = root.insert(x);
     return (size > prevSize);
   }
-  public boolean is_bst(T min, T max) {
-    return root.is_bst(T min, T max);
+  public boolean is_bst() {
+    if (root.is_empty()) {
+      return true;
+    } else {
+      return root.is_bst(min().get(), max().get());
+    }
   }
   public Optional<T> min() {
     return root.min();
@@ -230,19 +234,23 @@ public class BstSet<T extends Comparable<? super T>> {
     void adjust() {}
     void LL() {
       Node lNode = (Node) left;
-      Node tempNode = this;
-      tempNode.left = lNode.right;
+      T temp = this.item;
       this.item = lNode.item;
+      lNode.item = temp;
       this.left = lNode.left;
-      this.right = tempNode;
+      lNode.left = lNode.right;
+      lNode.right = this.right;
+      this.right = lNode;
     }
     void RR() {
       Node rNode = (Node) right;
-      Node tempNode = this;
-      tempNode.right = rNode.left;
+      T temp = this.item;
       this.item = rNode.item;
-      this.left = tempNode;
+      rNode.item = temp;
       this.right = rNode.right;
+      rNode.right = rNode.left;
+      rNode.left = this.left;
+      this.left = rNode;
     }
   }
 }

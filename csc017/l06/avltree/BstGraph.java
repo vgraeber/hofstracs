@@ -15,7 +15,7 @@ public class BstGraph extends JFrame {
   public BstGraph(int x, int y) {
     xBound = x;
     yBound = y;
-    this.setBounds(0, 0, xBound + 4, yBound);
+    this.setBounds(0, 0, xBound + (5 * xOffset), yBound);
     this.setVisible(true);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     display = this.getGraphics();
@@ -42,7 +42,7 @@ public class BstGraph extends JFrame {
       return;
     }
     branchHeight = (yBound - yOffset) / treeDepth;
-    draw(treee, 0, 0, xBound - xOffset);
+    draw(treee, 0, (xOffset / 2) + (5 * xOffset), xBound - xOffset);
   }
   public void draw(BstSet<?> treee) {
 	  drawtree(treee.root);
@@ -60,14 +60,14 @@ public class BstGraph extends JFrame {
     display.setColor(Color.green);
     display.fillOval(((leftBound + rightBound) / 2) - 10, yOffset + (currLevel * branchHeight), 20, 20);
     display.setColor(Color.red);
-    display.drawString(nodee.item + "", ((leftBound + rightBound) / 2) - 5, yOffset + 15 + (currLevel * branchHeight));
+    display.drawString(nodee.item + "", ((leftBound + rightBound) / 2) - (nodee.item.toString().length() * 4), yOffset + 15 + (currLevel * branchHeight));
     display.setColor(Color.blue);
     if (!nodee.left.is_empty()) {
-      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * leftBound) + rightBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
+      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * leftBound) + rightBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight) - 1);
       draw(nodee.left, currLevel + 1, leftBound, (leftBound + rightBound) / 2);
     }
     if (!nodee.right.is_empty()) {
-      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * rightBound) + leftBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight));
+      display.drawLine((leftBound + rightBound) / 2, yOffset + 20 + (currLevel * branchHeight), (((3 * rightBound) + leftBound) / 4), yOffset + ((currLevel * branchHeight) + branchHeight) - 1);
       draw(nodee.right, currLevel + 1, (leftBound + rightBound) / 2, rightBound);
     }
   }

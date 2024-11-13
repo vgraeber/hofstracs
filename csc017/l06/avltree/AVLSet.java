@@ -161,23 +161,27 @@ public class AVLSet<T extends Comparable<? super T>> extends BstSet<T> implement
     @Override
     void LL() {
       AVLNode lNode = (AVLNode) left;
-      AVLNode tempNode = this;
-      tempNode.left = lNode.right;
-      tempNode.set_height();
+      T temp = this.item;
       this.item = lNode.item;
+      lNode.item = temp;
       this.left = lNode.left;
-      this.right = tempNode;
+      lNode.left = lNode.right;
+      lNode.right = this.right;
+      this.right = lNode;
+      lNode.set_height();
       this.set_height();
     }
     @Override
     void RR() {
       AVLNode rNode = (AVLNode) right;
-      AVLNode tempNode = this;
-      tempNode.right = rNode.left;
-      tempNode.set_height();
+      T temp = this.item;
       this.item = rNode.item;
-      this.left = tempNode;
+      rNode.item = temp;
       this.right = rNode.right;
+      rNode.right = rNode.left;
+      rNode.left = this.left;
+      this.left = rNode;
+      rNode.set_height();
       this.set_height();
     }
   }
