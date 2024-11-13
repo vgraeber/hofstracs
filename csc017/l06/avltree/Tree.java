@@ -21,7 +21,7 @@ public interface Tree<T> {
   Optional<T> min();
   Optional<T> max();
   Tree<T> clone();
-  //Tree<T> sucessor(T x, Tree<T> ancestor);
-  //Tree<T> predecessor(T x, Tree<T> ancestor);
-  //boolean is_bst(... you determine arguments ... );
+  Tree<T> sucessor(T x, Tree<T> ancestor);
+  Tree<T> predecessor(T x, Tree<T> ancestor);
+  boolean is_bst(T min, T max);
 }

@@ -60,6 +60,7 @@ public class AVLSet<T extends Comparable<? super T>> extends BstSet<T> implement
     @Override
     public Tree<T> insert(T x) {
       size++;
+      System.out.println(x);
       return new AVLNode(x, Empty, Empty);
     }
     @Override

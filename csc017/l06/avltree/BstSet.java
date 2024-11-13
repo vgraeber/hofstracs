@@ -22,6 +22,12 @@ public class BstSet<T extends Comparable<? super T>> {
   public int depth() {
     return root.depth();
   }
+  public BstSet<T> clone() {
+    BstSet<T> newBST = new BstSet<T>(cmp);
+    newBST.root = this.root.clone();
+    newBST.size = this.size;
+    return newBST;
+  }
   public boolean contains(T x) {
 	  if (x == null) {
       return false;
@@ -37,11 +43,20 @@ public class BstSet<T extends Comparable<? super T>> {
     root = root.insert(x);
     return (size > prevSize);
   }
+  public boolean is_bst(T min, T max) {
+    return root.is_bst(T min, T max);
+  }
   public Optional<T> min() {
     return root.min();
   }
   public Optional<T> max() {
     return root.max();
+  }
+  public Node predecessor(T x) {
+    return (Node) root.predecessor(x, root);
+  }
+  public Node sucessor(T x) {
+    return (Node) root.sucessor(x, root);
   }
   public void map_inorder(Consumer<? super T> cf) {
 	  if (cf != null) {
@@ -77,6 +92,15 @@ public class BstSet<T extends Comparable<? super T>> {
     public Optional<T> max() {
       return Optional.empty();
     }
+    public Tree<T> sucessor(T x, Tree<T> ancestor) {
+      return Empty;
+    }
+    public Tree<T> predecessor(T x, Tree<T> ancestor) {
+      return Empty;
+    }
+    public boolean is_bst(T min, T max) {
+      return true;
+    }
     public void map_inorder(Consumer<? super T> cf) {}
     public void ifPresent(Consumer<? super T> cf) {}
     public <U> U match(Function<? super T, ? extends U> fn, Supplier<? extends U> fe) {
@@ -101,15 +125,6 @@ public class BstSet<T extends Comparable<? super T>> {
     public boolean contains(T x) {
       int c = cmp.compare(x, item);
       return ((c == 0) || ((c < 0) && left.contains(x)) || ((c > 0) && right.contains(x)));
-      /* for earthlings, the above line is equivalent to:
-        if (c == 0) {
-          return true;
-        } else if (c < 0) {
-          return left.contains(x);
-        } else {
-          return right.contains(x);
-        }
-      */
     }
     public Tree<T> clone() {
       return new Node(item, left.clone(), right.clone());
@@ -137,6 +152,45 @@ public class BstSet<T extends Comparable<? super T>> {
       } else {
         return right.max();
       }
+    }
+    public Tree<T> predecessor(T x, Tree<T> ancestor) {
+      int c = cmp.compare(x, ((Node) ancestor).item);
+      if (c < 0) {
+        return left.predecessor(x, this);
+      } else if (c > 0) {
+        return right.predecessor(x, ancestor);
+      }
+      return ancestor;
+    }
+    public Tree<T> sucessor(T x, Tree<T> ancestor) {
+      int c = cmp.compare(x, ((Node) ancestor).item);
+      if (c < 0) {
+        return left.sucessor(x, ancestor);
+      } else if (c > 0) {
+        return right.sucessor(x, this);
+      }
+      return ancestor;
+    }
+    public boolean is_bst(T min, T max) {
+      boolean lGood = true;
+      boolean rGood = true;
+      if (!left.is_empty()) {
+        Node lNode = (Node) left;
+        if ((cmp.compare(lNode.item, min) < 0) || (cmp.compare(lNode.item, item) > 0)) {
+          lGood = false;
+        } else {
+          lGood = lNode.is_bst(min, max);
+        }
+      }
+      if (!right.is_empty()) {
+        Node rNode = (Node) right;
+        if ((cmp.compare(rNode.item, item) < 0) || (cmp.compare(rNode.item, max) > 0)) {
+          rGood = false;
+        } else {
+          rGood = rNode.is_bst(min, max);
+        }
+      }
+      return (lGood && rGood);
     }
     public void map_inorder(Consumer<? super T> cf) {
       left.map_inorder(cf);
