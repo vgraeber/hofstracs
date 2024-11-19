@@ -24,7 +24,6 @@ public abstract class AbstTrie<KT, KCT, VT> {
 				Node child = children.get(c);
 				child.cleanup();
 				if (child.item.isEmpty() && (child.children.size() == 0)) {
-					//this.children.remove(c);
 					to_remove.add(c);
 					nodes--;
 				}

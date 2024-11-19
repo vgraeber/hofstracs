@@ -1,16 +1,16 @@
 import java.util.stream.Stream;
 
 public class StringTrie<VT> extends AbstTrie<String, Character, VT> {
-	public int key_length(String key) {
+	protected int key_length(String key) {
 		return key.length();
 	}
-	public Character kctAt(String key, int i) {
+	protected Character kctAt(String key, int i) {
 		return key.charAt(i);
 	}
-	public String empty_key() {
+	protected String empty_key() {
 		return "";
 	}
-	public String kt_add_kct(String key, Character keypart) {
+	protected String kt_add_kct(String key, Character keypart) {
 		return (key + keypart);
 	}
 	public static void main(String[] args) {
