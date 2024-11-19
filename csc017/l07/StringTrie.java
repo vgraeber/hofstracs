@@ -1,43 +1,3 @@
-/* String-keyed tries.
-
-You can easily find articles explaining what tries are.
-Most often they will have strings as keys and the strings are considered character by character.
-The keys themselves determine the structure of the "trie".
-The root of the trie is always associated with the empty string as its key.
-Let's say you also need keys "ab", "abc", "abx", and "abcd".
-This forms the trie:
-			""
-			|
-			a
-			|
-			ab
-		/    \
-	abx    abc
-					|
-				abcd
-
-The key associated with a parent node is always a *prefix* of the keys associated with its descendants (in the subtree beneath it).
-A node can have an arbitrary number of children: up to 26 if we're limited to lower case characters, more if other chars are allowed.
-Each child extends the parent key by one character.
-
-Notice that even though "a" was not one of the keys we need, we still need a node in the trie that correspond to it, for otherwise we won't be able to form the nodes beneath it.
-
-At each node, we can optionally store a value.
-Not all nodes will have values: sometimes only the leave nodes of the tree will have values.
-Unlike hashmaps and treemaps, however, we don't need to store the keys inside the nodes: the path from the root to the node defines the key.
-
-The time complexity of searching, inserting or removing a key is O(length_of_key).
-Some sources says this is O(n) but that's misleading: n is the not the number of nodes in the trie but the length of the longest key, which correspond to the *depth* of the trie.
-
-Tries were invented by AT&T, the only phone company back in the 1950's to store information about phone numbers.
-It allows, for example, numbers with the same area code to be grouped together in the same "subtrie".
-Unlike hashmap/treemap, a trie allows us to consider an entire group of values that's associated with a key *prefix*.
-Each key prefix defines a subtree of other keys and values.
-We can get all numbers at Hofstra with the prefix "516-463".
-Even though 516-463 is not an actual phone number, it is a node in the trie: it contains no value but its 10-digit descendants will have values.
-
-This program will make heavy use of both the Optional and Stream monads.
-*/
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
@@ -47,7 +7,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 import java.util.function.*;
 
-//record rankedword(String word, int rank) {}
 abstract class AbstTrie<KT, KCT, VT> {
 	record KVPair<K, V>(K key, V val) {
 		@Override
