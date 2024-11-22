@@ -24,10 +24,9 @@ public class wordfinder extends JFrame implements KeyListener {
   public int XDIM, YDIM;
   public Graphics display;
   public int yoff = 40;
-  public int xoff = 8;
+  public int xoff = 40;
   int lower = YDIM - 40;
   StringTrie<Integer> rwords = new StringTrie<Integer>();
-  //TreeSet<RWord> ranked;
   PriorityQueue<RWord> ranked = new PriorityQueue<RWord>();
   public wordfinder(int x, int y) {
     XDIM = x;
@@ -74,7 +73,7 @@ public class wordfinder extends JFrame implements KeyListener {
     int dcount = 0;
     while ((ranked.size() > 0) && (dcount++ < 10)) {
       var rw = ranked.poll();
-      display.drawString(rw.word()/* + " : " + rw.rank()*/, 20, ypos);
+      display.drawString(rw.word()/* + " : " + rw.rank()*/, xoff + 12, ypos + yoff);
       ypos += 30;
     }
 	  ranked.clear();
@@ -86,7 +85,7 @@ public class wordfinder extends JFrame implements KeyListener {
   public void keyTyped(KeyEvent e) {}
   public void keyPressed(KeyEvent e) {
 	  int key = e.getKeyCode();
-    //System.out.println("key " + key);
+    System.out.println("key: " + key);
     if ((key >= 65) && (key <= 90)) {
       next((char) (key + 32));
     } else if (key == 8) {
