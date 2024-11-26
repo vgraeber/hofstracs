@@ -56,8 +56,9 @@ public class phraselearner extends JFrame implements KeyListener {
     this.addKeyListener(this);
     try {
       Scanner scin2 = new Scanner(new File("phrases.txt"));
-      while (scin2.hasNextInt()) {
-        int rank = scin2.nextInt();
+      scin2.useDelimiter("\n");
+      while (scin2.hasNext()) {
+        int rank = 1;
         String words = scin2.next();
         List<String> phrase = new ArrayList<String>(Arrays.asList(words.split(" ")));
         rphrases.set(phrase, rank);
@@ -75,7 +76,6 @@ public class phraselearner extends JFrame implements KeyListener {
   }
   String getLastKCT() {
     List<String> currphrase = rphrases.current_key();
-    System.out.println(currphrase);
     int ind = rphrases.key_length(currphrase) - 1;
     if (ind < 0) {
       return "";
@@ -94,7 +94,7 @@ public class phraselearner extends JFrame implements KeyListener {
     rphrases.continue_search(lastword + nextchar);
     newframe();
     rphrases.current_stream(5).limit(20).forEach(sv -> {
-      //System.out.println("adding " + sv);
+      System.out.println("adding " + sv);
       ranked.add(new RPhrase(sv.key(), sv.val()));
     });
     int ypos = yoff + 20;
@@ -127,7 +127,7 @@ public class phraselearner extends JFrame implements KeyListener {
   public void keyTyped(KeyEvent e) {}
   public void keyPressed(KeyEvent e) {
 	  int key = e.getKeyCode();
-    System.out.println("key " + key);
+    //System.out.println("key " + key);
     if (key == 16) {
       shift = true;
     } else if (key == 20) {
@@ -156,8 +156,8 @@ public class phraselearner extends JFrame implements KeyListener {
       if (!shift) {
         next((char) (key));
       } else {
-        char[] alts = {':', ' ', '+'};
-        next (alts[key - 59]);
+        char[] alts = {':', '+'};
+        next (alts[key / 60]);
       }
     } else if ((91 <= key) && (key <= 93)) {
       if (!shift) {
