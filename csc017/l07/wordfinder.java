@@ -66,7 +66,7 @@ public class wordfinder extends JFrame implements KeyListener {
     rwords.continue_search(nextchar);
     newframe();
     rwords.current_stream(5).limit(20).forEach(sv -> {
-      //System.out.println("adding " + sv);
+      System.out.println("adding " + sv);
       ranked.add(new RWord(sv.key(), sv.val()));
     });
     int ypos = yoff + 20;
@@ -85,7 +85,7 @@ public class wordfinder extends JFrame implements KeyListener {
   public void keyTyped(KeyEvent e) {}
   public void keyPressed(KeyEvent e) {
 	  int key = e.getKeyCode();
-    System.out.println("key: " + key);
+    //System.out.println("key: " + key);
     if ((key >= 65) && (key <= 90)) {
       next((char) (key + 32));
     } else if (key == 8) {
