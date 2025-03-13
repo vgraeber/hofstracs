@@ -4,7 +4,7 @@
 
 def check(ui, color):
   while ((not ui.isnumeric()) and ((ui < 0) or (255 < ui))):
-    print("Invalid input.")
+    print("Invalid input. Values should be a number between 0 and 255 (inclusive).")
     ui = input("Please enter your " + color + " value: ")
   return int(ui)
 
