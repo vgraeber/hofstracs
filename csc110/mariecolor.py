@@ -52,6 +52,6 @@ def main():
   binGreen = decToBin5(decMarieColor(green))
   binBlue = decToBin5(decMarieColor(blue))
   hexMarieColor = bin16ToHex(binRed, binGreen, binBlue)
-  print("The MARIE hexadecimal color code for RGB(" + str(red) + ", " + str(green) + ", " + str(blue) + ") is :" + hexMarieColor)
+  print("The MARIE hexadecimal color code for RGB(" + str(red) + ", " + str(green) + ", " + str(blue) + ") is: " + hexMarieColor)
 
 main()
