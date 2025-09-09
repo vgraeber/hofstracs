@@ -25,7 +25,6 @@
 </pre>
 ## linux lab ssh instructions
 <pre>
-ssh -p 5010 h703248488@adams204xx.hofstra.edu
+ssh -p 5010 h700#@adams204xx.hofstra.edu
 </pre>
 ### the xx is any number from 1 to 30
-## links to copy over
