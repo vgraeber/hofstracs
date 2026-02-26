@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "WnuBx4vQoR0=",
+  "success": true,
+  "projectFilePath": "/home/vgraeber/hofstracs/csc123/FSharp/FSharp.fsproj",
+  "expectedPackageFiles": [
+    "/home/vgraeber/.nuget/packages/fsharp.core/10.0.103/fsharp.core.10.0.103.nupkg.sha512"
+  ],
+  "logs": []
+}
