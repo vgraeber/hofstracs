@@ -1,0 +1,48 @@
+# procedure log2 at lambda level 1 :
+jmp 41
+push bp
+mov sp bp
+# getting var n at level 1
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+push 1
+pop bx
+pop cx
+sub bx cx
+jnz 14
+push 1
+jz 15
+push 0
+pop cx
+jz 19
+push 0
+jmp 34
+push 1
+# getting var n at level 1
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+push 2
+pop bx
+pop ax
+idiv bx ax
+push ax
+call 1
+pop bx
+pop ax
+add bx ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 1024
+call 1
+nop
+# compiled for: let log2 = (lambda n. if (n eq 1) 0 else 1+(log2 (n/2))): (log2 1024) 

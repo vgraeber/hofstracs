@@ -1,0 +1,12 @@
+# AM7B+ program to compute gcd(cx,bx), cx can be 0 initially
+
+mov 24 cx
+mov 16 bx
+mov cx ax
+jz 8
+idiv cx bx
+mov dx cx
+mov ax bx
+jmp 2
+push bx
+#end

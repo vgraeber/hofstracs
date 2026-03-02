@@ -1,0 +1,24 @@
+# procedure f:
+jmp 19
+push bp
+mov sp bp
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+push 1
+pop bx
+pop ax
+add bx ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 2
+call 1
+nop
+# compiled for: let f=(lambda x.x+1): (f 2) 

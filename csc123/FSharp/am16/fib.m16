@@ -1,0 +1,83 @@
+push 10
+pop ax
+mov 4094 bx
+mov ax [bx]
+push 0
+pop ax
+mov 4093 bx
+mov ax [bx]
+push 1
+pop ax
+mov 4092 bx
+mov ax [bx]
+push 0
+# finding var n at level 0
+mov 4094 bx
+mov [bx] ax
+push ax
+push 1
+pop bx
+pop ax
+sub bx ax
+push ax
+pop bx
+pop cx
+sub bx cx
+jn 27
+push 0
+jmp 28
+push 1
+pop cx
+jz 72
+# finding var a at level 0
+mov 4093 bx
+mov [bx] ax
+push ax
+# finding var b at level 0
+mov 4092 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+add bx ax
+push ax
+# finding var b at level 0
+mov 4092 bx
+pop ax
+mov ax [bx]
+# finding var b at level 0
+mov 4092 bx
+mov [bx] ax
+push ax
+# finding var a at level 0
+mov 4093 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+sub bx ax
+push ax
+# finding var a at level 0
+mov 4093 bx
+pop ax
+mov ax [bx]
+# finding var n at level 0
+mov 4094 bx
+mov [bx] ax
+push ax
+push 1
+pop bx
+pop ax
+sub bx ax
+push ax
+# finding var n at level 0
+mov 4094 bx
+pop ax
+mov ax [bx]
+# finding var b at level 0
+mov 4092 bx
+mov [bx] ax
+push ax
+jmp 12
+nop
+# compiled for: let n = 10: let a = 0: let b = 1: while (0 lt n-1)  (    b = a+b;    a = b-a;    n = n-1;    b;  ) 

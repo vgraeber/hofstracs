@@ -1,0 +1,35 @@
+# procedure cube at lambda level 1 :
+jmp 30
+push bp
+mov sp bp
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 10
+call 1
+nop
+# compiled for: let cube = (lambda x.x*x*x):(cube 10) 

@@ -1,0 +1,34 @@
+push 3
+push 3
+push 1
+pop bx
+pop ax
+sub bx ax
+push ax
+pop bx
+pop cx
+sub bx cx
+jnz 13
+push 1
+jz 14
+push 0
+pop cx
+jz 18
+push 100
+jmp 33
+push 1
+push 2
+pop bx
+pop cx
+sub bx cx
+jn 26
+push 0
+jmp 27
+push 1
+pop cx
+jz 32
+push 200
+jmp 33
+push 300
+nop
+# compiled for: if (3 eq 3-1) 100 else (if (1 lt 2) 200 else 300) 

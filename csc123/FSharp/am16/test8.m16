@@ -1,0 +1,28 @@
+mov 1517 bx
+mov 1 cx
+sub bx cx
+jn 6
+push 0
+jmp 23
+mov 2 cx
+sub bx cx
+jnz 11
+push 1
+jmp 23
+mov 2 ax
+mov bx dx
+idiv ax dx
+mov dx cx
+jz 22
+add 1 ax
+mov bx cx
+sub ax cx
+jnz 12
+push 1
+jmp 23
+push ax
+nop
+# AM7B+ program to test if the number in bx is prime
+# Will push the largest number<bx that divides bx, so 1 if it's a prime number.
+# Will push 0 on the stack if bx holds 1 or a smaller number
+

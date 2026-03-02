@@ -1,0 +1,58 @@
+push 314159
+pop ax
+mov 4094 bx
+mov ax [bx]
+# procedure area at lambda level 1 :
+jmp 38
+push bp
+mov sp bp
+# finding var pi at level 1
+mov 4094 bx
+mov [bx] ax
+push ax
+# finding var r at level 1
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+# finding var r at level 1
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+push 100000
+pop bx
+pop ax
+idiv bx ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 1
+pop ax
+mov 4093 bx
+mov ax [bx]
+push 51
+call 5
+# finding var pi at level 1
+mov 4093 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+add bx ax
+push ax
+nop
+# compiled for: let pi = 314159:  let area = (lambda r.(pi*r*r)/100000): let pi = 1: ((area 51)+pi) 

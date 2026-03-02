@@ -1,0 +1,42 @@
+push 1
+pop ax
+mov 4094 bx
+mov ax [bx]
+# procedure f at lambda level 1 :
+jmp 31
+push bp
+mov sp bp
+mov 4094 bx
+mov [bx] ax
+push ax
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+add bx ax
+push ax
+mov 4094 bx
+pop ax
+mov ax [bx]
+mov 4094 bx
+mov [bx] ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 2
+call 5
+push 3
+call 5
+push 4
+call 5
+call 5
+call 5
+nop
+# compiled for: let x=1: let f=(lambda y.(x=x+y; x;)): (   (f 2);   (f 3);   (f (f (f 4))); ) 

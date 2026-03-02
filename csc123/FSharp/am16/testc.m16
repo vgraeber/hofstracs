@@ -1,0 +1,25 @@
+# procedure f:
+mov 0 cx
+jz 20
+mov -3 bx
+mov [bx] ax
+push ax
+mov -3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+mov -3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+imul bx ax
+push ax
+ret
+push 10
+call 2
+nop
+# compiled for: let f=lambda x.x*x*x:(f 10)

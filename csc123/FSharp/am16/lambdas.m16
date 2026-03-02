@@ -1,0 +1,45 @@
+# procedure f at lambda level 1 :
+jmp 37
+push bp
+mov sp bp
+# procedure g at lambda level 2 :
+jmp 28
+push bp
+mov sp bp
+# finding var x at level 2
+mov bp bx
+sub 1 bx
+mov [bx] ax
+mov ax bx
+sub 3 bx
+mov [bx] ax
+push ax
+# finding var y at level 2
+mov bp bx
+sub 3 bx
+mov [bx] ax
+push ax
+pop bx
+pop ax
+add bx ax
+push ax
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 10
+call 4
+pop ax
+mov bp bx
+sub 3 bx
+mov ax [bx]
+mov bp sp
+pop bp
+ret
+push 200
+call 1
+nop
+# compiled for: let f = (lambda x. (let g = (lambda y.x+y): (g 10))): (f 200) 
