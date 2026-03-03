@@ -110,26 +110,29 @@ let coredump() =
     printfn "%d" (RAM.[i])
     i <- i-1;;
 
-let regclean = function
-  | Reg(a) -> a
-  | x -> (string x)
+let rec clean cln l r =
+  match cln with
+  | Imm x -> l + (string x) + r
+  | Reg(a) -> l + a + r
+  | Mem(a) -> (clean a "[" "]")
 
-let prettyinst inst = function
-  | ALU("add",a,Reg(b)) -> "add " + (regclean a) + " " + b
-  | ALU("sub",a,Reg(b)) -> "sub " + (regclean a) + " " + b
-  | ALU("imul",a,Reg(b)) -> "imul " + (regclean a) + " " + b
-  | ALU("idiv",a,Reg(b)) -> "idiv " + (regclean a) + " " + b
-  | PUSH(x) -> "push " + (regclean x)
-  | POP(r) -> "pop " + (regclean r)
-  | MOV(a,b) -> "mov " + (regclean a) + " " + (regclean b)
+let prettyinst inst =
+  match inst with
+  | ALU("add",a,Reg(b)) -> "add " + (clean a "" "") + " " + b
+  | ALU("sub",a,Reg(b)) -> "sub " + (clean a "" "") + " " + b
+  | ALU("imul",a,Reg(b)) -> "imul " + (clean a "" "") + " " + b
+  | ALU("idiv",a,Reg(b)) -> "idiv " + (clean a "" "") + " " + b
+  | PUSH(x) -> "push " + (clean x "" "")
+  | POP(r) -> "pop " + (clean r "" "")
+  | MOV(a,b) -> "mov " + (clean a "" "") + " " + (clean b "" "")
   | JMP(l) -> "jmp " + (string l)
   | JNZ(l) -> "jnz " + (string l)
   | JZ(l) -> "jz " + (string l)
   | JN(l) -> "jn " + (string l)
   | CALL(l) -> "call " + (string l)
   | RET -> "ret"
-  | NOP -> ""
-  | x -> "Illegal instruction " + (string x);;
+  | NOP -> "nop"
+  | x -> "Illegal instruction: " + (string x);;
 
 let execute = function
   | ALU("add",a,Reg(b)) -> REGS.[b] <- REGS.[b] + (load_operand a)
@@ -149,25 +152,29 @@ let execute = function
     let movstr = (string (prettyinst (MOV(a,b))))
     let bmem = (movstr.[movstr.Length-1]=']')
     if (not bmem) then
-      REGS.[movstr.[(movstr.Length-2)..(movstr.Length-1)]] <- (load_operand a)
+      REGS.[movstr.[(movstr.Length-2)..]] <- (load_operand a)
     elif (bmem&&(movstr.[4]<>'[')) then
-      RAM.[load_operand b] <- (load_operand a)
-  | JMP(l) -> pc <- l
+      let newb = (clean b "" "")
+      RAM.[(load_operand (Reg(newb.[1..(newb.Length-2)])))] <- (load_operand a)
+    else
+      printfn "Illegal instruction: %s" movstr
+      coredump()
+  | JMP(l) -> pc <- (l-1)
   | JNZ(l) -> 
     if (REGS.["cx"]<>0) then
-      pc <- l
+      pc <- (l-1)
   | JZ(l) -> 
     if (REGS.["cx"]=0) then
-      pc <- l
+      pc <- (l-1)
   | JN(l) -> 
     if (REGS.["cx"]<0) then
-      pc <- l
+      pc <- (l-1)
   | CALL(l) -> 
     sp <- sp+1
-    pc <- l
-  | RET -> pc <- sp
+    pc <- (l-1)
+  | RET -> pc <- (sp-1)
   | NOP -> ()
-  | x -> printfn "Illegal instruction %s" (string x); coredump();;
+  | x -> printfn "Illegal instruction: %s" (string x); coredump();;
 
 let execute_program trace (program:Vec<instruction>) =
   pc <- 0
@@ -177,7 +184,7 @@ let execute_program trace (program:Vec<instruction>) =
     execute inst
     pc <- pc + 1
     if trace then
-      printf "%O" (prettyinst inst)
+      printf "%s,    \t" (prettyinst inst)
       printf "ax=%d, bx=%d, cx=%d, dx=%d, sp=%d, pc=%d" (REGS.["ax"]) (REGS.["bx"]) (REGS.["cx"]) (REGS.["dx"]) sp pc
       if sp>0 then printfn " tos=%d" (RAM.[sp-1]) else printfn "";;
 
