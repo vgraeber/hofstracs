@@ -170,9 +170,12 @@ let execute = function
     if (REGS.["cx"]<0) then
       pc <- (l-1)
   | CALL(l) -> 
+    RAM.[sp] <- pc
     sp <- sp+1
     pc <- (l-1)
-  | RET -> pc <- (sp-1)
+  | RET ->
+    sp <- sp-1
+    pc <- RAM.[sp]
   | NOP -> ()
   | x -> printfn "Illegal instruction: %s" (string x); coredump();;
 

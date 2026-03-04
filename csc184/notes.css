@@ -12,7 +12,8 @@ nav.navbar {
 }
 nav.navbar div.actions{
   display: flex;
-  align-content: right;
+  margin-right: 3%;
+  justify-content: flex-end;
 }
 main {
   padding-top: 3%;
@@ -31,4 +32,10 @@ td.time {
 }
 td.checkbox {
   text-align: center;
+}
+div.new {
+  position: fixed;
+  bottom: 2%;
+  right: 2%;
+  z-index: 2;
 }
