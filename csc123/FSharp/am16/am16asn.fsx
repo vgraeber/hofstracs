@@ -110,13 +110,12 @@ let coredump() =
     printfn "%d" (RAM.[i])
     i <- i-1;;
 
-let rec clean cln l r =
-  match cln with
-  | Imm x -> l + (string x) + r
-  | Reg(a) -> l + a + r
-  | Mem(a) -> (clean a "[" "]")
-
 let prettyinst inst =
+  let rec clean cln l r =
+    match cln with
+    | Imm x -> l + (string x) + r
+    | Reg(a) -> l + a + r
+    | Mem(a) -> (clean a "[" "]")
   match inst with
   | ALU("add",a,Reg(b)) -> "add " + (clean a "" "") + " " + b
   | ALU("sub",a,Reg(b)) -> "sub " + (clean a "" "") + " " + b
@@ -154,8 +153,7 @@ let execute = function
     if (not bmem) then
       REGS.[movstr.[(movstr.Length-2)..]] <- (load_operand a)
     elif (bmem&&(movstr.[4]<>'[')) then
-      let newb = (clean b "" "")
-      RAM.[(load_operand (Reg(newb.[1..(newb.Length-2)])))] <- (load_operand a)
+      RAM.[(load_operand (Reg(movstr.[(movstr.Length-3)..(movstr.Length-2)])))] <- (load_operand a)
     else
       printfn "Illegal instruction: %s" movstr
       coredump()

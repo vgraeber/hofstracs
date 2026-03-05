@@ -1,2 +1,4 @@
 *.class
 csc016/*.out
+
+.fake
