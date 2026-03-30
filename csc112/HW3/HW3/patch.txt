@@ -1,0 +1,388 @@
+diff -Naur xv6-public/defs.h xv6-public2/defs.h
+--- xv6-public/defs.h	2025-10-09 02:23:01.382128182 -0400
++++ xv6-public2/defs.h	2025-10-08 20:37:48.000000000 -0400
+@@ -9,7 +9,6 @@
+ struct sleeplock;
+ struct stat;
+ struct superblock;
+-#include "rand.h"
+ #include "pstat.h"
+ 
+ // bio.c
+diff -Naur xv6-public/exec.c xv6-public2/exec.c
+--- xv6-public/exec.c	2025-12-05 13:44:50.365127196 -0500
++++ xv6-public2/exec.c	2025-09-24 02:17:11.000000000 -0400
+@@ -62,16 +62,11 @@
+ 
+   // Allocate two pages at the next page boundary.
+   // Make the first inaccessible.  Use the second as the user stack.
+-  //sz = PGROUNDUP(sz);
+-  //if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
+-  //  goto bad;
+-  //clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
+-  uint stackbase = KERNBASE - PGSIZE; //bottom on init stack pg
+-  if(allocuvm(pgdir, stackbase, stackbase + PGSIZE) == 0) goto bad;
+-  curproc->stackz = 1;
+   sz = PGROUNDUP(sz);
+-  //sp = sz;
+-  sp = KERNBASE;
++  if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
++    goto bad;
++  clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
++  sp = sz;
+ 
+   // Push argument strings, prepare rest of stack in ustack.
+   for(argc = 0; argv[argc]; argc++) {
+diff -Naur xv6-public/Makefile xv6-public2/Makefile
+--- xv6-public/Makefile	2025-11-07 02:10:14.536029296 -0500
++++ xv6-public2/Makefile	2025-10-08 00:38:01.000000000 -0400
+@@ -185,7 +185,6 @@
+ 	_syscallTest\
+ 	_rand\
+ 	_lotterytest\
+-	_stacktester\
+ 
+ fs.img: mkfs README $(UPROGS)
+ 	./mkfs fs.img README $(UPROGS)
+@@ -255,7 +254,7 @@
+ EXTRA=\
+ 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
+ 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
+-	printf.c syscallTest.c rand.c lotterytest.c stacktester.c umalloc.c\
++	printf.c syscallTest.c rand.c lotterytest.c umalloc.c\
+ 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
+ 	.gdbinit.tmpl gdbutil\
+ 
+diff -Naur xv6-public/memlayout.h xv6-public2/memlayout.h
+--- xv6-public/memlayout.h	2025-09-24 02:17:11.731370543 -0400
++++ xv6-public2/memlayout.h	2025-11-07 16:16:10.104609145 -0500
+@@ -7,6 +7,7 @@
+ // Key addresses for address space layout (see kmap in vm.c for layout)
+ #define KERNBASE 0x80000000         // First kernel virtual address
+ #define KERNLINK (KERNBASE+EXTMEM)  // Address where kernel is linked
++#define PGSIZE 4096
+ 
+ #define V2P(a) (((uint) (a)) - KERNBASE)
+ #define P2V(a) ((void *)(((char *) (a)) + KERNBASE))
+diff -Naur xv6-public/proc.c xv6-public2/proc.c
+--- xv6-public/proc.c	2025-11-07 16:14:19.459957368 -0500
++++ xv6-public2/proc.c	2025-10-08 20:17:49.865061000 -0400
+@@ -7,9 +7,6 @@
+ #include "proc.h"
+ #include "spinlock.h"
+ #include "rand.h"
+-#include "pstat.h"
+-
+-void hlt(void){}
+ 
+ struct {
+   struct spinlock lock;
+@@ -92,15 +89,14 @@
+ found:
+   p->state = EMBRYO;
+   p->pid = nextpid++;
+-  p->tickets = 10;
+-  p->ticks = 0;
+-  p->stackz = 0;
+ 
+   release(&ptable.lock);
+ 
+   // Allocate kernel stack.
+   if((p->kstack = kalloc()) == 0){
+     p->state = UNUSED;
++    p->tickets = 10;
++    p->ticks = 0;
+     return 0;
+   }
+   sp = p->kstack + KSTACKSIZE;
+@@ -332,68 +328,36 @@
+   struct proc *p;
+   struct cpu *c = mycpu();
+   c->proc = 0;
+-  //int foundproc = 1;
+-
++  
+   for(;;){
+     // Enable interrupts on this processor.
+     sti();
+-    int totalTix = 0;
+-    int Tix_pass = 0;
+-    acquire(&ptable.lock);
+-    
+-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+-      if(p->state == RUNNABLE)
+-        totalTix += p->tickets;
+-    }
+-    
+-    // pick a winning ticket
+-    long winner = random_at_most((long)totalTix);
+-    //if(winner<0){winner=0;}
+-
+ 
+-    if(totalTix == 0){
+-      // nothing runnable right now
+-      release(&ptable.lock);
+-      //hlt();
+-      continue;
+-    }
+-
+-
+-    //find the winning process
+-    //acquire(&ptable.lock);
++    // Loop over process table looking for process to run.
++    acquire(&ptable.lock);
+     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+-      if(p->state != RUNNABLE) 
++      if(p->state != RUNNABLE)
+         continue;
+ 
+-      Tix_pass += p->tickets;
+-      if(Tix_pass <= winner) 
+-        continue;
+-        
+-      //foundproc = 1;
+-
+-      // found winner
++      // Switch to chosen process.  It is the process's job
++      // to release ptable.lock and then reacquire it
++      // before jumping back to us.
+       c->proc = p;
+       switchuvm(p);
+       p->state = RUNNING;
+-      p->ticks++;
+ 
+-      // context switch
+-      swtch(&c->scheduler, p->context);
++      swtch(&(c->scheduler), p->context);
+       switchkvm();
+ 
+-      // back in scheduler after process yielded/exited
++      // Process is done running for now.
++      // It should have changed its p->state before coming back.
+       c->proc = 0;
+-      totalTix = 0;
+-      Tix_pass = 0;
+-      break; // break out and restart outer loop
+     }
+-
+     release(&ptable.lock);
++
+   }
+ }
+ 
+-
+-
+ // Enter scheduler.  Must hold only ptable.lock
+ // and have changed proc->state. Saves and restores
+ // intena because intena is a property of this
+@@ -571,19 +535,3 @@
+     cprintf("\n");
+   }
+ }
+-
+-int
+-getpinfo_helper(struct pstat *ps)
+-{
+-   if (ps == 0) return -1;
+-  acquire(&ptable.lock);  // Lock process table for safety
+-  for (int i = 0; i < NPROC; i++) {
+-    struct proc *p = &ptable.proc[i];
+-    ps->inuse[i] = p->state != UNUSED;  // 1 if in use, 0 otherwise
+-    ps->tickets[i] = p->tickets;
+-    ps->pid[i] = p->pid;
+-    ps->ticks[i] = p->ticks;
+-  }
+-  release(&ptable.lock);  // Unlock
+-  return 0;
+-}
+diff -Naur xv6-public/proc.h xv6-public2/proc.h
+--- xv6-public/proc.h	2025-11-05 23:34:56.230511002 -0500
++++ xv6-public2/proc.h	2025-10-08 01:06:27.000000000 -0400
+@@ -51,7 +51,6 @@
+   char name[16];               // Process name (debugging)
+   int tickets;		       //Ticket amount (lottery scheduler)
+   int ticks;		       //Times run
+-  int stackz;		       //number of stack pages
+ };
+ 
+ // Process memory is laid out contiguously, low addresses first:
+diff -Naur xv6-public/stacktester.c xv6-public2/stacktester.c
+--- xv6-public/stacktester.c	2025-11-07 02:07:21.205826000 -0500
++++ xv6-public2/stacktester.c	1969-12-31 19:00:00.000000000 -0500
+@@ -1,54 +0,0 @@
+-#include "types.h"
+-#include "stat.h"
+-#include "user.h"
+-#include "fs.h"
+-#include "memlayout.h"
+-#include "mmu.h"
+-
+-int magic_num = 123456;
+-
+-// this address is stored in data/text section 
+-int* stack_ptr = (int*) KERNBASE - 4; 
+-
+-int
+-main(int argc, char *argv[])
+-{
+-  // create two integers, one in stack, another in heap
+-  int stack_val = magic_num;
+-  int* heap_ptr = malloc(sizeof(int));
+-  printf(1, "addr of stack_val: %x\n", &stack_val);
+-  printf(1, "addr of heap_ptr: %x\n", heap_ptr);
+-
+-  // compare the addresses of the two integers
+-  // test will pass if stack_val has higher address
+-  if(heap_ptr < &stack_val){
+-    printf(1, "TEST 1 PASSED\n");
+-  } else {
+-    exit();
+-  }
+-
+-  // initialize somewhere in the end of user memory(i.e., stack)
+-  *stack_ptr = magic_num;
+-
+-  // create a chile with the same address space
+-  int rc = fork();
+-  if(rc == 0){
+-    // test would pass only if the stack is properly copied
+-    // if not, the kernel traps
+-    if(*stack_ptr == magic_num){
+-      printf(1, "TEST 2 PASSED\n");
+-    } 
+-  } else if (rc > 0) {
+-    (void) wait();
+-    // grow the stack by accessing a address 
+-    // in the page right below the initial stack page
+-    char *p = (char*) (KERNBASE - PGSIZE - 4);
+-    *p = 'z';
+-
+-    // test would pass if no trap happened
+-    printf(1, "TEST 3 PASSED\n");
+-  } else {
+-    printf(1, "fork failed!\n");
+-  }
+-  exit();
+-}
+diff -Naur xv6-public/syscall.c xv6-public2/syscall.c
+--- xv6-public/syscall.c	2025-11-07 16:28:28.971221641 -0500
++++ xv6-public2/syscall.c	2025-10-08 00:52:24.000000000 -0400
+@@ -23,9 +23,9 @@
+ int
+ fetchint(uint addr, int *ip)
+ {
+-  //struct proc *curproc = myproc();
++  struct proc *curproc = myproc();
+ 
+-  if(addr < KERNBASE)
++  if(addr >= curproc->sz || addr+4 > curproc->sz)
+     return -1;
+   *ip = *(int*)(addr);
+   return 0;
+@@ -40,7 +40,7 @@
+   char *s, *ep;
+   struct proc *curproc = myproc();
+ 
+-  if(addr < KERNBASE)
++  if(addr >= curproc->sz)
+     return -1;
+   *pp = (char*)addr;
+   ep = (char*)curproc->sz;
+diff -Naur xv6-public/trap.c xv6-public2/trap.c
+--- xv6-public/trap.c	2025-12-19 22:26:09.969571365 -0500
++++ xv6-public2/trap.c	2025-11-07 16:49:56.244882813 -0500
+@@ -78,19 +78,19 @@
+     lapiceoi();
+     break;
+     
+-    case T_PGFLT:
+-  uint faultva = rcr2();  // CR2 has faulting VA
+-  if (myproc == 0) panic("page fault in kernel");
+-  uint stackbase = KERNBASE - myproc->stackz * PGSIZE;
+-  uint newpageva = stackbase - PGSIZE;  // Page right below current stack
+-  if (PGROUNDDOWN(faultva) == newpageva && faultva >= newpageva) {  // In the new page?
+-    if (allocuvm(myproc->pgdir, newpageva, newpageva + PGSIZE) == 0)
+-      cprintf("allocuvm failed\n");  // Or panic
+-    else {
+-      myproc->stackz++;  // Grow counter
+-      return;  // Resume user
++  case T_PGFLT:
++    uint faultva = rcr2();  // CR2 has faulting VA
++    if (proc == 0) panic("page fault in kernel");
++    uint stackbase = KERNBASE - proc->stacksz * PGSIZE;
++    uint newpageva = stackbase - PGSIZE;  // Page right below current stack
++    if (PGROUNDDOWN(faultva) == newpageva && faultva >= newpageva) {  // In the new page?
++      if (allocuvm(proc->pgdir, newpageva, newpageva + PGSIZE) == 0)
++        cprintf("allocuvm failed\n");  // Or panic
++      else {
++        proc->stacksz++;  // Grow counter
++        return;  // Resume user
++      }
+     }
+-  }
+   // Else: Not stack growth; panic
+   cprintf("unexpected page fault! va %x\n", faultva);
+   proc->killed = 1;  // Kill process instead of panic for safety
+diff -Naur xv6-public/user.h xv6-public2/user.h
+--- xv6-public/user.h	2025-10-09 01:44:48.103296792 -0400
++++ xv6-public2/user.h	2025-10-08 20:37:02.000000000 -0400
+@@ -28,6 +28,7 @@
+ int getopenfilecount(void);
+ int settickets(int number);
+ int getpinfo(struct pstat *);
++int sleep(int ticks);
+ 
+ // ulib.c
+ int stat(const char*, struct stat*);
+diff -Naur xv6-public/vm.c xv6-public2/vm.c
+--- xv6-public/vm.c	2025-12-19 22:27:41.369820603 -0500
++++ xv6-public2/vm.c	2025-09-24 02:17:11.000000000 -0400
+@@ -319,8 +319,6 @@
+   pte_t *pte;
+   uint pa, i, flags;
+   char *mem;
+-  struct proc *curproc = myproc();
+-  myproc->stackz = curproc -> stackz;
+ 
+   if((d = setupkvm()) == 0)
+     return 0;
+@@ -331,12 +329,6 @@
+       panic("copyuvm: page not present");
+     pa = PTE_ADDR(*pte);
+     flags = PTE_FLAGS(*pte);
+-    
+-    if((pte = walkpgdir(pgdir,(void *) 1, 0)) == 0) continue;
+-    if(!(*pte & PTE_P)) continue;
+-    pa = PTE_ADDR(*pte);
+-    flags = *pte & 0xFFF;
+-    
+     if((mem = kalloc()) == 0)
+       goto bad;
+     memmove(mem, (char*)P2V(pa), PGSIZE);
+@@ -345,26 +337,6 @@
+       goto bad;
+     }
+   }
+-  
+-  uint stackbase = KERNBASE - myproc->stackz * PGSIZE;
+-for(i = 0; i < myproc->stackz * PGSIZE; i += PGSIZE) {
+-  uint va = STACKBASE + i;
+-  pte_t *pte;
+-  if((pte = walkpgdir(pgdir, (void *)va, 0)) == 0)
+-    panic("copyuvm: walkpgdir failed");  // handle error
+-  if(!(*pte & PTE_P))
+-    panic("copyuvm: page not present");  // skip if not mapped
+-  char *newpa = kalloc();
+-  if(newpa == 0)
+-    goto bad;
+-  memmove(newpa, P2V(PTE_ADDR(*pte)), PGSIZE);
+-  if(mappages(np->pgdir, va, PGSIZE, V2P(newpa), PTE_W|PTE_U) < 0) {
+-    kfree(newpa);
+-    goto bad;
+-  }
+-}
+-
+-
+   return d;
+ 
+ bad:

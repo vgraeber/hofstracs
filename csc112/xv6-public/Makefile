@@ -33,7 +33,7 @@ OBJS = \
 # TOOLPREFIX = i386-jos-elf
 
 # Using native tools (e.g., on X86 Linux)
-#TOOLPREFIX = 
+#TOOLPREFIX =
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
@@ -184,13 +184,14 @@ UPROGS=\
 	_zombie\
 	_syscallTest\
 	_lotterytest\
+	_stacktester\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
 
 -include *.d
 
-clean: 
+clean:
 	rm -f *.tex *.dvi *.idx *.aux *.log *.ind *.ilg \
 	*.o *.d *.asm *.sym vectors.S bootblock entryother \
 	initcode initcode.out kernel xv6.img fs.img kernelmemfs \
@@ -249,6 +250,8 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 # after running make dist, probably want to
 # rename it to rev0 or rev1 or so on and then
 # check in that version.
+
+#stacktester.c (insert after lotterytest)
 
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\

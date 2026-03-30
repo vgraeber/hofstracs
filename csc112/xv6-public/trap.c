@@ -77,6 +77,14 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+  case T_PGFLT:
+  	uint addr = rcr2();
+  	if(PGROUNDUP(addr) == myproc()->sb){
+  		allocuvm(myproc()->pgdir, PGROUNDDOWN(addr), (myproc()->sb)-1);
+  		myproc()->sb = PGROUNDDOWN(addr);
+  	}
+  	cprintf("addr: %d\n", addr);
+  	break;
 
   //PAGEBREAK: 13
   default:

@@ -27,4 +27,4 @@ let rec multi a b =
   | (x,y) -> multi y x;;
 
 let div a b =
-  Option.map (fun x -> multi a x) (inverse b)
+  Option.map (fun x -> multi a x) (inverse b);;
