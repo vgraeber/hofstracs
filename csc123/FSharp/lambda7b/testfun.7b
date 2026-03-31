@@ -1,0 +1,18 @@
+# testing simple function
+
+define factorial = lambda n:(
+  define ax = 1;
+  while (!(n==0)) (
+    ax=ax*n;
+    n=n-1;
+  );
+  ax;
+);
+
+print "Enter a non-negative integer: ";
+define n = get;
+if (n<0) print "I said NON-NEGATIVE\n"
+else (
+  print factorial(n);
+  print "\n";
+);

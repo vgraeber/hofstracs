@@ -1,0 +1,8 @@
+# Testing if-else and booleans, division by zero, short circuiting
+
+print (if (3 == 3-1) 100 else (if (!(1 == 1+1)) 200 else 300)); print "\n";
+print (!(1 || 0) == (!1 && !0)) && (!(1 && 1) == (!0 || !0)); print "\n";
+print (if (3<2) (1/0) else 2); print "\n";
+print (if (3==1 && ((1/0) == 1)) 1000 else 2000); print "\n";
+print (100/(3-2-1));  print "\n";
+

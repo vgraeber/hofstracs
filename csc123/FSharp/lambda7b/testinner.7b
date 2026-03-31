@@ -1,0 +1,8 @@
+# function with locally defined functions
+
+define f = lambda x: (
+  define g = lambda y:x+y;
+  define h = lambda z:g(z);
+  h(15);
+);
+print f(10); print "\n";

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "nP2sBLbi5M8=",
+  "success": true,
+  "projectFilePath": "/home/vgraeber/hofstracs/csc123/FSharp/lambda7b/lambda7b.fsproj",
+  "expectedPackageFiles": [
+    "/home/vgraeber/.nuget/packages/fsharp.core/10.0.104/fsharp.core.10.0.104.nupkg.sha512"
+  ],
+  "logs": []
+}

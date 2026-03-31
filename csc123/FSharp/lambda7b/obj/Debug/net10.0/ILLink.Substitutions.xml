@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="lambda7b">
+    <resource name="FSharpSignatureData.lambda7b" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.lambda7b" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.lambda7b" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.lambda7b" action="remove"></resource>
+    <resource name="FSharpOptimizationData.lambda7b" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.lambda7b" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.lambda7b" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.lambda7b" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.lambda7b" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.lambda7b" action="remove"></resource>
+  </assembly>
+</linker>

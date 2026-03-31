@@ -1,0 +1,14 @@
+# nth Fibonacci with simple while loop - don't feed to stdin
+
+print "Enter a positive integer: ";
+define n = get;
+print "The "; print n; print "th Fibonacci number is ";
+define a = 1;
+define b = 1;
+while (2<n) (
+  b = a+b;
+  a = b-a;
+  n = n-1;
+);
+print b;
+print "\n";

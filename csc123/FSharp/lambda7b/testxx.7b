@@ -1,0 +1,4 @@
+# Testing if-else and booleans, division by zero, short circuiting
+
+print (if (1 == 2-2) 200 else 300); print "\n";
+

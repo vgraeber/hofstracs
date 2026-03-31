@@ -1,0 +1,12 @@
+# function that takes another function as an argument:
+
+define fsquared = lambda g:lambda x:g(g(x));
+print fsquared(lambda x:x*3)(2);
+print "\n(should be 18)\n";
+
+# compose two functions into one:
+
+define compose = lambda f:lambda g: lambda x: f(g(x));
+define fc = compose(lambda x:x*2)(lambda x:x+1);
+print fc(3);
+print "\nshould be 2*(3+1)=8\n";

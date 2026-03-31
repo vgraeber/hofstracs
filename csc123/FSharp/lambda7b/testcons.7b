@@ -1,0 +1,9 @@
+# data structures in lambda calc style
+
+define cons = lambda a:lambda b:lambda c:if (c) a else b;
+define car = lambda p:p(1);
+define cdr = lambda p:p(0);
+define p = cons(2)(3);
+define m = cons(2)(cons(3)(cons(5)(7)));
+print car(cdr(cdr(m)));
+print "\n(should be 5)\n";

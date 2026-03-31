@@ -1,0 +1,19 @@
+# function to compute base**n by binary factorization on n:
+# testing Curried function
+define power = lambda base:lambda n:(
+  define ax = 1;
+  define factor = base;
+  while (0<n) (
+    if ((n%2) == 1) (ax = ax * factor) else 0;
+    factor = factor * factor;
+    n = n/2;
+  );
+  ax;
+);
+
+print "Enter base: ";
+define base = get;
+print "Enter exponent: ";
+define exponent = get;
+print power(base)(exponent);
+print "\n";

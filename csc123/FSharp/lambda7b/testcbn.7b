@@ -1,0 +1,11 @@
+# The following program behaves differently under call-by-value and
+# call-by-name.  Under CBV, it should print 1 because f(1) is called
+# before g(f(1)).  Under CBN, it should print 0 because f is called
+# after g.
+
+define x = 2;
+define f = lambda y: (x = x*0; y;);
+define g = lambda y: (x = x+1; y;);
+g(f(1));
+print x;
+print "\n";

@@ -1,0 +1,6 @@
+# recursive function
+
+define log = lambda n: if (n==1) 0 else 1+log(n/2);
+print "\nlog(512) is ";
+print log(512);
+print "\n\n";

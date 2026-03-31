@@ -1,0 +1,14 @@
+# Save your planet with static scoping!
+
+define pi = 314159;
+define area = lambda radius:pi*radius*radius;
+let pi = 0 in (
+  define result = area(51);
+  define quotient = result / 100000;
+  define remainder = result % 100000;
+  print "\nAccording to your program, area(51) is ";
+  print quotient;  print ".";  print remainder;
+  if (quotient == 8171) (print "\nYour planet is safe for now ...\n\n")
+  else (print "\nYour planet is doomed.\n\n");
+);
+

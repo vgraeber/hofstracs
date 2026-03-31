@@ -79,7 +79,7 @@ trap(struct trapframe *tf)
     break;
   case T_PGFLT:
   	uint addr = rcr2();
-  	if(PGROUNDUP(addr) == myproc()->sb){
+  	if((addr < myproc()->sb) && (PGROUNDUP(addr) == myproc()->sb)){
   		allocuvm(myproc()->pgdir, PGROUNDDOWN(addr), (myproc()->sb)-1);
   		myproc()->sb = PGROUNDDOWN(addr);
   	}
