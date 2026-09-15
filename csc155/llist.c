@@ -74,7 +74,7 @@ int uiForFunc(int (**mainFuncCalls)(int*, llnode**), int *lllen, llnode **start,
 
 int f1(int *lllen, llnode **start) {
   char uin[100];
-  int unum = -1;
+  int unum = 0;
   printf("Running addAtEnd. Type 'back' to return to the previous menu.\n");
   printf("Enter the number to add to the list: ");
   fgets(uin, sizeof(uin), stdin);
@@ -111,13 +111,13 @@ int addAtEnd(int newData, llnode *start) {
 
 int f2(int *lllen, llnode **start) {
   char uin[100];
-  int unum = -1;
+  int upos = 0;
   printf("Running deleteNode. Type 'back' to return to the previous menu.\n");
-  printf("Enter the position of the node to delete (positions begin at 0): ");
+  printf("Enter the position of the node to delete (positions begin at 1): ");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
-    if (uinToInt(uin, &unum) && ((-1 < unum) && (unum < *lllen))) {
-      deleteNode(unum, start);
+    if (uinToInt(uin, &upos) && ((-1 < (upos - 1)) && ((upos - 1) < *lllen))) {
+      deleteNode(upos-1, start);
       *lllen = *lllen - 1;
     } else {
       printf("Please enter a valid position.\n");
@@ -149,21 +149,21 @@ int deleteNode(int pos, llnode **start) {
 
 int f3(int *lllen, llnode **start) {
   char uin[100];
-  int unum = -1;
-  int unum2 = -1;
+  int upos = 0;
+  int unum = 0;
   printf("Running insertNode. Type 'back' to return to the previous menu.\n");
-  printf("Enter the position you wish to insert the node at (positions begin at 0): ");
+  printf("Enter the position you wish to insert the node at (positions begin at 1): ");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
-    if (uinToInt(uin, &unum) && ((-1 < unum) && (unum < (*lllen + 1)))) {
+    if (uinToInt(uin, &upos) && ((-1 < (upos - 1)) && ((upos - 1) < (*lllen + 1)))) {
       printf("Enter the number to add to the list: ");
       fgets(uin, sizeof(uin), stdin);
       int ins = 0;
       while ((ins == 0) && (strcmp(uin, "back\n") != 0)) {
-        if (uinToInt(uin, &unum2)) {
+        if (uinToInt(uin, &unum)) {
           fgets(uin, sizeof(uin), stdin);
-          uinToInt(uin, &unum2)
-          insertNode(unum, unum2, start);
+          uinToInt(uin, &unum)
+          insertNode(unum, upos-1, start);
           *lllen = *lllen + 1;
           ins = 1;
         }
@@ -204,7 +204,7 @@ int insertNode(int newData, int pos, llnode **start) {
 
 int f4(int *lllen, llnode **start) {
   char uin[100];
-  int unum = -1;
+  int unum = 0;
   printf("Running search. Type 'back' to return to the previous menu.\n");
   printf("Enter the number to search for: ");
   fgets(uin, sizeof(uin), stdin);
@@ -229,10 +229,9 @@ llnode* search(int check, llnode *start) {
   return curr;
 }
 
-
 int f5(int *lllen, llnode **start) {
   char uin[100];
-  int unum = -1;
+  int unum = 0;
   printf("Running printNode. Type 'back' to return to the previous menu.\n");
   printf("Enter the position of the node to print (positions begin at 0): ");
   fgets(uin, sizeof(uin), stdin);
@@ -274,7 +273,7 @@ int f6(int *lllen, llnode **start) {
     } else {
       printf("Please enter a valid command.\n");
     }
-    printf("Running printList. Type 'back' to return to the previous menu, or enter 'print' to print the list: ");
+    printf("Running printList. Type 'back' to return to the previous menu, or enter 'print' to print the list again: ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
