@@ -79,11 +79,11 @@ trap(struct trapframe *tf)
     break;
   case T_PGFLT:
   	uint addr = rcr2();
-  	if((addr < myproc()->sb) && (PGROUNDUP(addr) == myproc()->sb)){
+  	if(PGROUNDUP(addr+1) == myproc()->sb){
   		allocuvm(myproc()->pgdir, PGROUNDDOWN(addr), (myproc()->sb)-1);
   		myproc()->sb = PGROUNDDOWN(addr);
+  		return;
   	}
-  	cprintf("addr: %d\n", addr);
   	break;
 
   //PAGEBREAK: 13

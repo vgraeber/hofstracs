@@ -1,0 +1,886 @@
+/*           An Introduction and Transition Guide to Rust 
+                for Advanced Computer Science Students
+
+                 Chuck Liang, Hofstra University
+*/
+
+// compiler directive to hide some expected warnings:
+#![allow(unused_variables, unused_assignments, unused_mut, dead_code)]
+
+/*
+Rust is a difficult language to learn even for seasoned programmers.
+It's perhaps most difficult for programmers who are only familiar with
+languages with a garbage collector, including Java, Python and Go.
+The majority of modern programming languages rely on automatic garbage
+collection but only a handful, including Rust, do without it in order
+to minimize runtime overhead.
+
+Find all resources on rust-lang.org.  Once you've Rust installed,
+compile this program with `rustc transitionguide.txt` and run it with
+`./transitionguide`.  Usually, rust programs end in a .rs suffix, but
+it's not strictly required. Most Rust projects live in "cargo crates", 
+but this is a stand-alone program.
+
+This guide is written for people who have already seen a spectrum of
+different programming languages and are familiar with the following:
+
+  1. Smart pointers and move semantics in modern C++.  In particular,
+     familiarity both in theory and in practice of the concepts of
+     LIFETIME and OWNERSHIP.
+     
+  2. Lambda expressions, closures and monadic error handling using
+     the `Option`, `Maybe` or `Result` monads.
+
+  3. A statically typed functional language in the ML class, such as
+     Haskell, F#, or Scala. In particular, type inference and pattern
+     matching with algebraic data types.  Roughly speaking, you can 
+     think of Rust as F# without a garbage collector.
+
+Of these points, the first concerning C++ is most critical.
+
+Data types in Rust can be divided into two categories: those that can
+be copied and those that can't be.  Specifically, a data type can be
+copied if it implements the `Copy` trait. A `trait` is similar to an
+interface and is a crucial part of Rust.  A type can implement this
+trait only if it's of a fixed size that's known at compile-time and
+is contiguous in memory (and therefore can be completely allocated on
+the stack and copied in one pass with a procedure akin to `memcpy` in
+C).  Data that can be copied include primitive types for numerical
+values (i32, u32, f64, etc), booleans, and single characters.  If you
+define a data structure that contains only copyable values, then that
+struct can also be copied (you can automatically derive the Copy trait
+for it). For example, Rust arrays must have their size known at
+compile time, and so an array of :Copy values can itself be copied.
+However, if some part of your data structure contains (smart) pointers
+to heap-allocated data, such as in the case of a std::Vec (vector),
+then it cannot be copied.  
+
+If a type cannot be copied, it is *moved*.  Whenever you write an
+assignment statement in Rust:
+
+                              a = b;
+
+it is similar to `a = move(b)` in modern C++ with its *default* move
+semantics. By this we mean the semantics given to types that do not
+define custom destructors, copy/move constructors or assignment
+operators, i.e., types that follow "the rule of zero".  If the type of
+a and b is copyable then b is copied to a, otherwise, it's moved to a.
+A byte-by-byte duplication always occurs during a copy.  A *transfer
+of ownership* always occurs during a move.  These semantics are the
+only semantics in Rust.  For the Rust compiler to check if your
+program is well-behaved, the meaning of copy and move has to be thus
+fixed.  It cannot allow you to change them arbitrarily, like you can
+in C++:
+
+  mystruct(const mystruct& other) {  // copy constructor
+    cout << "don't feel like copying";
+  }
+  mystruct(mystruct&& other) {  // move constructor
+    cout << "too tired to move";
+  }
+
+There is another trait in Rust, Clone, that can be customized.  Rust
+distinguishes copying from cloning (unlike C++).
+
+If you take C++ and restrict it to references and the built-in std
+smart pointers, avoid raw pointers, avoid defining your own copy/move
+semantics, and replace all "a=b" with "a=move(b)", then it's somewhat
+close to Rust. Somewhat. There is still a rather large difference.
+It's called the RUST BORROW CHECKER.  
+
+In Rust, the rules of LIFETIMES are checked at COMPILE TIME.  Once
+"move occurs", you can no longer refer to the item that was moved
+because its lifetime has ended. Recall that lifetime refers to how
+long something is guaranteed to stay at the same location in memory.
+The lifetime of a value ends when it's deallocated from memory (popped
+from the stack or free from the heap) or when it is moved.  If `a = b`
+resulted in a move, then any subsequent reference to b will result in
+a compiler error.  C++ will continue to allow you to refer to the
+moved object, which could result in dereferencing a null pointer.
+
+Let's look at how the rust compiler checks an actual function:
+*/
+   fn copy_or_move() {
+      let mut x = 3; // type of x is inferred, 'mut' required for reassignment
+      let y = 4;
+      x = y;  // copy occurs because integers implement the Copy trait
+      println!("y is still usable and still has value {}",y);
+      
+      let a = vec![1,2,3]; // vectors are heap-allocated and not copyable
+      let b = a;  // move occurs
+      //let first = a[0]; // WON'T COMPILE!
+   }
+/*
+If you compile this function with the last line uncommented (try it), you
+will see the following compiler error (line numbers may vary):
+
+--------
+80 |       let a = vec![1,2,3];
+   |           - move occurs because `a` has type `Vec<i32>`, which does not implement the `Copy` trait
+81 |       let b = a;
+   |               - value moved here
+82 |       let first = a[0];
+   |                   ^ value borrowed here after move
+   |
+help: consider cloning the value if the performance cost is acceptable
+   |
+81 |       let b = a.clone();
+   |                ++++++++
+--------
+
+This is your first encounter with the borrow checker, dreaded by most
+newcomers to Rust but you've been well-prepared.  The compiler gave
+clear reasons for why it didn't compile the code: it violated the
+rules of lifetimes: `a` should not be referenced again after the move.
+However, the advice it gave you about cloning should be ignored: the
+performance cost is generally unacceptable: cloning would replicate
+the entire vector.  Most types can implement Clone and many newbies
+will call .clone() profusely in order to escape the borrow checker.
+This is wrong.  Find another way to write your program because Rust
+shares with C++ the principle of "zero overhead abstraction."
+However, the way this principle is realized is very different in the
+two languages.  Both languages waste little effort to check for memory
+violations at runtime, but only Rust will check for these violations
+at compile time.  Ironically, despite promoting the zero-overhead
+concept, many custom copy constructors in C++ actually clone
+(e.g. std::vector). But that's the least of C++'s problems.  The
+following C++ code will compile and either give you a segmentation
+fault or (more likely) print out junk:
+
+   vector<int> v{1,2,3,4}
+   int& second = v[1];
+   v.push_back(5);   
+   v.push_back(6);
+   cout << second;  // what's printed won't be 2
+
+Why does it print junk? (run it if you don't believe me).  Because
+when the vector is mutated by the push_backs, new memory had to be
+allocated for the vector to stay contiguous in memory. The original
+memory for 1,2,3,4 wasn't enough.  The lifetime of the data referenced
+by `int& second` ended because it's no longer at the same location in
+memory, yet the reference itself is still ALIVE!  But rust will protect
+you from the zombie reference: it won't even compile.
+*/
+  fn undead_reference() {
+    let mut v = vec![1,2,3,4];
+    let second = &v[1];
+    v.push(5);
+    // print!("{}", second); // COMPILER ERROR if uncommented
+  }
+/*
+The compiler error here would be
+
+--------
+135 |   let second = &v[1];
+    |                 - immutable borrow occurs here
+136 |   v.push(5);
+    |   ^^^^^^^^^ mutable borrow occurs here
+137 |   print!("{}", second);
+    |                ------ immutable borrow later used here
+--------
+
+The error is caused by a violation of the rules of lifetimes but more
+fundamentally, it's a violation of the rules of safe mutation.
+(something I call personally the "principle of exclusive mutation").
+That is, you can't change something while it's still being used.  Even
+if you adopt exclusively unique_ptr/make_unique for managing heap
+memory in C++, there can still be memory leaks because of violations
+of this principle.  It's easy to correct the program once you
+understand the borrow checker's message: just make a fresh borrow
+after the mutation: `print!("{}", &v[1]);`
+
+
+                  About Pointers and References
+
+There are two types of pointers in Rust: smart pointers and "borrows" (raw
+pointers are allowed in unsafe rust, which we won't cover here.)  Borrows
+have syntax that's similar to those of pointers in C++ (in the use
+of * and &).  However, unlike C++ raw pointers, borrows are not involved 
+in the acquisition or destruction of memory: they cannot *own* heap data,
+only borrow them.  In this way they are safe and are more comparable to
+C++ references in terms of the role that they play.
+Let's look at some examples of borrows:
+
+   let mut x = 1;         // something to be borrowed
+   
+   let     r1 = &x;       // spacing added for clarity
+   let mut r2 = &x; 
+   let     r3 = &mut x; 
+   let mut r4 = &mut x;
+
+Simple integers don't really need to be borrowed because it's just as
+efficient to copy them, but we can still illustrate the borrowing
+concept.  Both r1 and r2 are *immutable* borrows in the sense that
+they can't be used to change x.  The difference between r1 and r2 is
+that r2 can be reassigned to borrow something else (unlike references
+in C++).  Both r3 and r4 are *mutable* borrows because with them we
+can change x: *r3 += 1 will increment x. r4 can also be changed to
+mutably borrow something else.  Only something mutable can be mutably
+borrowed (x must be declared 'mut').
+
+Immutable borrows (&x) can be copied but mut ones (&mut x) can't be.
+During the lifetime of a mut borrow, NO OTHER BORROWS OF THE SAME
+VALUE CAN EXIST, mutable or immutable.  This is the most important
+rule of safe mutation (more on why later). However, if there are no
+live muts, there can be multiple immutable borrows, which is why
+immutables are copyable.  A borrow can be created explicitly using the
+& (or &mut) operator (you can also say `let ref (mut) second = v[1]`).
+They can also be created implicity.  When you access the vector via
+expressions like `v[1]` or `v.push`, you're creating borrows (mut or
+not) implicitly.  Think of them as v->get(1) and v->push.  Another way
+for a borrow to occur implicitly is when a free variable is captured
+inside a closure: in `|x|x+y` the free variable y is a borrow (read
+|x| as "lambda x.").  To avoid borrowing the free variable, you can
+create a closure with `move |x|x+y`. This is actually the only place
+in rust where the "move" keyword appears: "move" has the following
+effect on the closure: free variables of copyable types are copied 
+into the closure, otherwise, they're moved into the closure.
+
+A borrow can be dereferenced using the * operator, like a pointer in
+C++.  However, unlike a C++ pointer, you cannot perform pointer
+arithmetic.  Did you know that in C++, given an array A and integer i,
+A[i] and i[A] are the same, because both are just *(i+A)?  Fun trick
+for your next nerd party.
+
+You can avoid transfers of ownership with borrows, just like with
+references in C++. Unlike C++ raw pointers, mixing borrows with smart
+pointers won't create the same kind of chaos.  For example, transfers
+of ownership (move) also occurs when you pass a non-copyable object
+to a function, or return one from a function.  But you can avoid that
+by passing a borrow.
+
+Most "rustaceans" use the terms "borrow" and "reference"
+interchangebly.  All borrows must refer to allocated data because
+after they're deallocated, you can't use the borrows again (unless you
+assign them to reference something else). In other words, the lifetime
+of a borrow cannot be longer than the data that it borrows.  There is
+NO NULL REFERENCE in Rust (at least not in "safe" rust).  Another type
+of reference, called a "slice", consists of a memory address and a
+length.  They reference a contiguous block of memory of a certain
+length.  For example, given an array or vector A of type T, the slice
+`&A[2..6]` refers to A[2] through A[5]: this slice would have type `&[T]`.
+
+When heap memory is first allocated, they are pointed to by smart
+pointers.  The built-in smart pointers in Rust are essentially the
+same as the ones in C++ : `Box` corresponds to unique_ptr, `Rc`
+corresponds to shared_ptr and `Weak` corresponds to weak_ptr. As in
+C++, a Box cannot be copied, only moved.  A structure that contains a
+Box also can only be moved.  As long as shared Rc's point to immutable
+data, everything is still fine.  However, when combined with something
+called `RefCell`, which allows mutations to be hidden from the
+compiler, it becomes possible to use Rc's to form cyclic graphs in
+memory.  Even Rust doesn't have a better solution when pointers form
+cyclic graphs, except for a combination of Rc (referece counter) and
+Weak.  The only situation when safe Rust can still produce a memory
+leak is when not enough Rc's are designated Weak.  You might be
+disappointed by this news, but consider the reasons.  The compiler
+cannot predict the value of a reference counter in an Rc just as it
+cannot in general predict the value of any variable at runtime.  If we
+cannot detect the problem at compile time, what kind of overhead would
+it incur at runtime?  You would have to generate a *spanning tree*,
+traversing the pointer graph until you've created an acyclic closure.
+That's a rather expensive algorithm, and is in fact what a *garbage
+collector* would do.  But that's exactly what we're trying to avoid.
+
+Fortunately, in most situations that require shared pointers it's easy
+to determine which, if any ones should be downgraded to weak pointers.
+For example, in a doubly-linked list, the "next" pointers can be Rc
+and the "previous" pointers can be Weak.  In the observer design
+pattern, the pointers from observers to observed objects can be Rc and
+the pointers in the other direction should be Weak.  Speaking of
+OOP design patterns, Rust should NOT be considered an object oriented
+programming language, at least not in the sense of Java.  Although
+there is support for dynamic dispatch, you would have to emulate
+inheritance.  If you want to do heavy OOP, go back to javaland.
+
+None of the smart pointers can be copied, but Rc can be cloned in O(1)
+time by incrementing the reference counter. Box and Rc implement 
+"deref coercion": given `let b = Box::new(a),` `&b` is equivalent to
+`&a`.  Box::new is the equivalent of make_unique in C++.   Like C++,
+structures that contain Boxes can only be moved, not copied. But unlike
+C++, Rc also cannot be copied, only cloned.
+
+
+                =============== +++++++++++++++++
+
+                 What Kind of Mutations are Safe
+
+   The pure typed lambda calculus gives us many *invariants* such
+   as the Church-Rosser property, which says that we can evaluate
+   an expression any way we want and it will give us the same result
+   at the end: this means we have the greatest freedom in finding the 
+   *optimal* way to run a program.  Unfortunately we can't guarantee 
+   this property often enough.  Take, for example, the following
+   program in a language called "lambda7b", which can support both 
+   call-by-value as well as call-by-name evaluation:
+
+      define x = 2;
+      define f = lambda y: (x = x*0; y;);
+      define g = lambda y: (x = x+1; y;);
+      g(f(1));
+      x;
+
+   The last line of the program would evaluate to 1 under call-by-value
+   (f is called first) and to 0 under call-by-name (g is called
+   first).  This program is clearly not admissible in lambda calculus
+   (typed or untyped) as it violates the Church-Rosser property.  What
+   is the source of the impurity?  It's easy to point to mutation
+   (destructive assignment) as the culprit: in a language without
+   mutation (Haskell, Elm), this example would not be possible.  But
+   are all forms of mutation equally inadmissible in lambda calculus?
+   It's hardly possible to write all algorithms efficiently without
+   mutation. Let's try to write the above example in Rust, which
+   allows mutations.
+  */
+  fn can_church_rosser_live_alongside_mutations() {
+     let mut x = 2;
+     let mut f = |y:i32|{x=x*0; y };
+     let mut g = |y:i32|{x=x+1; y; x };
+
+     // Note that f and g are both "mut" because the closure itself
+     // changes each time it's called.  We can define f and g but
+     // we can only call one of them.  Their lifetimes cannot intersect.
+     // The offending line won't compile:
+
+     //g(f(1));   // COMPILER ERROR if uncommented
+  }
+  /*
+   **The fact that Rust allows destructive assignment does not by
+   itself mean that there's a loss of the Church-Rosser property.**
+   It's not just mutation but mutation from two different borrows.
+   Uncomment the call to g(f(1)) and look at the compiler error
+   message, which will include:
+  -----    
+  let mut f = |y:i32|{x=x*0; y };
+              ------- - first borrow occurs due to use of `x` in closure
+              |
+              first mutable borrow occurs here
+  let mut g = |y:i32|{x=x+1; y; x };
+              ^^^^^^^ - second borrow occurs due to use of `x` in closure
+  g(f(1));
+    - first borrow later used here
+  -----
+
+  Had we copied the integer x into the closures f and g (move |y:i32|...)
+  the call to g(f(1)) will compile, but the Church-Rosser property
+  would not be violated: the closures would be mutating their own copies.
+  
+  Let's look at this problem another way.  Not all destructive
+  assignments are equally "destructive."  We know that many loops with
+  "i++" at the end can be rewritten as tail-recursive functions
+  without destructive assignment.  This means that at least some loops
+  are actually admissible as purely functional programs, does it not?
+
+  The infamous "x=x+1" can be explained in the following way in lambda
+  calculus. The construct (let x=v in E) is equivalent to (lambda x.E)v.
+  That is, bind x to v then evaluate E, which may have free occurrences 
+  of x.  We can't "mutate" x but we can define a new version of it, 
+  under a different lambda binder, with a different value.  Suppose an 
+  expression had the following format:
+
+      let x = 1 in 
+         ..outer1.. 
+         let x = x+1 in 
+            ..inner..
+         ..outer2..
+
+  This term is equivalent to 
+
+     (lambda x. ..outer1.. (lambda x. ..inner..)x+1 ..outer2..) 1
+
+  That is, inside the body of the outer lambda, there is an inner
+  definition of another x, with value bound to the outer x plus 1.
+  outer1 and outer2 designate the portions of the body of the outer
+  lambda x before and after the inner lambda (with body ..inner..).
+  Assume a call-by-value, left-to-right order of evaluation.
+
+  We know that there are actually two x's in the program (it's not
+  even necessary to alpha-convert them).  When implementing such an
+  expression, we should allocate a different memory location for each
+  x. But ARE THERE CIRCUMSTANCES IN WHICH WE CAN ALLOW AN OPTIMIZATION,
+  and REUSE the memory for the outer x to store the inner x? 
+  Clearly, that is only possible if the outer x does not appear free
+  again in the ..outer2.. portion.  That is, if the value of the 
+  outer x WON'T BE NEEDED AGAIN. 
+
+  The logic here is a generalization of the justification for the
+  elimination of tail-recursion: if we won't need the values on the
+  current stack frame again, there's no need to create a new frame.
+  However, here we are applying the "contrapositive" of this logic:
+  mutation, x=x+1, can be admissible in pure lambda calculus if there
+  are no further references to the value of x before the mutation.
+
+  It's not just variables declared 'mut' that can be mutated.  We 
+  should realize that "end of lifetime" is also a form of mutation.
+  When something gets deallocated from memory, or moved, it mutates.
+*/
+   fn exclusive_mutation() {
+     let mut u = 2;
+     let bu = &u; // an explicit borrow
+     u += 1; // mutates
+     //println!("{}",bu); // COMPILER ERROR - bu invalidated by mutation.
+     let v = vec![1,2,3];
+     let w = v; // move occurs 
+     //println!("{}",v[1]); // COMPILER ERROR - moving is also a mutation
+   }
+/*
+  The dreaded borrow checker is in fact checking for only one thing:
+  
+        **MUTATION MUST INVALIDATE ALL OTHER REFERENCES**
+
+  As another lambda-calculus related example, we know that dynamic
+  scoping is not admissible in lambda calculus: the lambda binds statically.
+  We can easily verify that Rust is also statically scoped with the following
+  example:
+*/
+  fn static_scope() {
+    let x = 1;
+    let f = ||x;
+    {
+       let x = 2;
+       println!("f() is {}", f());  // prints 1
+    }
+  }
+/*
+  However, in most statically scoped languages that also allow
+  mutations, it's possible to simulate the effects of dynamic scoping
+  by temporarily changing the value of a variable, and restoring it to
+  its original value at the end of the simulated "scope".  We can do
+  this, for example, in F#:
+
+     let mutable y = 1
+     let g = fun z -> y+z
+     let savey = y   // save previous value on stack, simulates start of scope
+     y <- 2          // change to new value.
+     printfn "(g 0) is %d" (g 0)     // prints (g 0) is 2
+     y <- savey      // exits "dynamic scope"
+
+  Once again, it's easy to point to destructive assignment as the main
+  culprit that ruined lambda calculus.  But let's try to reproduce this
+  example in Rust:
+*/
+  fn dynamic_scope_attempt() {
+     let mut y = 1;
+     let g = move ||y;  // won't compile without move
+     {
+       let savey = y;
+       y = 2;
+       println!("g() is {}", g()); // 1 with move, compiler error without
+       y = savey;
+     }
+  }
+/*
+  This code still prints 1.  The "move" keyword in the definition of the
+  closure (g = move ||y) moved the free variable of y to the closure.
+  Since y is a copyable integer, this means that the closure gets its own
+  copy of y, and the external mutation of y in `y=2;` will have no effect 
+  on it: g() will still print 1 when called, preserving static scoping. If
+  we removed "move," then y is captured by reference, which is then 
+  invalidated by the mutation. We'd get a compiler error if we tried to
+  call g() after the mutation:
+
+432 |      let g = /*move*/ ||y;
+    |                       --- borrow occurs due to use in closure
+    |                       |
+    |                       `y` is borrowed here
+...
+435 |        y = 2;
+    |        ^^^^^ `y` is assigned to here but it was already borrowed
+436 |        println!("g() is {}", g());
+    |                              - borrow later used here
+
+  Despite the borrow checker keeping mutations safe, Rust is still not
+  pure lambda calculus; it can make system calls and do input/output.
+  But Rust have greater invariants of the kind that we want from pure
+  programs.  When using Rust, especially as a replacement for C++, it
+  will often have the look and feel of an imperative language with
+  loops, references and destructive assignment.  In fact, Rust doesn't
+  even guarantee tail-recursive optimization in all cases: recursion
+  is generally discouraged.  But despite how it looks, it is actually
+  closer to pure typed lambda calculus than many "functional"
+  languages, including F# and Scala.
+
+  As a last but very important example of the safe rules of mutation,
+  let's try to reproduce a C++ memory leak that occurs even with smart
+  pointers:
+
+    struct node {
+      unique_ptr<int[]> A;
+      unique_ptr<node> next;  // pointer to next node struct  
+      node(int n) { A = make_unique<int[]>(n); } //constructor
+    };
+
+    void it_still_leaks() {
+      unique_ptr<node> P = make_unique<node>(10);
+
+      P->next = move(P);  // this line causes a memory leak.  ***
+    }
+
+The leak is easily observed by calling the function in an infinite
+loop.  It still leaks despite using unique_ptr/make_unique to
+exclusively manage heap memory.  In the offending line, the unique
+pointer P->next "ate itself:" two mutations (move and assign) were
+being made to it at the same time.  P becomes nullptr after the move
+and there's no way to reach the allocated array.  The following is a
+close-enough replication in Rust.
+*/
+  struct node {
+    a : Vec<i32>,      
+    next : Option<Box<node>>, // Box is basically equivalent to unique_ptr
+  }
+  fn does_it_leak() {
+    let  p = node { a : vec![5;10],  next : None, };
+    let mut P = Box::new(p);  // Box::new is equivalent to make_unique
+    //P.next = Some(P);       // this line emulates the C++ memory leak
+  } // no, it won't compile
+/*
+The line that would've caused a memory leak was caught by the borrow checker:
+------
+424 |     P.next = Some(P);
+    |     ^^^^^^        - value moved here
+    |     |
+    |     value partially assigned here after move
+------
+
+Since P.next is part of P, it was mutated when moved.  But the value
+was needed again in the assignment. Two mutable references to P->next
+(and to P) had intersecting lifetimes.  The rules of exclusive
+mutation insist that the two mutations take place in separate stages:
+the second one should not start before the first one is complete.
+
+Incidentally, in a garbage-collected language such as Java, P.next=P
+won't cause a memory leak but the effect is still rather unpleasant.
+Any `while (P!=null)` loop will have a hard time terminating.  Rust
+guarantees that pointers created with Box form *trees* in memory.
+*/
+
+/*
+                      NOW FOR THE BAD PART
+
+Programming in Rust is a different experience, with many surprises for
+newcomers, including advanced ones.  
+
+                  EVEN BUBBLESORT CAN GO WRONG!
+
+fn bubblesort<T:Ord>(v: &mut [T]) {
+  for i in 0 .. v.len()-1 {
+    for k in 1 .. v.len()-i {
+       if v[k]<v[k-1] { // swap
+         let temp = v[k];
+         v[k] = v[k-1];
+         v[k-1] = v[k];
+       }//swap
+    }//for k
+  }//for i
+}//bubblesort
+
+The above code won't compile.  The function is generic over typename
+T, which is only required to implement the Ord (ordered) trait. This
+allows us to apply the < operator between values of type T.  Generic
+functions and structures are type-checked then instantiated at compile
+time.  Rust has the type safety of F# and the runtime efficiency of
+C++.  Great, if you can get the damn thing to compile! The compiler
+complains:
+-----
+239 |          let temp = v[k];
+    |                     ^^^^
+    |                     |
+    |                     cannot move out of here
+    |                     move occurs because `v[_]` has type `T`, which does not implement the `Copy` trait
+-----
+
+Unlike C++, you can't move something out of a vector or any other structure
+except right before the end of the structure's lifetime.  You can't just
+leave a hole (null pointer) there!  Then how can you swap two values
+in the vector?  You have to make it an atomic step, a single mutation
+instead of three:
+*/
+fn bubblesort<T:Ord>(v: &mut [T]) {
+  for i in 0..v.len()-1 {
+    for k in 1 .. v.len()-i {
+       if v[k]<v[k-1] { // swap
+         v.swap(k,k-1);
+       }//swap
+    }//for k
+  }//for i
+}//bubblesort
+/*
+  This is a characteristic of programming in Rust: you have to call
+built-in functions even for some simple tasks such as swaping values
+inside structures.  If we look at the machine/assembly code generated,
+we might not find much difference between what the Vec::swap function
+does and what the usual three-step swap does. But there is a *logical*
+difference in the high-level language: the swap function encapsulates
+the swapping in a single operation.
+
+Next example:
+*/
+fn mutable_borrows_are_tricky() {
+  let mut v = vec![1,2,3,4,5];
+  v[0] = v[v.len()-1]; // copies (since it's an int) last value to first
+
+  //v[v.len()-1] = v[0]; // WON'T COMPILE                       
+/*
+   What's wrong with the above line?  It's simply trying to change the 
+ last value of the vector; it's something you can write without any
+ problems in other languages.  You have to really think hard to
+ understand the compiler's error message: "immutable borrow occurs
+ here ... mutable borrow later used here".  It may look like we're not
+ doing anything different from the previous line, which compiled.  But
+ there's a difference between using the expression v[v.len()-1] as an
+ R-value (on the right-side of =) than as an L-value. R-values are
+ temporary: they are created then destroyed, while L-values persist
+ after the assignment.  The two occurrences of v in v[v.len()-1] on
+ the right side of = are both immutable references: they only access
+ and do not modify the vector. Once they've served their purpose they
+ can be dropped: they do not interfere with the mutable use of v[0] on
+ the left side of =.  But when v[v.len()-1] is on the left side of =,
+ there is a mutable borrow of v which cannot coexist with the other
+ use of v in 'v.len()'.
+
+ It's easy to get around the problem once you understand it:
+*/
+  let lastindex = v.len()-1;
+  v[lastindex] = v[0];
+
+/*
+   This time we followed the rules of safe mutation (exclusive mutation)
+ by reading and writing to the vector in different stages.
+*/
+} // mutable_borrows_are_tricky
+
+/*
+Rust is difficult to program in because you have to convince the compiler
+that your program is safe, but sometimes it's not easily convinced.
+
+QUIZ TIME: predict the compiler error for the following function,
+if uncommented:
+
+   fn d(x:i32) -> &i32 {
+     return &x;
+   }
+
+I hope you know that this function would return a dangling reference
+because x gets popped from the stack, and even the C++ compiler will
+warn you about it.  But Rust's compiler error message will say:
+
+235 |    fn d(x:i32) -> &i32 {
+    |                   ^ expected named lifetime parameter
+
+This is because all borrows have associated with them a lifetime. Of
+course, this lifetime cannot exceed that of the value that's being
+borrowed.  When specifying the type of a borrow, the full syntax is
+&'t where 't is a called a "lifetime parameter."  Newbies to rust are
+often confused about how to use lifetime parameters: sometimes they
+think that it would allow them to specify how long something should
+live, and may write something like
+
+   fn d(x:i32) -> &'static i32 {
+     return &x;
+   }
+
+because the 'static lifetime refers to the duration of the entire
+program.  But this won't compile either.  You can't extend lifetimes:
+things die when they're supposed to.  The purpose of the lifetime
+parameter is for you to PROVE to the compiler that your program
+observes the rules of lifetimes.  In many situations, the compiler can
+infer the correct lifetime,  like it can infer types, but here it can't
+figure it out, so it's asking you for proof.  Of course you can't
+provide proof because the reference returned would outlive x: the
+mutation of x by popping it off the stack must invalidate the &x.  
+But the following compiles:
+*/
+fn d2() -> &'static str {
+  return "string literals really do have 'static lifetime";
+}
+/*
+A literal (constant) has to be part of the source code itself, so it
+must exist statically in memory for the duration of the program, and
+thus have the 'static lifetime.  How about the following:
+
+fn d3(x:&i32, y:&i32) -> &i32 {
+  if x<y {x} else {y}  // "return" is not required
+}
+
+It won't compile.  Of course the compiler can't tell if x or y will be
+returned.  What if they have different lifetimes?  The compiler has to
+know the lifetime associated with the returned reference, for
+otherwise it won't be able to determine if it's compatible with other
+lifetimes when used later.  We have to restrict the function and give
+proof that it's returning a reference with a valid lifetime.  The
+following all compile.
+
+*/
+fn d3<'t>(x:&'t i32, y:&'t i32) -> &'t i32 {
+  if x<y {x} else {y}
+}
+
+fn d4<'t,'u:'t> (x:&'u i32, y:&'t i32) -> &'t i32 {
+  if x<y {x} else {y}
+}
+
+fn d5<'t>(x:&i32, y:&'t i32) -> &'t i32 {
+  return y;
+}
+/*
+
+These generic (template) functions are parameterized by lifetime
+variables ('t, 'u).  We've restricted d3 so that the lifetimes of x
+and y are compatible.  In d4, the notation 'u:'t should be read as "'u
+lives at least as long as 't."  Thus the returned borrow references
+data that will still be alive for duration 't.  In d5, the lifetime of
+x doesn't matter, so it's not necessary for you to provide it.  Change
+things around to see what kind of error messages the compiler will give.
+
+In the final example we first show how to define a simple struct:
+*/
+  #[derive(Copy,Clone,Debug,Eq,PartialEq,Ord,PartialOrd,Hash)]
+  struct date {
+    year  : u16, // 16 bit unsigned integer
+    month : u8,
+    day   : u8,
+  }
+/*
+A large number of traits can be derived automatically for many
+types. For the date type, Copy is also derivable because the struct
+consists of only copyable types and can be represented contiguously in
+memory.  The Ord trait is derived from the Ord trait implementations
+of the components of the type, and is the lexicographical ordering
+dependent on the order in which the fields are defined.  The Debug
+trait allows date structs to be printed with the string formatter
+{:?}. To have it printed in a custom way you will have to manually
+define the Display trait. You can custom define most traits EXCEPT
+COPY.
+*/
+  
+  fn change_day(the_date:&mut date, d:u8) {
+    the_date.day = d;
+  }
+  
+  fn thats_not_what_I_changed() {
+    let mut today = date { month:4, day:20, year:2026, };
+    let y = &today.year;
+    change_day(&mut today,21);
+    //println!("year {}", y);  // WON'T COMPILE AND THAT'S NOT FAIR!
+  }
+/*
+  However, the function `thats_not_what_I_changed` fails to compile if
+its last line is uncommented, because the reference y was used after a
+mutation to the date structure.  But that's so unfair!  The change was
+to the day, not the year!  But the rust compiler doesn't look inside
+functions.  It just sees that a &mut of the object was passed to the
+function.  The function could've done nothing at all and it would
+still be an error.  Perhaps in future this can improve, or a syntax
+could be provided to allow us to specify what part of the struct will
+mutate.  For now, we just have to work around the borrow checker. As
+a general strategy, always "borrow fresh."  Avoid creating a borrow
+and use it at some later point.  The code above can be fixed by
+re-borrowing y after the change_day.  Another solution is to pass
+only the value(s) to be mutated to the function:
+*/
+  fn change_month_day(m:&mut u8, nm:u8, d:&mut u8, nd:u8) {
+    *d = nd;  *m = nm;
+  }
+  fn now_you_know_what_I_changed() {
+    let mut today = date { month:4, day:22, year:2026, };
+    let y = &today.year;
+    change_month_day(&mut today.month,5, &mut today.day,4);
+    println!("year {}", y); 
+  }
+/*  
+ If we want the safety of Rust, we have to live with the fact that
+sometimes its compiler takes a little more convincing.
+
+
+To conclude this introduction, the main function of this program
+reinforces and further illustrates the principles we've discussed.
+It also introduces some other features of rust (pattern matching
+and error handling).  Other features will be introduced by a series
+of examples in other documents.
+
+ALL THE COMMENTED-OUT LINES OF CODE WOULD CAUSE COMPILER ERRORS.
+*/
+
+// function called from main: (doesn't have to be defined first)
+fn f1(s:String) -> String // a function that takes and returns ownership
+{
+   let mut s2 = s;  //moves again to another local var
+   s2.push_str(" and that ends that string");
+   return s2;   // transer ownership of local var
+}// called from main
+
+fn main() {   // main
+  use std::str::from_utf8;  //this function returns a Result monad
+  
+  let mut a1:[u8;3] = [97,98,99]; // size of array is part of its TYPE
+  let mut a2 = a1; // array size is known at compile time, copyable
+  a1[1] = 66; // a1 still usable because the above line copies, not moves
+
+  let a2_slice:&[u8] = &a2[1..3]; // slice reference to 98, 99, "bc"
+
+  // from_utf8 interprets &[u8] as string slices (type &str):
+  
+  match from_utf8(a2_slice) {  
+    Ok(string_slice) => {println!("a2 slice as str: {}",string_slice);},
+    Err(_) => {eprintln!("conversion of &[u8] to &str failed");}
+  }//match
+
+  let a1_as_str:&str  = from_utf8(&a1[..]).unwrap_or("UNEXPECTED ERROR");
+  println!("but a1 is now {}",&a1_as_str);
+
+  // A string slice (&str) must refer to allocated data.  The type String
+  // is implemented underneath with a vector (Vec<char>) and is therefore
+  // heap-allocated and not copyable.
+
+  let mut s1 = String::from("abcd");
+  let mut rs = &s1; // a "borrow" of s1 
+  let mut s2 = s1; // MOVE OCCURS
+  //println!("can I still print the string with rs1? {}", rs1);
+  rs = &s2;  // valid because rs is declared with "let mut .."
+  println!("but I can re-borrow: {}",rs);
+  s2.push_str("efg"); // mutate string  (implicity mutable borrowing occurs)
+  //println!("is rs still a valid borrow of s2? {}",rs);
+
+  // move something back into s1 (because it's mut s1)
+  s1 = "hello world".to_owned(); // another way to create an "owned String"
+
+  // move (transfer of ownership) also occurs when passing a String to
+  // a function, and when a string is returned from a function
+
+  let s3 = f1(s1);
+  //println!("{} has been transformed into {}",&s1, &s3);
+
+  // How can I do anything with a variable if gets "moved" so easily?
+  // I can BORROW it with a reference (alias), without taking ownership:
+
+  let s4 = f2(&s3[..]); // f2 defined after main
+  println!("{} has been transformed into {}",&s3, &s4);
+  
+  ///// When you have a borrow of a non :Copy value, don't try to
+  //    to dereference it as it would try to create a temporary copy
+  //    of the value, which of course it could not:
+  let b4 = &s4;
+  //let s5 = *b4; // "move occurs ... does not implement the Copy trait"
+
+  ///// mutable references must exist (live) exclusively:
+  let mut x = 1;
+  let rx = &x;
+  x += 1; // mutation invalidates all references, even for copyable things
+  //let y = *rx + 1;  // would work in C but not here...
+
+  // let mb4 = &mut b4; // cannot create a mutable ref to an immutable value
+  let mb2 = &mut s2; // OK
+  *mb2 = String::from("aaabbb"); //OK, move occurs
+  assert_eq!(6, mb2.len());
+  //while s2.len()<100 { mb2.push('x'); } // add chars to end
+  while mb2.len()<100 { mb2.push('x'); } // add chars to end
+  println!("s2 is now {}",&s2); // ok but mb2 can't occur after this line
+
+}//main
+
+fn f2(s: &str) -> String
+{
+   let mut s2:String = String::from(s);
+   s2.push_str(" and that ends that string");
+   return s2;   // transer ownership of local var
+}

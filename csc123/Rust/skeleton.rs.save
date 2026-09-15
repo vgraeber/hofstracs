@@ -1,0 +1,80 @@
+/* optional compiler directives to avoid certain non-essential warnings
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+#![allow(non_camel_case_types)]
+*/
+#![allow(unused_parens)]
+
+use std::mem::{swap,replace,take};
+use std::collections::{HashSet,HashMap};
+use std::hash::Hash;
+
+fn flap<T>(v:&Vec<T>) -> Vec<&T> {
+	let mut fl:Vec<&T> = Vec::new();
+	let mut i = 0;
+	let mut j = v.len() - 1;
+	let k = v.len() / 2;
+	while (i < k) {
+		i += 1;
+		fl.push(&v[k-i]);
+	}
+	if (k % 2 == 0) {
+		fl.push(&v[k]);
+	}
+	while (j > k) {
+		fl.push(&v[j]);
+		j -= 1;
+	}
+	return fl;
+}
+
+fn count<T>(v:&[T]) -> i32 {
+	let mut i = 0;
+	for x in 0..v.len() {
+		i += 1;
+	}
+	return i;
+}
+
+fn union<'t,'u,T:Eq>(v1:&'t Vec<T>, v2:&'u Vec<T>) -> Vec<&'t T> {
+	let mut uv = Vec::new();
+	let mut dup = Vec::new();
+	for x in 0..v1.len() {
+		for y in 0..v2.len() {
+			if (&v1[x] == &v2[y]) {
+				let t1 = count(&v1[..]);
+				let t2 = count(&v2[..]);
+				dup.push(&v1[x]);
+			}
+		}
+	}
+	let mut i = 0;
+	for x in 0..v1.len() {
+		
+	}
+	return uv;
+}
+
+// your code can go before or after main.  make sure it's clearly marked.
+// This main wont' compile until you've completed parts of your assignment.
+
+fn main() {
+  let strs = ["c","kotlin","scala","perl","f#","c#","rust","c++","lambda7b"];
+  let mut v= Vec::<String>::new();
+  for s in strs.iter() { v.push(String::from(*s)); }
+  // note: strs is a vector containing values of type &str, which is a
+  // "string slice", which can be copied so *s is safe.  But String type
+  // are vectors underneath and can't be copied. s by itself has type &&str
+  // so one * is required.
+  //for s in &v { print!("{} ",s) }  println!();
+  //let flipv = flip(&v);
+
+  let flapv = flap(&v);
+  for s in &flapv { print!("{} ",s) }  println!();
+
+  let v1 = vec!["ab","cd","ab","xz"];
+  let v2 = vec!["ef","ab","cd","gh"];
+  let rv3 = union(&v1,&v2);
+  println!("{:?}",rv3); //{:?} prints anything that implements Debug trait
+}

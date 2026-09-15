@@ -19,7 +19,7 @@ fetchint(uint addr, int *ip)
 {
   struct proc *curproc = myproc();
 
-  if(addr < curproc->sb || addr+4 >= KERNBASE)
+  if((addr >= curproc->sz || addr+4 > curproc->sz) && (addr < curproc->sb || addr+4 >= KERNBASE))
     return -1;
   *ip = *(int*)(addr);
   return 0;
@@ -34,9 +34,14 @@ fetchstr(uint addr, char **pp)
   char *s, *ep;
   struct proc *curproc = myproc();
 
-  if(addr < curproc->sb)
+  if((addr >= curproc->sz) && (addr < curproc->sb))
     return -1;
   *pp = (char*)addr;
+  ep = (char*)curproc->sz;
+  for(s = *pp; s < ep; s++){
+    if(*s == 0)
+      return s - *pp;
+  }
   ep = (char*)KERNBASE;
   for(s = *pp; s < ep; s++){
     if(*s == 0)
@@ -63,7 +68,7 @@ argptr(int n, char **pp, int size)
 
   if(argint(n, &i) < 0)
     return -1;
-  if(size < 0 || (uint)i < curproc->sb || (uint)i+size >= KERNBASE)
+  if(size < 0 || (((uint)i >= curproc->sz || (uint)i+size > curproc->sz) && ((uint)i < curproc->sb || (uint)i+size >= KERNBASE)))
     return -1;
   *pp = (char*)i;
   return 0;
@@ -103,37 +108,29 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_getreadcount(void);
-extern int sys_getopenfilecount(void);
-extern int sys_settickets(void);
-extern int sys_getpinfo(void);
 
 static int (*syscalls[])(void) = {
-[SYS_fork]              sys_fork,
-[SYS_exit]              sys_exit,
-[SYS_wait]              sys_wait,
-[SYS_pipe]              sys_pipe,
-[SYS_read]              sys_read,
-[SYS_kill]              sys_kill,
-[SYS_exec]              sys_exec,
-[SYS_fstat]             sys_fstat,
-[SYS_chdir]             sys_chdir,
-[SYS_dup]               sys_dup,
-[SYS_getpid]            sys_getpid,
-[SYS_sbrk]              sys_sbrk,
-[SYS_sleep]             sys_sleep,
-[SYS_uptime]            sys_uptime,
-[SYS_open]              sys_open,
-[SYS_write]             sys_write,
-[SYS_mknod]             sys_mknod,
-[SYS_unlink]            sys_unlink,
-[SYS_link]              sys_link,
-[SYS_mkdir]             sys_mkdir,
-[SYS_close]             sys_close,
-[SYS_getreadcount]      sys_getreadcount,
-[SYS_getopenfilecount]  sys_getopenfilecount,
-[SYS_settickets]        sys_settickets,
-[SYS_getpinfo]          sys_getpinfo,
+[SYS_fork]    sys_fork,
+[SYS_exit]    sys_exit,
+[SYS_wait]    sys_wait,
+[SYS_pipe]    sys_pipe,
+[SYS_read]    sys_read,
+[SYS_kill]    sys_kill,
+[SYS_exec]    sys_exec,
+[SYS_fstat]   sys_fstat,
+[SYS_chdir]   sys_chdir,
+[SYS_dup]     sys_dup,
+[SYS_getpid]  sys_getpid,
+[SYS_sbrk]    sys_sbrk,
+[SYS_sleep]   sys_sleep,
+[SYS_uptime]  sys_uptime,
+[SYS_open]    sys_open,
+[SYS_write]   sys_write,
+[SYS_mknod]   sys_mknod,
+[SYS_unlink]  sys_unlink,
+[SYS_link]    sys_link,
+[SYS_mkdir]   sys_mkdir,
+[SYS_close]   sys_close,
 };
 
 void
