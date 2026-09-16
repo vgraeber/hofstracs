@@ -29,11 +29,8 @@ int uinToInt(char *uin, int *unum) {
   int base = 10;
   char *convRes = "";
   *unum = (int)strtol(uin, &convRes, base);
-  if (convRes == uin) {
+  if ((convRes == uin) && (*convRes != '\n')) {
     printf("\nPlease enter a number.\n");
-    return 0;
-  } else if (*convRes != '\n') {
-    printf("\nPlease enter only a number.\n");
     return 0;
   }
   return 1;
@@ -53,7 +50,7 @@ int main() {
   mainFuncCalls[4] = f5;
   mainFuncCalls[5] = f6;
   mainFuncCalls[6] = f7;
-  printf("LinkedList running.\nType 'stop' to stop and exit.\nSeven functions available.\n");
+  printf("Running LinkedList.\nType 'stop' to stop and exit.\nSeven functions available.\n");
   printf("1. addAtEnd\n2. deleteNode\n3. insertNode\n4. search\n5. printNode\n6. printList\n7. deleteList\n");
   printf("Type the number of a function to start it.\n");
   fgets(uin, sizeof(uin), stdin);
@@ -267,7 +264,7 @@ int f6(int *lllen, llnode **start) {
   while (strcmp(uin, "back\n") != 0) {
     if (strcmp(uin, "print\n") == 0) {
       printList(*start);
-      printf("\nRunning printList.\nType 'back' to return to the previous menu, or enter 'print' to print the list again:\n");
+      printf("List printed.\n\nRunning printList.\nType 'back' to return to the previous menu, or enter 'print' to print the list again:\n");
     } else {
       printf("\nPlease enter a valid command.\n");
     }
