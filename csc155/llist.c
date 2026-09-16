@@ -205,8 +205,13 @@ int f4(int *lllen, llnode **start) {
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
     if (uinToInt(uin, &unum)) {
-      search(unum, *start);
-      printf("\nRunning search.\nType 'back' to return to the previous menu, or enter the next number to search for:\n");
+      llnode* temp = search(unum, *start);
+      if (temp != NULL) {
+        printf("Node found. Data: %d\n", temp->data);
+      } else {
+        printf("No node with that data found.");
+      }
+      printf("\n\nRunning search.\nType 'back' to return to the previous menu, or enter the next number to search for:\n");
     }
     fgets(uin, sizeof(uin), stdin);
   }
@@ -216,7 +221,7 @@ int f4(int *lllen, llnode **start) {
 
 llnode* search(int check, llnode *start) {
   llnode *curr = start;
-  while ((curr->next != NULL) && (curr->data != check)) {
+  while ((curr != NULL) && (curr->data != check)) {
     curr = curr->next;
   }
   return curr;
@@ -287,7 +292,7 @@ int f7(int *lllen, llnode **start) {
   while (strcmp(uin, "back\n") != 0) {
     if (strcmp(uin, "delete\n") == 0) {
       deleteList(*start);
-      printf("\nRunning deleteList.\nType 'back' to return to the previous menu, or enter 'delete' to delete the list again:\n");
+      printf("\nList deleted. Running deleteList.\nType 'back' to return to the previous menu, or enter 'delete' to delete the list again:\n");
     } else {
       printf("\nPlease enter a valid command.\n");
     }
