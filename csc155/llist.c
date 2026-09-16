@@ -53,14 +53,16 @@ int main() {
   mainFuncCalls[4] = f5;
   mainFuncCalls[5] = f6;
   mainFuncCalls[6] = f7;
-  printf("LinkedList running. Type 'stop' to stop and exit.\n");
-  printf("Seven functions available.\n");
+  printf("LinkedList running.\nType 'stop' to stop and exit.\nSeven functions available.\n");
   printf("1. addAtEnd\n2. deleteNode\n3. insertNode\n4. search\n5. printNode\n6. printList\n7. deleteList\n");
   printf("Type the number of a function to start it.\n");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "stop\n") != 0) {
     if (uinToInt(uin, &unum) && ((0 < unum) && (unum < (numFuncs + 1)))) {
       uiForFunc(mainFuncCalls, &lllen, &start, unum);
+      printf("LinkedList running.\nType 'stop' to stop and exit.\nSeven functions available.\n");
+      printf("1. addAtEnd\n2. deleteNode\n3. insertNode\n4. search\n5. printNode\n6. printList\n7. deleteList\n");
+      printf("Type the number of a function to start it.\n");
     }
     fgets(uin, sizeof(uin), stdin);
   }
@@ -277,11 +279,10 @@ int f6(int *lllen, llnode **start) {
 
 int printList(llnode *start) {
   llnode *curr = start;
-  while (curr->next != NULL) {
+  while (curr != NULL) {
     printf("Data: %d\n", curr->data);
     curr = curr->next;
   }
-  printf("Data: %d\n", curr->data);
   return 1;
 }
 
