@@ -64,12 +64,12 @@ int main() {
     }
     fgets(uin, sizeof(uin), stdin);
   }
-  return 0;
+  return 1;
 }
 
 int uiForFunc(int (**mainFuncCalls)(int*, llnode**), int *lllen, llnode **start, int unum) {
   ((int(**)(int*, llnode**))mainFuncCalls)[unum-1](lllen, start);
-  return 0;
+  return 1;
 }
 
 int f1(int *lllen, llnode **start) {
@@ -82,10 +82,8 @@ int f1(int *lllen, llnode **start) {
     if (uinToInt(uin, &unum)) {
       addAtEnd(unum, *start);
       *lllen = *lllen + 1;
-    } else {
-      printf("Please enter a number.\n");
+      printf("Running addAtEnd. Type 'back' to return to the previous menu, or enter the next number to add to the list: ");
     }
-    printf("Running addAtEnd. Type 'back' to return to the previous menu, or enter the next number to add to the list: ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
@@ -116,13 +114,15 @@ int f2(int *lllen, llnode **start) {
   printf("Enter the position of the node to delete (positions begin at 1): ");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
-    if (uinToInt(uin, &upos) && ((-1 < (upos - 1)) && ((upos - 1) < *lllen))) {
-      deleteNode(upos-1, start);
-      *lllen = *lllen - 1;
-    } else {
-      printf("Please enter a valid position.\n");
+    if (uinToInt(uin, &upos)) {
+      if ((-1 < (upos - 1)) && ((upos - 1) < *lllen)) {
+        deleteNode(upos-1, start);
+        *lllen = *lllen - 1;
+        printf("Running deleteNode. Type 'back' to return to the previous menu, or enter the position of the next node to delete (positions begin at 1): ");
+      } else {
+        printf("Please enter a valid position.\n");
+      }
     }
-    printf("Running deleteNode. Type 'back' to return to the previous menu, or enter the position of the next node to delete (positions begin at 0): ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
@@ -155,23 +155,25 @@ int f3(int *lllen, llnode **start) {
   printf("Enter the position you wish to insert the node at (positions begin at 1): ");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
-    if (uinToInt(uin, &upos) && ((-1 < (upos - 1)) && ((upos - 1) < *lllen))) {
-      printf("Enter the number to add to the list: ");
-      fgets(uin, sizeof(uin), stdin);
-      int ins = 1;
-      while ((ins) && (strcmp(uin, "back\n") != 0)) {
-        if (uinToInt(uin, &unum)) {
-          fgets(uin, sizeof(uin), stdin);
-          uinToInt(uin, &unum)
-          insertNode(unum, upos-1, start);
-          *lllen = *lllen + 1;
-          ins = 0;
+    if (uinToInt(uin, &upos)) {
+      if ((-1 < (upos - 1)) && ((upos - 1) < *lllen)) {
+        printf("Enter the number to add to the list: ");
+        fgets(uin, sizeof(uin), stdin);
+        int ins = 1;
+        while ((ins) && (strcmp(uin, "back\n") != 0)) {
+          if (uinToInt(uin, &unum)) {
+            insertNode(unum, upos-1, start);
+            *lllen = *lllen + 1;
+            ins = 0;
+            printf("Running insertNode. Type 'back' to return to the previous menu, or enter the position of the next node to insert (positions begin at 1): ");
+          } else {
+            fgets(uin, sizeof(uin), stdin);
+          }
         }
+      } else {
+        printf("Please enter a valid position.\n");
       }
-    } else {
-      printf("Please enter a valid position.\n");
     }
-    printf("Running insertNode. Type 'back' to return to the previous menu, or enter the position of the next node to insert (positions begin at 1): ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
@@ -187,9 +189,6 @@ int insertNode(int newData, int pos, llnode **start) {
     curr = curr->next;
     i = i + 1;
   }
-  if (i < pos) {
-    return -1;
-  }
   llnode *newNode = malloc(sizeof(llnode));
   newNode->data = newData;
   if (pos == 0) {
@@ -199,7 +198,7 @@ int insertNode(int newData, int pos, llnode **start) {
     prev->next = newNode;
     newNode->next = curr;
   }
-  return 0;
+  return 1;
 }
 
 int f4(int *lllen, llnode **start) {
@@ -211,14 +210,12 @@ int f4(int *lllen, llnode **start) {
   while (strcmp(uin, "back\n") != 0) {
     if (uinToInt(uin, &unum)) {
       search(unum, *start);
-    } else {
-      printf("Please enter a number.\n");
+      printf("Running search. Type 'back' to return to the previous menu, or enter the next number to search for: ");
     }
-    printf("Running search. Type 'back' to return to the previous menu, or enter the next number to search for: ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
-  return 0;
+  return 1;
 }
 
 llnode* search(int check, llnode *start) {
@@ -236,16 +233,18 @@ int f5(int *lllen, llnode **start) {
   printf("Enter the position of the node to print (positions begin at 1): ");
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
-    if (uinToInt(uin, &upos) && ((-1 < (upos - 1)) && ((upos - 1) < *lllen)))) {
-      printNode(upos-1, *start);
-    } else {
-      printf("Please enter a valid position.\n");
+    if (uinToInt(uin, &upos)) {
+      if ((-1 < (upos - 1)) && ((upos - 1) < *lllen)) {
+        printNode(upos-1, *start);
+        printf("Running printNode. Type 'back' to return to the previous menu, or enter the position of the next node to print (positions begin at 1): ");
+      } else {
+        printf("Please enter a valid position.\n");
+      }
     }
-    printf("Running printNode. Type 'back' to return to the previous menu, or enter the position of the next node to print (positions begin at 1): ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
-  return 0;
+  return 1;
 }
 
 int printNode(int pos, llnode *start) {
@@ -255,11 +254,8 @@ int printNode(int pos, llnode *start) {
     curr = curr->next;
     i = i + 1;
   }
-  if (i < pos) {
-    return -1;
-  }
   printf("Data: %d\n", curr->data);
-  return 0;
+  return 1;
 }
 
 int f6(int *lllen, llnode **start) {
@@ -270,14 +266,14 @@ int f6(int *lllen, llnode **start) {
   while (strcmp(uin, "back\n") != 0) {
     if (strcmp(uin, "print\n") == 0) {
       printList(*start);
+      printf("Running printList. Type 'back' to return to the previous menu, or enter 'print' to print the list again: ");
     } else {
       printf("Please enter a valid command.\n");
     }
-    printf("Running printList. Type 'back' to return to the previous menu, or enter 'print' to print the list again: ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
-  return 0;
+  return 1;
 }
 
 int printList(llnode *start) {
@@ -287,7 +283,7 @@ int printList(llnode *start) {
     curr = curr->next;
   }
   printf("Data: %d\n", curr->data);
-  return 0;
+  return 1;
 }
 
 int f7(int *lllen, llnode **start) {
@@ -298,14 +294,14 @@ int f7(int *lllen, llnode **start) {
   while (strcmp(uin, "back\n") != 0) {
     if (strcmp(uin, "delete\n") == 0) {
       deleteList(*start);
+      printf("Running deleteList. Type 'back' to return to the previous menu, or enter 'delete' to delete the list again: ");
     } else {
       printf("Please enter a valid command.\n");
     }
-    printf("Running deleteList. Type 'back' to return to the previous menu, or enter 'delete' to delete the list again: ");
     fgets(uin, sizeof(uin), stdin);
   }
   printf("Returning to previous menu.\n");
-  return 0;
+  return 1;
 }
 
 int deleteList(llnode *start) {
@@ -316,5 +312,5 @@ int deleteList(llnode *start) {
     prev = start;
   }
   free(prev);
-  return 0;
+  return 1;
 }
