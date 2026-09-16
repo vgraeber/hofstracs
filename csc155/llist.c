@@ -91,8 +91,8 @@ int f1(int *lllen, llnode **start) {
 int addAtEnd(int newData, llnode **start) {
   if (*start == NULL) {
     *start= malloc(sizeof(llnode));
-    *start->data = newData;
-    *start->next = NULL;
+    (*start)->data = newData;
+    (*start)->next = NULL;
   } else {
     llnode *end = malloc(sizeof(llnode));
     end->next = NULL;
