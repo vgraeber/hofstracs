@@ -16,7 +16,7 @@ int f4(int*, llnode**);
 int f5(int*, llnode**);
 int f6(int*, llnode**);
 int f7(int*, llnode**);
-int addAtEnd(int, llnode*);
+int addAtEnd(int, llnode**);
 int deleteNode(int, llnode**);
 int insertNode(int, int, llnode**);
 llnode* search(int, llnode*);
@@ -78,9 +78,9 @@ int f1(int *lllen, llnode **start) {
   fgets(uin, sizeof(uin), stdin);
   while (strcmp(uin, "back\n") != 0) {
     if (uinToInt(uin, &unum)) {
-      addAtEnd(unum, *start);
+      addAtEnd(unum, start);
       *lllen = *lllen + 1;
-      printf("\nRunning addAtEnd.\nType 'back' to return to the previous menu, or enter the next number to add to the list:\n");
+      printf("Node added.\n\nRunning addAtEnd.\nType 'back' to return to the previous menu, or enter the next number to add to the list:\n");
     }
     fgets(uin, sizeof(uin), stdin);
   }
@@ -88,16 +88,16 @@ int f1(int *lllen, llnode **start) {
   return 1;
 }
 
-int addAtEnd(int newData, llnode *start) {
-  if (start == NULL) {
-    start= malloc(sizeof(llnode));
-    start->data = newData;
-    start->next = NULL;
+int addAtEnd(int newData, llnode **start) {
+  if (*start == NULL) {
+    *start= malloc(sizeof(llnode));
+    *start->data = newData;
+    *start->next = NULL;
   } else {
     llnode *end = malloc(sizeof(llnode));
     end->next = NULL;
     end->data = newData;
-    llnode *curr = start;
+    llnode *curr = *start;
     while(curr->next != NULL) {
       curr = curr->next;
     }
