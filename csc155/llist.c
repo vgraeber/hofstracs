@@ -63,6 +63,7 @@ int main() {
     }
     fgets(uin, sizeof(uin), stdin);
   }
+  deleteList(start);
   return 1;
 }
 
