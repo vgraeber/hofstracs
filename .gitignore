@@ -1,5 +1,6 @@
 *.class
-csc016/*.out
+*.out
+*.o
 __pycache__
 .fake
 *_donotgit*
