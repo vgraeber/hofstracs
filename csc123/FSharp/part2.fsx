@@ -68,17 +68,19 @@ let filter func ll =
   inner func ll Nil;;
 
 let subset ll1 ll2 =
-  let rec inner1 llout llin ss =
+  let rec inner1 llouter llinner subst =
     let rec inner2 check lls inll =
       match lls with
       | Nil -> inll
       | Cons(a,b) ->
-        if (a=check) then inner2 check b true
+        if (a!=check) then inner2 check b false
         else inner2 check b inll
-    match llout with
-    | Nil -> ss
-    | Cons(a,b) -> inner1 b llin (inner2 a ll2 ss)
-  inner1 ll1 ll2 false;;
+    match llouter with
+    | Nil -> subst
+    | Cons(a,b) -> inner1 b llinner (inner2 a ll2 subst)
+  let test1 = inner1 ll1 ll2 true
+  let test2 = inner1 ll2 ll1 true
+  (test1 || test2);;
 
 let tolist ll =
   let rec inner l lcurr =
