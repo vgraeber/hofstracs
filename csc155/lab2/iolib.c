@@ -12,6 +12,24 @@ int print(char *toPrint) {
   return 0;
 }
 
+int printPsswd(char psswdInfo[][7][100], int numUsrs) {
+  /*
+  0 -> username
+  1 -> password
+  2 -> user id (uid)
+  3 -> group id (gid)
+  4 -> user id info (gecos)
+  5 -> home directory
+  6 -> command/shell
+  */
+  for (int i = 0; i < numUsrs; i++) {
+    print(psswdInfo[i][0]);
+    print(":");
+    print(psswdInfo[i][6]);
+    print("\n");
+  }
+}
+
 int parsePsswd(char *fc) {
   int numUsrs = 0;
   int amtInfo = 0;
@@ -30,12 +48,7 @@ int parsePsswd(char *fc) {
       curPos += 1;
     }
   }
-  for (int i = 0; i < numUsrs; i++) {
-    print(psswdInfo[i][0]);
-    print(":");
-    print(psswdInfo[i][6]);
-    print("\n");
-  }
+  printPsswd(psswdInfo, numUsrs);
   return 0;
 }
 
