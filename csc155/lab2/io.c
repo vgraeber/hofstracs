@@ -1,7 +1,6 @@
 #include<fcntl.h>
 #include<unistd.h>
 #include<string.h>
-#include<stdio.h>
 
 int print(char *str);
 int readPwd(int fd);
