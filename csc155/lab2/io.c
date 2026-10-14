@@ -11,28 +11,22 @@ int print(char *toPrint) {
   return 0;
 }
 
-char* test(char *temp) {
-  return temp;
-}
-
 int parsePsswd(char *fc) {
-  int numUsrs = 100;
-  int amtInfo = 7;
-  char *delims = ":\n";
-  char psswdInfo[numUsrs][amtInfo][100];
-  char *rst = strpbrk(fc, delims);
-  int pos = 0;
-  for (int i = 0; i < numUsrs; i++) {
-    for (int j = 0; j < amtInfo; j++) {
-      int infoLen = (int)(rst - fc) - pos;
-      strncpy(psswdInfo[i][j], fc + pos, infoLen);
-      psswdInfo[i][j][infoLen] = '\0';
-      pos += infoLen + 1;
-      rst = strpbrk(rst+1, delims);
-    }
-    if (rst == NULL) {
-      numUsrs = i + 1;
-      break;
+  int numUsrs = 0;
+  int amtInfo = 0;
+  int curPos = 0;
+  char psswdInfo[1000][7][100];
+  for (int i = 0; i < strlen(fc); i++) {
+    if (fc[i] == '\n') {
+      numUsrs += 1;
+      amtInfo = 0;
+      curPos = 0;
+    } else if (fc[i] == ':') {
+      amtInfo += 1;
+      curPos = 0;
+    } else {
+      psswdInfo[numUsrs][amtInfo][curPos] = fc[i];
+      curPos += 1;
     }
   }
   for (int i = 0; i < numUsrs; i++) {
