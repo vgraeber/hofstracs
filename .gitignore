@@ -1,6 +1,7 @@
 *.class
 *.out
 *.o
+*.run
+*.fake
 __pycache__
-.fake
 *_donotgit*
