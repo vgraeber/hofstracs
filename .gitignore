@@ -5,3 +5,9 @@
 *.fake
 __pycache__
 *_donotgit*
+csc123/FSHarp/lambda7b/bin/Debug/net10.0/lambda7b
+csc123/FSHarp/lambda7b/obj/Debug/net10.0/apphost
+csc123/Rust/skeleton
+csc123/Rust/transitionguide
+csc155/lab1/llist
+csc155/lab2/io
