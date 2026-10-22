@@ -48,20 +48,23 @@ def printFfeed(ffeed):
     print(fpost)
 
 def main():
-  dbPassword = open("postgres_password_donotgit.txt", 'r').readline()
-  uinname = sys.argv[1]
-  with psycopg.connect(dbname='lab3', user='postgres', password=dbPassword, host='localhost') as connection:
-    with connection.cursor(row_factory=dict_row) as cursor:
-      uid = getUid(cursor, uinname)
-      if (uid is None):
-        print("User not found.")
-      else:
-        ufollows = getFollows(cursor, uid)
-        feed = getFeed(cursor, ufollows)
-        if (not feed):
-          print("Your feed is empty. Try following some people or making some posts.")
+  if (len(sys.argv) < 1):
+    dbPassword = open("postgres_password_donotgit.txt", 'r').readline()
+    uinname = sys.argv[1]
+    with psycopg.connect(dbname='lab3', user='postgres', password=dbPassword, host='localhost') as connection:
+      with connection.cursor(row_factory=dict_row) as cursor:
+        uid = getUid(cursor, uinname)
+        if (uid is None):
+          print("User not found.")
         else:
-          ffeed = formatFeed(cursor, feed)
-          printFfeed(ffeed)
+          ufollows = getFollows(cursor, uid)
+          feed = getFeed(cursor, ufollows)
+          if (not feed):
+            print("Your feed is empty. Try following some people or making some posts.")
+          else:
+            ffeed = formatFeed(cursor, feed)
+            printFfeed(ffeed)
+  else:
+    print("This file requires an additional argument to run. Please add a username after the file name.")
 
 main()
