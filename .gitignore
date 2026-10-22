@@ -5,6 +5,7 @@
 *.fake
 __pycache__
 *_donotgit*
+csc112/hofbus-tester
 csc123/FSharp/lambda7b/bin/Debug/net10.0/lambda7b
 csc123/FSharp/lambda7b/obj/Debug/net10.0/apphost
 csc123/Rust/skeleton
