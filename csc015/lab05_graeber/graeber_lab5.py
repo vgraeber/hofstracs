@@ -36,7 +36,7 @@ def stockInfo():
     sns.lineplot(data=priceHist, x="Date", y="Close")
     plt.xticks(rotation=35)
     plt.tight_layout()
-    plt.savefig(stockSymb + "_graeber.chart", format="png")
+    plt.savefig(stockSymb + "_graeber.png", format="png")
 
 def main():
   stockInfo()
