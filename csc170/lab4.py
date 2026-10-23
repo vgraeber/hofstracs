@@ -15,40 +15,42 @@ def getFollows(cursor, uid):
     following = following + (row['following_id'],)
   return following
 
-def getFeed(cursor, ufollows):
-  query = sql.SQL("SELECT id, posted_by_id, post, timestamp FROM posts WHERE posted_by_id IN ({}) ORDER BY timestamp DESC").format(sql.SQL(', ').join(sql.Placeholder() * len(ufollows)))
-  cursor.execute(query, ufollows)
+def getFeed(cursor, following):
+  query = sql.SQL("SELECT id, posted_by_id, post, timestamp FROM posts WHERE posted_by_id IN ({}) ORDER BY timestamp DESC").format(sql.SQL(', ').join(sql.Placeholder() * len(following)))
+  cursor.execute(query, following)
   feed = []
   for row in cursor.fetchall():
     cursor.execute("SELECT commented_by_id, comment, timestamp FROM comments WHERE under_post_id = %s ORDER BY timestamp DESC", (row["id"],))
     comments = []
-    for r in cursor.fetchall():
-      comments.append(r)
+    for row2 in cursor.fetchall():
+      comments.append(row2)
     row["comments"] = comments
     feed.append(row)
   return feed
 
-def getUname(cursor, uid):
+def getUsername(cursor, uid):
   return cursor.execute("SELECT username from users WHERE id = %s", (uid,)).fetchone()["username"]
 
 def formatFeed(cursor, feed):
-  ffeed = []
+  formattedFeed = []
   for post in feed:
-    posteruname = getUname(cursor, post["posted_by_id"])
-    fpost = "\n" + posteruname + "\n" + post["timestamp"].strftime("%a %b %d, %Y %I:%M%p") + "\n\n" + post["post"] + "\n-"
+    posterUsername = getUsername(cursor, post["posted_by_id"])
+    formattedPost = "\n" + posterUsername + "\n" + post["timestamp"].strftime("%a %b %d, %Y %I:%M%p") + "\n\n" + post["post"] + "\n-"
     for comment in post["comments"]:
-      commentuname = getUname(cursor, comment["commented_by_id"])
-      fpost += "\n\t" + commentuname + "\n\t" + comment["timestamp"].strftime("%a %b %d, %Y %I:%M%p") + "\n\n\t" + comment["comment"] + "\n"
-    fpost += "-"
-    ffeed.append(fpost)
-  return ffeed
+      commentUsername = getUsername(cursor, comment["commented_by_id"])
+      formattedPost += "\n\t" + commentUsername + "\n\t" + comment["timestamp"].strftime("%a %b %d, %Y %I:%M%p") + "\n\n\t" + comment["comment"] + "\n"
+    formattedPost += "-"
+    formattedFeed.append(formattedPost)
+  return formattedFeed
 
-def printFfeed(ffeed):
-  for fpost in ffeed:
-    print(fpost)
+def printformattedFeed(formattedFeed):
+  for formattedPost in formattedFeed:
+    print(formattedPost)
 
 def main():
-  if (len(sys.argv) < 1):
+  if (len(sys.argv) < 2):
+    print("This file requires an additional argument to run. Please add a username after the file in this format: [file] [username]")
+  else:
     dbPassword = open("postgres_password_donotgit.txt", 'r').readline()
     uinname = sys.argv[1]
     with psycopg.connect(dbname='lab3', user='postgres', password=dbPassword, host='localhost') as connection:
@@ -57,14 +59,12 @@ def main():
         if (uid is None):
           print("User not found.")
         else:
-          ufollows = getFollows(cursor, uid)
-          feed = getFeed(cursor, ufollows)
+          following = getFollows(cursor, uid)
+          feed = getFeed(cursor, following)
           if (not feed):
             print("Your feed is empty. Try following some people or making some posts.")
           else:
-            ffeed = formatFeed(cursor, feed)
-            printFfeed(ffeed)
-  else:
-    print("This file requires an additional argument to run. Please add a username after the file name.")
+            formattedFeed = formatFeed(cursor, feed)
+            printformattedFeed(formattedFeed)
 
 main()
