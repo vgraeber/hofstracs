@@ -18,14 +18,14 @@ extern void PWMInit(unsigned int address) {
   write8(__MODE2, __OUTDRV);
   write8(__MODE1, __ALLCALL);
   sleep(0.005);
-  int mode1 = readU8(__MODE1);
+  char mode1 = readU8(__MODE1);
   mode1 = mode1 & ~__SLEEP;
   write8(__MODE1, mode1);
   sleep(0.005);
 }
 
 extern void setPWMFreq(int freq) {
-  int prescaleval = 25000000.0;
+  float prescaleval = 25000000.0;
   prescaleval /= 4096.0;
   prescaleval /= (float)freq;
   prescaleval -= 1.0;
